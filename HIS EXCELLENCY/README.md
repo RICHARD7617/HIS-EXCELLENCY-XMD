@@ -1,7 +1,7 @@
 # HIS EXCELLENCY-XMD
 <div align="center">
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Black+Ops+One&size=50&pause=1000&color=1BAFBAFF&center=true&width=910&height=100&lines=HOLLA+THIS+IS+RAVEN-BOT;MULTI+DEVICE+WHATSAPP+BOT;MADE+TO+HELP+WHATSAPP+USERS;STAR+AND+FORK+THE+REPO" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Black+Ops+One&size=50&pause=1000&color=1BAFBAFF&center=true&width=910&height=100&lines=HEY+THIS+IS+HIS EXCELLENCY-XMD-BOT;MULTI+DEVICE+WHATSAPP+BOT;MADE+TO+HELP+WHATSAPP+USERS;STAR+AND+FORK+THE+REPO" alt="Typing SVG" />
   </a>
 </p>
   
@@ -10,16 +10,16 @@
 [![HIS EXCELLENCY](https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git.png?lenght=50width=50)](https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git)
 </p>
 <p align="center">
-  <a href="#"><img src="http://readme-typing-svg.herokuapp.com?color=d1fa02&center=true&vCenter=true&multiline=false&lines=RAVEN+WHATSAPP+BOT" alt="">
+  <a href="#"><img src="http://readme-typing-svg.herokuapp.com?color=d1fa02&center=true&vCenter=true&multiline=false&lines=HIS EXCELLENCY+BEST+WHATSAPP+BOT" alt="">
 </p>
 <p align="center">
 <a href="#"><img title="Creator" src="https://img.shields.io/badge/Creator-His_Excellency-red.svg?style=for-the-badge&logo=github"></a>
 </p>
 <p align="center">
-<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git?tab=followers"><img title="Followers" src="https://img.shields.io/github/followers/HunterNick2?label=Followers&style=social"></a>
-<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git/stargazers/"><img title="Stars" src="https://img.shields.io/github/stars/HunterNick2/RAVEN-BOT?&style=social"></a>
-<a href="https://github.com/HunterNick2/RAVEN-BOT/network/members"><img title="Fork" src="https://img.shields.io/github/forks/HunterNick2/RAVEN-BOT?style=social"></a>
-<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git/watchers"><img title="Watching" src="https://img.shields.io/github/watchers/HunterNick2/RAVEN-BOT?label=Watching&style=social"></a>
+<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git?tab=followers"><img title="Followers" src="https://img.shields.io/github/followers/RICHARD7617?label=Followers&style=social"></a>
+<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git/stargazers/"><img title="Stars" src="https://img.shields.io/github/stars/RICHARD7617/HIS-EXCELLENCY-XMD.git?&style=social"></a>
+<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git/network/members"><img title="Fork" src="https://img.shields.io/github/forks/RICHARD7617/HIS-EXCELLENCY-XMD.git?style=social"></a>
+<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git/watchers"><img title="Watching" src="https://img.shields.io/github/watchers/RICHARD7617/HIS-EXCELLENCY-XMD.git?label=Watching&style=social"></a>
 </p>
  
 
@@ -83,5 +83,6 @@ Our AI features use random APIs to run, so sometimes they may be down.
 [MIT License](https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git/blob/main/LICENSE)
 
 Copyright (c) 2025 HIS EXCELLENCY-XMD
+
 
 
