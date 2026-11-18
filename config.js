@@ -55,12 +55,21 @@ const config = {
   // session alive across restarts on hosts with a temporary filesystem.
   DATABASE_URL: env("DATABASE_URL", ""),
   // Port for the tiny health-check page (set automatically by the host)
-  PORT: env("PORT", ""),
+  PORT: env("PORT", env("PAIR_SITE", "false") === "true" ? "3000" : ""),
   // URL to ping so free web hosts don't sleep (Render sets RENDER_EXTERNAL_URL)
   KEEP_ALIVE_URL: env("KEEP_ALIVE_URL", env("RENDER_EXTERNAL_URL", "")),
   KEEP_ALIVE_EVERY: 10 * 60 * 1000, // ping every 10 minutes
   SEND_STARTUP_MSG: env("SEND_STARTUP_MSG", "true") === "true",
 
+  // ---- Pairing site ----
+  PAIR_SITE: env("PAIR_SITE", "false") === "true", // serve the pairing website
+  SITE_ONLY: env("SITE_ONLY", "false") === "true", // run ONLY the site (no bot)
+  SESSION_ID: env("SESSION_ID", ""), // paste the Session ID from the site here
+  SESSION_PREFIX: env("SESSION_PREFIX", "XMD~"),
+  PAIR_MAX_ACTIVE: num("PAIR_MAX_ACTIVE", 3), // pairings running at once (saves RAM)
+  PAIR_PER_IP: num("PAIR_PER_IP", 3), // attempts per IP per 10 minutes
+  PAIR_TTL_MS: num("PAIR_TTL_MS", 120000), // how long a code stays valid
+  
   // ---- Anti-spam / safety limits (protect your number and your host) ----
   COOLDOWN_MS: num("COOLDOWN_MS", 2000), // min gap between commands per user
   MAX_PER_MIN: num("MAX_PER_MIN", 15), // max commands per user per minute
