@@ -22,6 +22,7 @@ const {
 const C = require("./config");
 const createStore = require("./store");
 
+const pair = require("./pair");
 const logger = pino({ level: "silent" });
 const startTime = Date.now();
 const SESSION_PATH = path.resolve(__dirname, C.SESSION_DIR); // works for relative AND absolute paths
@@ -35,7 +36,7 @@ let reconnecting = false; // guards against duplicate reconnect timers
 let startupSent = false; // "connected" message is sent only once
 let attempts = 0; // consecutive failed connections (for backoff)
 let stopping = false; // true while shutting down
-
+let ignoreSessionId = false; // set after a logout so an old SESSION_ID is not reused
 // ------------------------------------------------------------
 //  Never die from errors: log only
 // ------------------------------------------------------------
@@ -64,10 +65,11 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 if (C.PORT) {
   http
     .createServer((req, res) => {
+      if (C.PAIR_SITE && pair.handle(req, res)) return; // pairing site routes
       res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
       res.end(`${C.BOT_NAME} is running\nUptime: ${uptime()}`);
     })
-    .listen(Number(C.PORT), "0.0.0.0", () => log("Health server on port", C.PORT));
+    .listen(Number(C.PORT), "0.0.0.0", () => log("Web server on port", C.PORT));
 }
 
 // Keep free web hosts (e.g. Render) awake by pinging our own URL
@@ -337,6 +339,17 @@ async function start() {
     }
   }
 
+  // Load a Session ID from the pairing site (only when no session exists yet)
+  if (C.SESSION_ID && !ignoreSessionId && !fs.existsSync(path.join(SESSION_PATH, "creds.json"))) {
+    try {
+      fs.mkdirSync(SESSION_PATH, { recursive: true });
+      fs.writeFileSync(path.join(SESSION_PATH, "creds.json"), pair.decodeSession(C.SESSION_ID));
+      log("Session loaded from SESSION_ID");
+    } catch (e) {
+      log("Invalid SESSION_ID:", e.message);
+    }
+  }
+  
   const { state, saveCreds } = await useMultiFileAuthState(SESSION_PATH);
   const needsPairing = !state.creds.registered;
   let pairNumber = "";
