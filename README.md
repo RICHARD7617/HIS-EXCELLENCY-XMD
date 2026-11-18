@@ -21,6 +21,26 @@
   </a>
 </p>
 
+---
+
+## 🔑 Get Your Session
+
+<div align="center">
+
+<a href="https://klaus-md-i86d.onrender.com/">
+  <img src="https://img.shields.io/badge/🔐_Get-Session-2563EB?style=for-the-badge&logoColor=white" alt="Get Session" height="40" />
+</a>
+&nbsp;
+<a href="https://klaus-md-i86d.onrender.com/export">
+  <img src="https://img.shields.io/badge/📤_Export-Session_String-F97316?style=for-the-badge&logoColor=white" alt="Export Session" height="40" />
+</a>
+
+</div>
+
+> 💡 **Heads up:** Generate your session **before** deploying — you'll need the string to connect.
+
+---
+
 **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥** is a free, modular WhatsApp bot developed and powered by **Benfei Tech**. It brings AI chat, AI media generation, social-media downloads, group tools, news, games, anime information and other everyday utilities into WhatsApp. Pair a WhatsApp account through the [official FEI XMD pairing website](https://fei-xmd.benfeilab.com), or explore and run the bot from this public GitHub source repository.
 
 The official product identity is **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 WhatsApp Bot | Official Pairing by Benfei Tech**. This repository contains the main FEI XMD bot source code. The pairing portal is a separate web application.
