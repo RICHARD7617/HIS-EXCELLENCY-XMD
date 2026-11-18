@@ -91,60 +91,6 @@
 | Bot artwork | [Official FEI XMD image](https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg) |
 
 
-## 𝐏𝐔𝐁𝐋𝐈𝐂 𝐌𝐄𝐍𝐔 𝐒𝐄𝐂𝐓𝐈𝐎𝐍𝐒 & 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒😜
-
-| 𝐌𝐞𝐧𝐮 𝐒𝐞𝐜𝐭𝐢𝐨𝐧 | 𝐀𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐂𝐨𝐦𝐦𝐚𝐧𝐝𝐬 |
-| --- | --- |
-| General | menu, help, ping, alive, owner, support, time, date, version, jid, whoami |
-| AI Chat | ai, ask, gpt, chatgpt, mathgpt, deepseek, translate, summarize, fable5, qwen, deepseek2 |
-| AI Media | flux, pollination, tts, tts2, tts3, tts4, tts5 |
-| News Desk | news, aljazeera, cnn, bbc, guardian, npr, nytimes, foxnews, skynews, dw, punchnews |
-| Group Tools | welcome, goodbye, groupinfo, groupjid, getgcpp, groupcount, groupstats, admins, tagall, link, revoke, kick, add, promote, demote, leave, groupname, groupdesc, close, open, antilink, warn, warnlist |
-| Downloads | aio, fb, twitter, instagram, ytmp4, tiktok, play2, ytsearch, video |
-| Fun Games | calc, poll, coinflip, dice, 8ball, choose, trivia, riddle, activity, pokemon |
-| Fun Mix | joke, dadjoke, progjoke, chuck, fact2, catfact, dog, cat, fox, advice, quote2, meme, numfact, history, wiki, nasa |
-| Anime Info | animemenu, anime, manga, character, charpic, staff, studio, recommend, episodes, animechars, trailer, pictures, streaming, review, genres, genre, topanime, topmanga, popular, favorite, airing, upcoming, trending, season, topchars, schedule, nextep |
-| Anime Art | randomanime, randommanga, randomchar, animequote, whatanime, waifu2, husbando, neko, kitsune |
-| Anime GIFs | angry, baka, bleh, blowkiss, blush, bored, carry, clap, confused, cry, cuddle, dance, facepalm, feed, handhold, handshake, happy, highfive |
-| Anime Reactions | hug, kabedon, kiss, lappillow, laugh, lurk, nod, nom, nope, nya, pat, peck, poke, pout, run, salute, shake |
-| Anime Moves | shocked, shrug, sip, sleep, smile, smug, spin, stare, teehee, think, thumbsup, tickle, wag, wave, wink, yawn, yeet |
-| Canvas Tools | wndwqute, canvasquote |
-| Media Tools | lyrics, vv, vv2 |
-| Chat Privacy | privacy, antidelete |
-| Status Tools | statusdraft, statusideas, gcstatus, gcstatusdm, autostatus, autoview, statusreact, statusreactmode, statusreactkeys |
-| Owner Tools | runtime |
-
-
-### 𝐌𝐀𝐈𝐍 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐓𝐈𝐎𝐍 〽️
-
-| 𝐕𝐚𝐫𝐢𝐚𝐛𝐥𝐞 | 𝐏𝐮𝐫𝐩𝐨𝐬𝐞 | Default |
-| --- | --- | --- |
-| BOT_NAME | WhatsApp bot display name | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 |
-| BOT_VERSION | Displayed bot version | 1.0.0 |
-| PREFIX | Any non-empty command prefix; supports symbols, words and multi-character strings | . |
-| OWNER_NAME | Configured owner/developer name | His Excellency |
-| OWNER_NUMBER | The single owner WhatsApp number, digits only | 254738993575 |
-| BOT_URL | Official pairing website shown with the menu artwork | - |
-| BOT_IMAGE_URL | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 menu artwork | Official Cloudinary image |
-| FEI_SESSION_DIR | Local WhatsApp authentication directory | ./auth_info_baileys |
-| FEI_DATA_DIR | Local writable data directory | ./data |
-| DATABASE_URL | Optional PostgreSQL connection for future database-backed features | Empty |
-
-Never commit a real .env file, WhatsApp authentication files, session credentials, database URLs or provider API keys.
-
-## 𝐓𝐄𝐂𝐇𝐍𝐎𝐋𝐎𝐆𝐘👽
-
-🔥𝐇.𝐄.𝐗 𝟎𝟎𝟏🔥 is built with:
-
-- **Node.js** and JavaScript ES modules.
-- **@whiskeysockets/baileys** — the normal WhiskeySockets Baileys npm package, pinned to **7.0.0-rc14**.
-- A recursive command loader that registers command modules and aliases.
-- Modular WhatsApp runtime, message utilities, session management and local state storage.
-- Bounded API clients for external AI, news, download, anime and media services.
-- Node.js built-in test runner for automated regression tests.
-
-This repository does not install the separate KaluLabs Baileys fork used by other 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 project deployments.
-
 ## 𝐅𝐑𝐄𝐐𝐔𝐄𝐍𝐓𝐋𝐘 𝐀𝐒𝐊𝐄𝐃 𝐐𝐒𝐓𝐍𝐒❓
 
 ### 𝐰𝐡𝐚𝐭 𝐢𝐬 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏?
