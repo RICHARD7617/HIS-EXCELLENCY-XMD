@@ -79,37 +79,23 @@
 
 ## 🔥𝐎𝐅𝐅𝐈𝐂𝐈𝐀𝐋 𝐏𝐑𝐎𝐉𝐄𝐂𝐓 𝐈𝐍𝐅𝐎🔥
 
-| Project detail | Official information |
+| 𝐏𝐫𝐨𝐝𝐮𝐜𝐭 𝐃𝐞𝐭𝐚𝐢𝐥 | 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐢𝐧𝐟𝐨 |
 | --- | --- |
 | Product name | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 |
 | Full product description | Free WhatsApp bot developed and powered by HisXcellency |
 | Developer and publisher | His excellency |
 | Official pairing website | - |
 | Main bot source code | https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD |
-| WhatsApp Channel | [𝐁𝐄𝐍𝐅𝐄𝐈 𝐓𝐄𝐂𝐇 ™](https://whatsapp.com/channel/0029VbCwtVY65yDBVR9uhJ02) |
-| YouTube | [@benfeitech](https://www.youtube.com/@benfeitech) |
-| Telegram | [t.me/benfeitech](https://t.me/benfeitech) |
-| Support | [WhatsApp Benfei Tech](https://wa.me/2349060715145) |
-| Bot artwork | [Official FEI XMD image](https://res.cloudinary.com/dqqyvozdw/image/upload/v1792848652/arbeimjfqkkfpn9zvfhf.png) |
+| WhatsApp Channel | [ 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘™](https://whatsapp.com/channel/0029VbBo6eD89inaLb2rjY2A)) |
+| YouTube | - |
+| Telegram | - |
+| Support | [𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘™](https://wa.me/254738993575) |
+| Bot artwork | [Official FEI XMD image](https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg) |
 
-## What can FEI XMD do?
 
-FEI XMD groups its **202 public commands into 18 menu sections**. The command menu is designed for WhatsApp conversations and groups, with feature-specific permission checks where an action affects group settings.
+## 𝐏𝐔𝐁𝐋𝐈𝐂 𝐌𝐄𝐍𝐔 𝐒𝐄𝐂𝐓𝐈𝐎𝐍𝐒 & 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒😜
 
-- **AI Chat:** chat with configured AI providers, ask questions, translate text, summarize content and use supported reasoning or writing tools.
-- **AI Media:** generate images from text prompts and convert text to speech using supported providers.
-- **News Desk:** retrieve current headlines from configured Nigerian and international news feeds.
-- **Group Tools:** view group information, manage group settings, create or reset invite links, tag members, add/remove/promote/demote participants, leave a group, opt into antilink enforcement and manage member warnings.
-- **Downloads:** request supported public media from services such as Facebook, Instagram, TikTok, X/Twitter and YouTube.
-- **Fun Games and Fun Mix:** use a calculator, polls, trivia, riddles, random choices, jokes, facts, animal images and conversation starters.
-- **Anime tools:** search anime, manga, characters, studios, rankings, schedules, recommendations and public anime art or reaction GIFs.
-- **Canvas and Media Tools:** create quote artwork and look up a song's artist with a short lyrics excerpt and a source link.
-- **Status Tools:** draft ordinary WhatsApp statuses, post group statuses in the active group or from a private chat, and explicitly enable status auto-view or emoji reactions with owner-only controls.
-- **Owner Tools:** view a read-only runtime uptime summary.
-
-## Public menu sections and commands
-
-| Menu section | Available commands |
+| 𝐌𝐞𝐧𝐮 𝐒𝐞𝐜𝐭𝐢𝐨𝐧 | 𝐀𝐯𝐚𝐢𝐥𝐚𝐛𝐥𝐞 𝐂𝐨𝐦𝐦𝐚𝐧𝐝𝐬 |
 | --- | --- |
 | General | menu, help, ping, alive, owner, support, time, date, version, jid, whoami |
 | AI Chat | ai, ask, gpt, chatgpt, mathgpt, deepseek, translate, summarize, fable5, qwen, deepseek2 |
@@ -130,105 +116,26 @@ FEI XMD groups its **202 public commands into 18 menu sections**. The command me
 | Status Tools | statusdraft, statusideas, gcstatus, gcstatusdm, autostatus, autoview, statusreact, statusreactmode, statusreactkeys |
 | Owner Tools | runtime |
 
-The Channel menu section is intentionally not included. The bot configuration retains the official Benfei Tech newsletter name and newsletter JID as branding metadata only; this public command set does not add a Channel menu, channel-management commands or automatic channel-following features.
-
-## Official FEI XMD pairing website
-
-Use the official [FEI XMD pairing portal](https://fei-xmd.benfeilab.com) for browser-based pairing, or pair directly from the interactive terminal when running this repository locally. The terminal flow asks for your WhatsApp number and prints a one-time pairing code; you do not need to edit source code or manually create an authentication file.
-
-**Interactive terminal pairing**
-
-1. Install dependencies and start the bot with `npm start` (or `npm run local`).
-2. If no saved session exists, the terminal prompts you to enter your WhatsApp number with country code.
-3. Enter digits only, including the country code (for example, `2348012345678`). The prompt validates the number and lets you retry if it is invalid. Enter `Q` to cancel.
-4. Copy the pairing code printed in the terminal.
-5. On your phone, open **WhatsApp → Settings → Linked devices → Link a device → Link with phone number instead**.
-6. Enter the code shown in the terminal. Keep the terminal process running while FEI XMD connects.
-
-For unattended startup, set `PAIRING_NUMBER` in `.env`; this skips the interactive number prompt and requests a code for that number. Leave it empty to use the interactive terminal prompt. The pairing code is sensitive: do not share it or publish terminal screenshots containing it.
-
-The pairing website and the bot source code are separate project components: this repository contains the main WhatsApp bot, while the official portal provides the web-based pairing experience.
-
-## Installation and local development
-
-### Requirements
-
-- Node.js **20.9 or newer**
-- npm
-- A WhatsApp account to link to FEI XMD
-
-### Install
-
-~~~bash
-git clone https://github.com/Benfeitech/FEI-XMD.git
-cd FEI-XMD
-npm install
-~~~
-
-Copy the example environment file and review the defaults.
-
-**Windows PowerShell:**
-
-~~~powershell
-Copy-Item .env.example .env
-~~~
-
-**macOS / Linux:**
-
-~~~bash
-cp .env.example .env
-~~~
-
-Start the local bot:
-
-~~~bash
-npm start
-~~~
-
-You can also use:
-
-~~~bash
-npm run local
-~~~
-
-The default owner is **Benfei Tech**, with one configured owner number: **2349060715145**. The OWNER_NUMBER environment variable can override this value for a private deployment. Do not add a second owner number to this public configuration.
-
-### Choose any command prefix
-
-Set `PREFIX` in your `.env` file to any non-empty string you want. FEI XMD uses that exact value when detecting commands; it is not restricted to a single punctuation character. Examples:
-
-~~~dotenv
-PREFIX=!
-# or
-PREFIX=!!
-# or
-PREFIX=fei
-# or
-PREFIX=#
-~~~
-
-After changing the prefix, restart FEI XMD. With `PREFIX=fei`, for example, use `feimenu` instead of `.menu`. If your chosen prefix contains spaces or dotenv-special characters, wrap the value in double quotes, for example `PREFIX="my prefix "`.
-
 ### Main configuration
 
-| Variable | Purpose | Default |
+| 𝐕𝐚𝐫𝐢𝐚𝐛𝐥𝐞 | 𝐏𝐮𝐫𝐩𝐨𝐬𝐞 | Default |
 | --- | --- | --- |
 | BOT_NAME | WhatsApp bot display name | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 |
 | BOT_VERSION | Displayed bot version | 1.0.0 |
 | PREFIX | Any non-empty command prefix; supports symbols, words and multi-character strings | . |
-| OWNER_NAME | Configured owner/developer name | Benfei Tech |
-| OWNER_NUMBER | The single owner WhatsApp number, digits only | 2349060715145 |
-| BOT_URL | Official pairing website shown with the menu artwork | https://fei-xmd.benfeilab.com |
-| BOT_IMAGE_URL | FEI XMD menu artwork | Official Cloudinary image |
+| OWNER_NAME | Configured owner/developer name | His Excellency |
+| OWNER_NUMBER | The single owner WhatsApp number, digits only | 254738993575 |
+| BOT_URL | Official pairing website shown with the menu artwork | - |
+| BOT_IMAGE_URL | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 menu artwork | Official Cloudinary image |
 | FEI_SESSION_DIR | Local WhatsApp authentication directory | ./auth_info_baileys |
 | FEI_DATA_DIR | Local writable data directory | ./data |
 | DATABASE_URL | Optional PostgreSQL connection for future database-backed features | Empty |
 
 Never commit a real .env file, WhatsApp authentication files, session credentials, database URLs or provider API keys.
 
-## Technology
+## 𝐓𝐄𝐂𝐇𝐍𝐎𝐋𝐎𝐆𝐘👽
 
-🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 is built with:
+🔥𝐇.𝐄.𝐗 𝟎𝟎𝟏🔥 is built with:
 
 - **Node.js** and JavaScript ES modules.
 - **@whiskeysockets/baileys** — the normal WhiskeySockets Baileys npm package, pinned to **7.0.0-rc14**.
@@ -239,61 +146,24 @@ Never commit a real .env file, WhatsApp authentication files, session credential
 
 This repository does not install the separate KaluLabs Baileys fork used by other FEI XMD project deployments.
 
-## Privacy and public-release boundaries
+## 𝐅𝐑𝐄𝐐𝐔𝐄𝐍𝐓𝐋𝐘 𝐀𝐒𝐊𝐄𝐃 𝐐𝐒𝐓𝐍𝐒❓
 
-The public FEI XMD command set deliberately avoids features that collect or expose more private account or chat information than needed. It excludes group-chat history collection and AI summaries of private conversations, live-presence tracking, anti-edit monitoring, read-receipt controls and contact blocking. Anti-delete is opt-in per chat and uses a short-lived in-memory cache; it does not cache view-once messages. The .vv and .vv2 commands run only when explicitly invoked as a reply to view-once media.
+### 𝐰𝐡𝐚𝐭 𝐢𝐬 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏?
 
-Group-setting commands apply permission checks. Invite-link retrieval and member tagging are restricted to group admins, and member tagging is capped. Welcome and goodbye messages are disabled by default; their settings are stored separately from chat history. Status auto-view and reactions are owner-controlled and disabled by default. Anti-delete is off by default and only stores enabled-chat messages temporarily in memory.
+𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 is a free, modular WhatsApp bot developed and powered by His Excellency. It provides AI chat and media tools, downloads, news, group utilities, games, anime features and other commands inside WhatsApp.
 
-The Chat Privacy command explains these boundaries. Status Tools include owner-controlled automatic status viewing and reactions (both off by default), with a selectable rotating emoji pool and optional keyword filter. Group-status publishing is available only when explicitly invoked by the configured owner. Group link moderation is off by default and must be enabled in each group. Anti-delete can be enabled with .antidelete on in each chat. Owner Tools only shows basic process uptime and connection status.
+### 𝐖𝐡𝐞𝐫𝐞 𝐢𝐬 𝐭𝐡𝐞 𝐨𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 𝐩𝐚𝐢𝐫𝐢𝐧𝐠 𝐰𝐞𝐛𝐬𝐢𝐭𝐞?
 
-## Tests and validation
+The official pairing portal is (-----).
 
-Run the JavaScript syntax checks and test suite before submitting changes:
+### 𝐖𝐡𝐞𝐫𝐞 𝐜𝐚𝐧 𝐈 𝐟𝐢𝐧𝐝 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 𝐬𝐨𝐮𝐫𝐜𝐞 𝐜𝐨𝐝𝐞?
 
-~~~bash
-npm run check
-npm test
-~~~
+The canonical main bot source repository is (https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD).
 
-GitHub Actions runs both checks on pushes and pull requests targeting main. The test suite covers command registration, menu ordering, excluded commands, API URL validation, news parsing, state storage, message utilities and calculator safety.
+### 𝐖𝐡𝐨 𝐝𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐝 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏?
+𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 is developed and powered by (His Excellency).
 
-External providers can change their APIs, apply rate limits or become temporarily unavailable. A provider outage does not mean that the FEI XMD WhatsApp runtime itself is offline.
 
-## Frequently asked questions
+**🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — WhatsApp automation by 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘.**
 
-### What is FEI XMD?
-
-FEI XMD is a free, modular WhatsApp bot developed and powered by Benfei Tech. It provides AI chat and media tools, downloads, news, group utilities, games, anime features and other commands inside WhatsApp.
-
-### Where is the official FEI XMD pairing website?
-
-The official pairing portal is [https://fei-xmd.benfeilab.com](https://fei-xmd.benfeilab.com).
-
-### Where can I find the FEI XMD source code?
-
-The canonical main bot source repository is [https://github.com/Benfeitech/FEI-XMD](https://github.com/Benfeitech/FEI-XMD).
-
-### Who develops FEI XMD?
-
-FEI XMD is developed and powered by [Benfei Tech](https://benfeitech.com).
-
-### Does the public FEI XMD bot include a Channel menu?
-
-No. The Channel menu section and channel-management commands are intentionally excluded from this public command set. The official Benfei Tech newsletter identity remains in the bot configuration as project branding metadata.
-
-## Official links
-
-- **Pair FEI XMD:** https://fei-xmd.benfeilab.com
-- **Main FEI XMD source code:** https://github.com/Benfeitech/FEI-XMD
-- **Benfei Tech:** https://benfeitech.com
-- **WhatsApp newsletter:** https://whatsapp.com/channel/0029VbCwtVY65yDBVR9uhJ02
-- **YouTube:** https://www.youtube.com/@benfeitech
-- **Telegram:** https://t.me/benfeitech
-- **WhatsApp support:** https://wa.me/2349060715145
-
----
-
-**🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — WhatsApp automation by Benfei Tech.**
-
-⚡ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ʙᴇɴꜰᴇɪ ᴛᴇᴄʜ*
+⚡ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Wrexustech*
