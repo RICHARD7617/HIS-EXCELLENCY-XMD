@@ -1,14 +1,5 @@
 # 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — 𝐅𝐑𝐄𝐄 𝐖𝐇𝐀𝐓'𝐒 𝐀𝐏𝐏 𝐁𝐎𝐓 𝐁𝐘 𝐉𝐀𝐍𝐀𝐌
 
-<p align="center">
-  <a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD">
-    <img src="https://img.shields.io/badge/⭐_Star_this_repo-top_right_corner-f1c40f?style=for-the-badge&logo=github&logoColor=white" alt="Star 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 on GitHub">
-  </a>
-  <a href="https://github.com/Benfeitech/FEI-XMD/fork">
-    <img src="https://img.shields.io/badge/Fork-Project-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Fork FEI XMD on GitHub">
-  </a>
-</p>
-
 <p align="center"><i>Like 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥? Tap the ⭐ <b>Star</b> button at the top of this page to support the project.</i></p>
 
 <p align="center">
@@ -52,6 +43,16 @@
 </div>
 
 ---
+## 𝐐𝐔𝐈𝐂𝐊 𝐀𝐂𝐓𝐈𝐎𝐍𝐒 👽
+
+<p align="center">
+  <a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD">
+    <img src="https://img.shields.io/badge/⭐_Star_this_repo-top_right_corner-f1c40f?style=for-the-badge&logo=github&logoColor=white" alt="Star 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 on GitHub">
+  </a>
+  <a href="https://github.com/Benfeitech/FEI-XMD/fork">
+    <img src="https://img.shields.io/badge/Fork-Project-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Fork FEI XMD on GitHub">
+  </a>
+</p>
 
 ## 𝐓𝐇𝐄 𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑👀
 
