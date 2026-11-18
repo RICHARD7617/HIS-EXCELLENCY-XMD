@@ -1,0 +1,25 @@
+{
+  "name": "his-excellency-xmd-001",
+  "description": "Lightweight WhatsApp bot (Baileys)",
+  "repository": "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git",
+  "keywords": ["whatsapp", "bot", "baileys", "nodejs"],
+  "buildpacks": [{ "url": "heroku/nodejs" }],
+  "env": {
+    "PAIR_NUMBER": {
+      "description": "WhatsApp number to link, with country code, digits only (e.g. 254738993575)",
+      "required": true
+    },
+    "OWNER_NUMBER": {
+      "description": "Owner number, with country code, digits only",
+      "required": true
+    },
+    "OWNER_NAME": { "description": "Owner display name", "value": "Owner", "required": false },
+    "PREFIX": { "description": "Command prefix", "value": ".", "required": false },
+    "MODE": { "description": "PUBLIC or PRIVATE (owner only)", "value": "PUBLIC", "required": false },
+    "TIMEZONE": { "description": "Timezone for the .time command", "value": "Africa/Lagos", "required": false }
+  },
+  "addons": [{ "plan": "heroku-postgresql:essential-0" }],
+  "formation": {
+    "worker": { "quantity": 1, "size": "eco" }
+  }
+}
