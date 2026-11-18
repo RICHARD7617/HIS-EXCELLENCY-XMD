@@ -116,7 +116,8 @@
 | Status Tools | statusdraft, statusideas, gcstatus, gcstatusdm, autostatus, autoview, statusreact, statusreactmode, statusreactkeys |
 | Owner Tools | runtime |
 
-### Main configuration
+
+### 𝐌𝐀𝐈𝐍 𝐂𝐎𝐍𝐅𝐈𝐆𝐔𝐑𝐀𝐓𝐈𝐎𝐍 〽️
 
 | 𝐕𝐚𝐫𝐢𝐚𝐛𝐥𝐞 | 𝐏𝐮𝐫𝐩𝐨𝐬𝐞 | Default |
 | --- | --- | --- |
