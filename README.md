@@ -47,7 +47,7 @@
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" height="40" />
 </a>
 &nbsp;
- <a href="https://dashboard.heroku.com/new?template=(https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD)"><img src="https://img.shields.io/badge/HerokuHosting-6762A6?style=for-the-badge&logo=heroku&logoColor=white&logoSize=auto"/></a>
+ <a href="https://dashboard.heroku.com/new?template=https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD"><img src="https://img.shields.io/badge/HerokuHosting-6762A6?style=for-the-badge&logo=heroku&logoColor=white&logoSize=auto"/></a>
 &nbsp;
 <a href="https://railway.app/new/template?template=https://github.com/fellix-234/KLAUS-MD">
   <img src="https://img.shields.io/badge/Deploy%20on-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white" alt="Deploy to Railway" height="40" />
