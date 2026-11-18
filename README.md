@@ -66,6 +66,26 @@
 
 The official product identity is **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 WhatsApp Bot | Official Pairing by Benfei Tech**. This repository contains the main FEI XMD bot source code. The pairing portal is a separate web application.
 
+---
+
+## 👨‍💻 The Developer
+
+<div align="center">
+
+<img src="./lib/alive.jpg" width="110" style="border-radius: 50%;" alt="Warrior Felix" />
+
+### **Warrior Felix**
+
+*Builder of bots. Breaker of limits.*
+
+<a href="https://wa.me/254738993575">
+  <img src="https://img.shields.io/badge/Chat_on-WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
+</a>
+
+</div>
+
+---
+
 ## 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — official project information
 
 | Project detail | Official information |
