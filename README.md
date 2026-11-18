@@ -72,9 +72,9 @@ The official product identity is **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄
 
 <div align="center">
 
-<img src="./lib/alive.jpg" width="110" style="border-radius: 50%;" alt="Warrior Felix" />
+<img src="https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg" width="110" style="border-radius: 50%;" alt="HIS EXCELLENCY" />
 
-### **Warrior Felix**
+### **HIS EXCELLENCY**
 
 *Builder of bots. Breaker of limits.*
 
