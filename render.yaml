@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: his-excellency-xmd-001
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: PAIR_NUMBER
+        sync: false
+      - key: OWNER_NUMBER
+        sync: false
+      - key: OWNER_NAME
+        value: Owner
+      - key: PREFIX
+        value: "."
+      - key: MODE
+        value: PUBLIC
+      - key: TIMEZONE
+        value: Africa/Lagos
+      - key: DATABASE_URL
+        sync: false
