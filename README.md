@@ -1,6 +1,6 @@
 # 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — 𝐅𝐑𝐄𝐄 𝐖𝐇𝐀𝐓'𝐒 𝐀𝐏𝐏 𝐁𝐎𝐓 𝐁𝐘 𝐉𝐀𝐍𝐀𝐌
 
-[![Validate 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥](https://github.com/Benfeitech/FEI-XMD/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/Benfeitech/FEI-XMD/actions/workflows/validate.yml)
+[![Validate🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥](https://github.com/Benfeitech/FEI-XMD/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/Benfeitech/FEI-XMD/actions/workflows/validate.yml)
 [![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Baileys](https://img.shields.io/badge/WhatsApp-Baileys-25D366?logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 
