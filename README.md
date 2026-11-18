@@ -23,7 +23,7 @@
 
 ---
 
-## 🔑 Get Your Session
+## 🔥𝐆𝐄𝐍𝐄𝐑𝐀𝐓𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐈𝐃👇🔥
 
 <div align="center">
 
@@ -37,11 +37,9 @@
 
 </div>
 
-> 💡 **Heads up:** Generate your session **before** deploying — you'll need the string to connect.
-
 ---
 
-## 🚀 Deploy in Seconds
+## 𝐃𝐄𝐏𝐋𝐎𝐘 𝐘𝐎𝐔𝐑 𝐁𝐎𝐓✅
 
 <div align="center">
 
@@ -61,14 +59,7 @@
 
 ---
 
-
-**🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥** is a free, modular WhatsApp bot developed and powered by **Benfei Tech**. It brings AI chat, AI media generation, social-media downloads, group tools, news, games, anime information and other everyday utilities into WhatsApp. Pair a WhatsApp account through the [official FEI XMD pairing website](https://fei-xmd.benfeilab.com), or explore and run the bot from this public GitHub source repository.
-
-The official product identity is **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 WhatsApp Bot | Official Pairing by Benfei Tech**. This repository contains the main FEI XMD bot source code. The pairing portal is a separate web application.
-
----
-
-## 👨‍💻 The Developer
+## 𝐓𝐇𝐄 𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑👀
 
 <div align="center">
 
@@ -86,15 +77,15 @@ The official product identity is **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄
 
 ---
 
-## 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — official project information
+## 🔥𝐎𝐅𝐅𝐈𝐂𝐈𝐀𝐋 𝐏𝐑𝐎𝐉𝐄𝐂𝐓 𝐈𝐍𝐅𝐎🔥
 
 | Project detail | Official information |
 | --- | --- |
 | Product name | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 |
-| Full product description | Free WhatsApp bot developed and powered by Benfei Tech |
-| Developer and publisher | [Benfei Tech](https://benfeitech.com) |
-| Official pairing website | [https://fei-xmd.benfeilab.com](https://fei-xmd.benfeilab.com) |
-| Main bot source code | [github.com/Benfeitech/FEI-XMD](https://github.com/Benfeitech/FEI-XMD) |
+| Full product description | Free WhatsApp bot developed and powered by HisXcellency |
+| Developer and publisher | His excellency |
+| Official pairing website | - |
+| Main bot source code | https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD |
 | WhatsApp Channel | [𝐁𝐄𝐍𝐅𝐄𝐈 𝐓𝐄𝐂𝐇 ™](https://whatsapp.com/channel/0029VbCwtVY65yDBVR9uhJ02) |
 | YouTube | [@benfeitech](https://www.youtube.com/@benfeitech) |
 | Telegram | [t.me/benfeitech](https://t.me/benfeitech) |
