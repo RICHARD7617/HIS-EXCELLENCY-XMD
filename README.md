@@ -145,7 +145,7 @@ Never commit a real .env file, WhatsApp authentication files, session credential
 - Bounded API clients for external AI, news, download, anime and media services.
 - Node.js built-in test runner for automated regression tests.
 
-This repository does not install the separate KaluLabs Baileys fork used by other FEI XMD project deployments.
+This repository does not install the separate KaluLabs Baileys fork used by other 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 project deployments.
 
 ## 𝐅𝐑𝐄𝐐𝐔𝐄𝐍𝐓𝐋𝐘 𝐀𝐒𝐊𝐄𝐃 𝐐𝐒𝐓𝐍𝐒❓
 
