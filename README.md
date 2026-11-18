@@ -13,7 +13,7 @@
   </a>
 </p>
 
-<p align="center"><i>Like FEI XMD? Tap the ⭐ <b>Star</b> button at the top of this page to support the project.</i></p>
+<p align="center"><i>Like 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥? Tap the ⭐ <b>Star</b> button at the top of this page to support the project.</i></p>
 
 <p align="center">
   <a href="https://fei-xmd.benfeilab.com">
