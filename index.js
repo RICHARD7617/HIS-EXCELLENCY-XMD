@@ -85,7 +85,7 @@ function askNumber() {
 
 // Bot info section (used by menu and alive)
 const botInfo = () =>
-  C.section("𝐁𝐎𝐓 𝐈𝐍𝐅𝐎".replace(/./gu, (c) => c) && "BOT INFO", [
+  C.section("BOT INFO", [
     ["owner", C.OWNER_NAME],
     ["prefix", C.PREFIX],
     ["mode", C.MODE],
