@@ -41,6 +41,27 @@
 
 ---
 
+## 🚀 Deploy in Seconds
+
+<div align="center">
+
+<a href="https://render.com/deploy?repo=https://github.com/fellix-234/KLAUS-MD">
+  <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" height="40" />
+</a>
+&nbsp;
+<a href="https://www.heroku.com/deploy?template=https://github.com/fellix-234/KLAUS-MD">
+  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy to Heroku" height="40" />
+</a>
+&nbsp;
+<a href="https://railway.app/new/template?template=https://github.com/fellix-234/KLAUS-MD">
+  <img src="https://img.shields.io/badge/Deploy%20on-Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white" alt="Deploy to Railway" height="40" />
+</a>
+
+</div>
+
+---
+
+
 **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥** is a free, modular WhatsApp bot developed and powered by **Benfei Tech**. It brings AI chat, AI media generation, social-media downloads, group tools, news, games, anime information and other everyday utilities into WhatsApp. Pair a WhatsApp account through the [official FEI XMD pairing website](https://fei-xmd.benfeilab.com), or explore and run the bot from this public GitHub source repository.
 
 The official product identity is **🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 WhatsApp Bot | Official Pairing by Benfei Tech**. This repository contains the main FEI XMD bot source code. The pairing portal is a separate web application.
