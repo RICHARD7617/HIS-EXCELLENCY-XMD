@@ -275,6 +275,10 @@ function handle(req, res) {
     (async () => {
       let number = "";
       try { number = digits(JSON.parse((await readBody(req)) || "{}").number); } catch (_) {}
+            // Auto-fix: remove leading zero if it exists
+      if (number.startsWith("0")) number = number.substring(1); 
+      // Auto-fix: prepend country code if they forgot it (optional, assume 254 Kenya based on your bot)
+      if (number.length === 9) number = "254" + number; 
       if (number.length < 8 || number.length > 15)
         return send(res, 400, { error: "Enter a valid number with country code, digits only." });
       if (ipLimited(clientIp(req)))
