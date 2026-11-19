@@ -4,7 +4,6 @@ const path = require("path");
 const crypto = require("crypto");
 const pino = require("pino");
 const {
-const {
   default: makeWASocket,
   useMultiFileAuthState,
   makeCacheableSignalKeyStore,
@@ -12,13 +11,7 @@ const {
   DisconnectReason,
   Browsers,
 } = require("@whiskeysockets/baileys");
-
 const C = require("./config");
-
-const logger = pino({ level: "silent" });
-const log = (...a) => console.log(`[${new Date().toISOString()}] [pair]`, ...a);
-const digits = (s) => String(s || "").replace(/\D/g, "");
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const jobs = new Map(); // job id -> job
 const ipHits = new Map(); // ip -> { start, count }
