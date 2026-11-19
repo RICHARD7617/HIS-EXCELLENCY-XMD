@@ -12,6 +12,7 @@ const {
   fetchLatestWaWebVersion,
   DisconnectReason,
   Browsers,
+  downloadMediaMessage,
 } = require("@whiskeysockets/baileys");
 
 const C = require("./config");
@@ -31,6 +32,14 @@ let ignoreSessionId = false;
 
 const SESSION_DIR = path.join(__dirname, "session");
 const PORT = process.env.PORT || C.PORT || 3000;
+
+// Database setup for group settings (antilink, antistatus)
+const dbPath = path.join(__dirname, "database.json");
+function getDB() {
+  if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ groups: {} }));
+  return JSON.parse(fs.readFileSync(dbPath, "utf8"));
+}
+function saveDB(db) { fs.writeFileSync(dbPath, JSON.stringify(db, null, 2)); }
 
 if (!fs.existsSync(SESSION_DIR)) {
   fs.mkdirSync(SESSION_DIR, { recursive: true });
@@ -141,12 +150,12 @@ function buildMenuText(userName) {
   const ramBar = "█".repeat(filled) + "░".repeat(barLength - filled);
 
   const header =
-    `┌─「 *🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥* 」\n` +
+    `┌─「 *HIS EXCELLENCY XMD 001* 」\n` +
     `│ User: 👤 ${userName}\n` +
     `│ Mode: 🌍 ${C.MODE}\n` +
     `│ Prefix: [ ${p} ]\n` +
     `│ Version: ${C.VERSION}\n` +
-    `│ Platform: ${os.platform()}\n` +
+    `│ Platform: 🐧 ${os.platform()}\n` +
     `│ Timezone: ${C.TIMEZONE}\n` +
     `│ Uptime: ${runtime()}\n` +
     `│ RAM: ${ramBar} ${ramPercent}%\n` +
@@ -205,21 +214,43 @@ async function sendStartupMessage(socket) {
 }
 
 // ============================================================
-//  MESSAGE HANDLER & OWNER CONTROL
+//  MESSAGE HANDLER (Includes Auto-Read, Anti-Link, etc.)
 // ============================================================
 async function handleMessage(socket, message) {
   try {
     if (!message.message || message.key.fromMe) return;
 
-    const text = getMessageText(message);
-    if (!text) return;
-
     const from = message.key.remoteJid;
     const isGroup = from.endsWith("@g.us");
     const sender = isGroup ? message.key.participant || from : from;
-    
-    // Get the name of the person sending the command (fallback to number)
     const userName = message.pushName || sender.split("@")[0];
+
+    // ---------- AUTO READ ----------
+    try { await socket.readMessages([message.key]); } catch (err) {}
+
+    // ---------- ANTI-LINK & ANTI-STATUS ----------
+    if (isGroup) {
+      const db = getDB();
+      const groupSettings = db.groups[from] || {};
+      const textMsg = (message.message.conversation || message.message.extendedTextMessage?.text || "").toLowerCase();
+      const isLink = /chat.whatsapp.com|wa.me|t.me|http/i.test(textMsg);
+
+      if (groupSettings.antilink && isLink) {
+        try {
+          const meta = await socket.groupMetadata(from);
+          const isAdmin = meta.participants.find(p => p.id === sender)?.admin;
+          if (!isAdmin) {
+            await socket.sendMessage(from, { delete: message.key });
+            await socket.sendMessage(from, { text: `🚫 *Antilink Triggered!*\n@${sender.split("@")[0]} sent a link and it was deleted.`, mentions: [sender] });
+            return;
+          }
+        } catch(e) { log("Antilink error:", e.message); }
+      }
+    }
+
+    // ---------- COMMAND PROCESSING ----------
+    const text = getMessageText(message);
+    if (!text) return;
 
     const prefix = C.PREFIX || ".";
     if (!text.startsWith(prefix)) return;
@@ -228,18 +259,15 @@ async function handleMessage(socket, message) {
     const command = (args.shift() || "").toLowerCase();
 
     // -------- OWNER PERMISSIONS CHECK --------
-    // The bot number (the person who paired it) is the ultimate owner
     const botNumber = socket.user.id.split(":")[0].replace(/[^0-9]/g, "");
     const ownerNumber = (process.env.OWNER_NUMBER || C.OWNER_NUMBER).replace(/[^0-9]/g, "");
-    
-    // Check if the sender is the bot owner OR the configured owner number
     const isOwner = sender.includes(botNumber) || sender.includes(ownerNumber);
 
     if (C.MODE === "PRIVATE" && !isOwner) {
       return socket.sendMessage(from, { text: "❌ Bot is currently in PRIVATE mode. Only the owner can use it." }, { quoted: message });
     }
 
-    // -------- BUILT-IN COMMANDS --------
+    // -------- BUILT-IN FAST COMMANDS --------
     switch (command) {
       case "menu":
       case "help": {
@@ -248,23 +276,20 @@ async function handleMessage(socket, message) {
         }, { quoted: message });
 
         await sleep(1500);
-
         const menuText = buildMenuText(userName);
         
         try {
-          // SENDS THE IMAGE + CAPTION TOGETHER
           await socket.sendMessage(from, {
             edit: loadingMsg.key,
-            image: { url: C.BOT_IMAGE }, // <-- PUT YOUR NEW IMAGE LINK IN config.js
+            image: { url: C.BOT_IMAGE }, 
             caption: menuText,
             footer: "Powered by His Excellency",
             buttons: [
               { buttonId: 'repo', buttonText: { displayText: '📂 Open Repository' }, type: 1, url: 'https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD' }
             ],
-            headerType: 4 // 4 is for image headers in Baileys
+            headerType: 4 
           });
         } catch (err) {
-          log("Menu with image failed, sending text only", err);
           await socket.sendMessage(from, {
             edit: loadingMsg.key,
             text: menuText + `\n\n📂 *Fork Repo:*\nhttps://github.com/RICHARD7617/HIS-EXCELLENCY-XMD`
@@ -283,16 +308,14 @@ async function handleMessage(socket, message) {
         await socket.sendMessage(from, { text: `👑 ${C.BOT_NAME} is alive and running!\n\n⏱ ${runtime()}` }, { quoted: message });
         return;
 
-      case "owner": {
+      case "owner":
         await socket.sendMessage(from, { text: `👑 Owner: ${C.OWNER_NAME}\n📞 ${C.OWNER_NUMBER}` }, { quoted: message });
         return;
-      }
 
       case "runtime":
         await socket.sendMessage(from, { text: `⏱ Bot uptime: ${runtime()}` }, { quoted: message });
         return;
 
-      // -------- MODE SWITCH COMMANDS --------
       case "public":
         if (!isOwner) return socket.sendMessage(from, { text: "❌ Only the owner can change modes." }, { quoted: message });
         C.MODE = "PUBLIC";
@@ -365,9 +388,6 @@ async function connectToWhatsApp() {
       if (connection === "open") {
         attempts = 0; reconnecting = false; startupSent = false;
         log("WhatsApp connected successfully.");
-        
-        // If you want the bot to pair automatically on first run, it should use the default config numbers.
-        // But if you already linked via the website, this will just connect.
         
         await autoFollowChannel(sock);
         await autoJoinGroup(sock);
