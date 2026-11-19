@@ -5,7 +5,7 @@
 
   <a href="https://git.io/typing-svg">
     <img
-      src="https://readme-typing-svg.demolab.com?font=Rockwell&size=35&pause=1000&color=33FF00&center=true&width=800&height=100&lines=His+Excellency+XMD+001;Next+Generation+WhatsApp+Bot;Developed+by+His+Excellency"
+      src="https://readme-typing-svg.demolab.com?font=Rockwell&size=35&pause=1000&color=33FF00&center=true&width=800&height=100&lines=𝐇𝐢𝐬+𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲+𝐱𝐦𝐝+𝟎𝟎𝟏;𝐍𝐞𝐱𝐭+𝐆𝐞𝐧𝐞𝐫𝐚𝐭𝐢𝐨𝐧+𝐖𝐡𝐚𝐭𝐬𝐚𝐩𝐩+𝐁𝐨𝐭;𝐃𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐝+𝐛𝐲+𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲"
       alt="Typing SVG"
     />
   </a>
