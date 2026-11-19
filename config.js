@@ -48,6 +48,23 @@ const config = {
     "BOT_IMAGE",
     "https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg"
   ),
+    // ---- API keys for stubbed commands ----
+  // Fill these in as you get each key. Leave empty to keep the stub message.
+  API_KEYS: {
+    OPENAI: env("OPENAI_API_KEY", ""),
+    GEMINI: env("GEMINI_API_KEY", ""),
+    GROQ: env("GROQ_API_KEY", ""),
+    BING: env("BING_API_KEY", ""),
+    REPLICATE: env("REPLICATE_API_KEY", ""),
+    WEATHER: env("WEATHER_API_KEY", ""),
+    NEWS: env("NEWS_API_KEY", ""),
+    TMDB: env("TMDB_API_KEY", ""),
+    SPOTIFY: env("SPOTIFY_API_KEY", ""),
+    YT: env("YT_API_KEY", ""),
+    MONGODB_URI: env("MONGODB_URI", ""),
+    POSTGRES_URL: env("POSTGRES_URL", ""),
+  },
+  
 
   // ---- Auto-follow channel + auto-join group on startup ----
   // Channel ID is the part after https://whatsapp.com/channel/
