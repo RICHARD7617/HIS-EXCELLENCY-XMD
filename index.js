@@ -9,7 +9,7 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   makeCacheableSignalKeyStore,
-  fetchLatestBaileysVersion,
+  fetchLatestWaWebVersion,
   DisconnectReason,
   Browsers,
 } = require("@whiskeysockets/baileys");
@@ -364,7 +364,7 @@ async function connectToWhatsApp() {
     const { default: makeWASocket, useMultiFileAuthState, fetchLatestWaWebVersion } = require("@whiskeysockets/baileys");
 
       // Inside the function, use the new method
-   const { version } = await fetchLatestWaWebVersion({});
+   const { version } = await fetchLatestWaWebVersion();
 
     sock = makeWASocket({
       version, logger, printQRInTerminal: false, browser: Browsers.ubuntu("Chrome"),
