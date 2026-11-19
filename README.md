@@ -18,6 +18,12 @@
 
 ---
 
+<div align="center">
+  <img src="https://readme-typing-svg.demolab.com/?lines=Smart+Powerful+Reliable;Built+to+redefine+your+whatsapp+experience" alt="Typing SVG" />
+</div>
+
+---
+
 ## 🔥𝐆𝐄𝐍𝐄𝐑𝐀𝐓𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐈𝐃👇🔥
 
 <div align="center">
