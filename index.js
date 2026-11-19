@@ -359,18 +359,17 @@ async function connectToWhatsApp() {
       }
     }
 
+    // ✅ CORRECTED SECTION:
     const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
-       // Import fetchLatestWaWebVersion
-    const { default: makeWASocket, useMultiFileAuthState, fetchLatestWaWebVersion } = require("@whiskeysockets/baileys");
-
-      // Inside the function, use the new method
-   const { version } = await fetchLatestWaWebVersion();
+    const { version } = await fetchLatestWaWebVersion();
 
     sock = makeWASocket({
       version, logger, printQRInTerminal: false, browser: Browsers.ubuntu("Chrome"),
       auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
       generateHighQualityLinkPreview: true, markOnlineOnConnect: false, syncFullHistory: false,
     });
+    
+    // ... the rest of the code ...
 
     sock.ev.on("creds.update", saveCreds);
 
