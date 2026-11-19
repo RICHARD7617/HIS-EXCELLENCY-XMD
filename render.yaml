@@ -20,4 +20,4 @@ services:
       - key: TIMEZONE
         value: Africa/Lagos
       - key: DATABASE_URL
-        sync: false
+        
