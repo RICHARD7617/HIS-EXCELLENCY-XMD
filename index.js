@@ -167,7 +167,9 @@ function buildMenuText() {
 
   const footer =
     `\n\n> 📢 https://whatsapp.com/channel/${C.CHANNEL_JID}\n` +
+    
     `> 👥 https://chat.whatsapp.com/${C.GROUP_INVITE}\n` +
+    
     `> 📂 https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD`;
 
   return header + body + footer;
@@ -358,7 +360,11 @@ async function connectToWhatsApp() {
     }
 
     const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
-    const { version } = await fetchLatestBaileysVersion();
+       // Import fetchLatestWaWebVersion
+    const { default: makeWASocket, useMultiFileAuthState, fetchLatestWaWebVersion } = require("@whiskeysockets/baileys");
+
+      // Inside the function, use the new method
+   const { version } = await fetchLatestWaWebVersion({});
 
     sock = makeWASocket({
       version, logger, printQRInTerminal: false, browser: Browsers.ubuntu("Chrome"),
