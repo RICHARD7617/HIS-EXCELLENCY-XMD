@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://fei-xmd.benfeilab.com">
-    <img src="https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg" alt="🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 WhatsApp bot by Benfei Tech" width="720">
+    <img src="https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg" alt="🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 WhatsApp bot by Benfei Tech" width="720">
   </a>
 </p>
 
@@ -24,7 +24,7 @@
 
 ---
 
-## 🔥𝐆𝐄𝐍𝐄𝐑𝐀𝐓𝐄 𝐒𝐄𝐒𝐒𝐈𝐎𝐍 𝐈𝐃👇🔥
+## 𝐆𝐞𝐧𝐞𝐫𝐚𝐭𝐞 𝐒𝐞𝐬𝐬𝐢𝐨𝐧 𝐈𝐃👇
 
 <div align="center">
 
@@ -40,7 +40,7 @@
 
 ---
 
-## 𝐃𝐄𝐏𝐋𝐎𝐘 𝐘𝐎𝐔𝐑 𝐁𝐎𝐓✅
+## 𝐃𝐞𝐩𝐥𝐨𝐲 𝐮𝐫 𝐛𝐨𝐭✅
 
 <div align="center">
 
@@ -57,24 +57,24 @@
 </div>
 
 ---
-## 𝐐𝐔𝐈𝐂𝐊 𝐀𝐂𝐓𝐈𝐎𝐍𝐒 👽
+## 𝐐𝐮𝐢𝐜𝐤 𝐚𝐜𝐭𝐢𝐨𝐧𝐬👽
 
 <p align="center">
   <a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD">
-    <img src="https://img.shields.io/badge/⭐_Star_this_repo-top_right_corner-f1c40f?style=for-the-badge&logo=github&logoColor=white" alt="Star 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 on GitHub">
+    <img src="https://img.shields.io/badge/⭐_Star_this_repo-top_right_corner-f1c40f?style=for-the-badge&logo=github&logoColor=white" alt="Star 🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 on GitHub">
   </a>
   <a href="https://github.com/Benfeitech/FEI-XMD/fork">
     <img src="https://img.shields.io/badge/Fork-Project-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Fork FEI XMD on GitHub">
   </a>
 </p>
 
-## 𝐓𝐇𝐄 𝐃𝐄𝐕𝐄𝐋𝐎𝐏𝐄𝐑👀
+## 𝐓𝐡𝐞 𝐝𝐞𝐯👀
 
 <div align="center">
 
-<img src="https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg" width="110" style="border-radius: 50%;" alt="HIS EXCELLENCY" />
+<img src="https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg" width="110" style="border-radius: 50%;" alt="His Excellency" />
 
-### **HIS EXCELLENCY**
+### **His Excellency**
 
 *Builder of bots. Breaker of limits.*
 
@@ -86,40 +86,40 @@
 
 ---
 
-## 🔥𝐎𝐅𝐅𝐈𝐂𝐈𝐀𝐋 𝐏𝐑𝐎𝐉𝐄𝐂𝐓 𝐈𝐍𝐅𝐎🔥
+## 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐩𝐫𝐨𝐣𝐞𝐜𝐭 𝐢𝐧𝐟𝐨🔥
 
 | 𝐏𝐫𝐨𝐝𝐮𝐜𝐭 𝐃𝐞𝐭𝐚𝐢𝐥 | 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐢𝐧𝐟𝐨 |
 | --- | --- |
-| Product name | 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 |
+| Product name | 🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 |
 | Full product description | Free WhatsApp bot developed and powered by HisXcellency |
 | Developer and publisher | His excellency |
 | Official pairing website | - |
 | Main bot source code | https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD |
-| WhatsApp Channel | [ 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘™](https://whatsapp.com/channel/0029VbBo6eD89inaLb2rjY2A)) |
+| WhatsApp Channel | [ 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲™](https://whatsapp.com/channel/0029VbBo6eD89inaLb2rjY2A)) |
 | YouTube | - |
 | Telegram | - |
-| Support | [𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘™](https://wa.me/254738993575) |
+| Support | [𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲™](https://wa.me/254738993575) |
 | Bot artwork | [Official FEI XMD image](https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg) |
 
 
-## 𝐅𝐑𝐄𝐐𝐔𝐄𝐍𝐓𝐋𝐘 𝐀𝐒𝐊𝐄𝐃 𝐐𝐒𝐓𝐍𝐒❓
+## 𝐅𝐫𝐞𝐪𝐮𝐞𝐧𝐭𝐥𝐲 𝐚𝐬𝐤𝐞𝐝 𝐪𝐮𝐞𝐬𝐭𝐢𝐨𝐧𝐬❓
 
-### 𝐰𝐡𝐚𝐭 𝐢𝐬 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏?
+### 𝐰𝐡𝐚𝐭 𝐢𝐬 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏?
 
-𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 is a free, modular WhatsApp bot developed and powered by His Excellency. It provides AI chat and media tools, downloads, news, group utilities, games, anime features and other commands inside WhatsApp.
+𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 is a free, modular WhatsApp bot developed and powered by His Excellency. It provides AI chat and media tools, downloads, news, group utilities, games, anime features and other commands inside WhatsApp.
 
-### 𝐖𝐡𝐞𝐫𝐞 𝐢𝐬 𝐭𝐡𝐞 𝐨𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 𝐩𝐚𝐢𝐫𝐢𝐧𝐠 𝐰𝐞𝐛𝐬𝐢𝐭𝐞?
+### 𝐖𝐡𝐞𝐫𝐞 𝐢𝐬 𝐭𝐡𝐞 𝐨𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 𝐩𝐚𝐢𝐫𝐢𝐧𝐠 𝐰𝐞𝐛𝐬𝐢𝐭𝐞?
 
 The official pairing portal is (-----).
 
-### 𝐖𝐡𝐞𝐫𝐞 𝐜𝐚𝐧 𝐈 𝐟𝐢𝐧𝐝 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 𝐬𝐨𝐮𝐫𝐜𝐞 𝐜𝐨𝐝𝐞?
+### 𝐖𝐡𝐞𝐫𝐞 𝐜𝐚𝐧 𝐈 𝐟𝐢𝐧𝐝 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 𝐬𝐨𝐮𝐫𝐜𝐞 𝐜𝐨𝐝𝐞?
 
 The canonical main bot source repository is (https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD).
 
-### 𝐖𝐡𝐨 𝐝𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐝 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏?
-𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏 is developed and powered by (His Excellency).
+### 𝐖𝐡𝐨 𝐝𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐝 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏?
+𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 is developed and powered by (His Excellency).
 
 
-**🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — WhatsApp automation by 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘.**
+**🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 — WhatsApp automation by 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘.**
 
 ⚡ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Wrexustech*
