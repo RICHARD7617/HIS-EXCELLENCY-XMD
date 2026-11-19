@@ -4,10 +4,11 @@ const path = require("path");
 const crypto = require("crypto");
 const pino = require("pino");
 const {
+const {
   default: makeWASocket,
   useMultiFileAuthState,
   makeCacheableSignalKeyStore,
-  fetchLatestBaileysVersion,
+  fetchLatestWaWebVersion, 
   DisconnectReason,
   Browsers,
 } = require("@whiskeysockets/baileys");
@@ -89,10 +90,10 @@ async function onLinked(job, sock) {
 async function connect(job) {
   const { state, saveCreds } = await useMultiFileAuthState(job.dir);
 
-  let version;
+    let version;
 
   try {
-    ({ version } = await fetchLatestBaileysVersion());
+    ({ version } = await fetchLatestWaWebVersion());
   } catch (error) {
     log("Version fetch failed:", error.message);
   }
