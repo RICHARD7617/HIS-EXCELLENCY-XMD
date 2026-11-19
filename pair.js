@@ -7,31 +7,31 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   makeCacheableSignalKeyStore,
-  fetchLatestWaWebVersion, 
+  fetchLatestWaWebVersion,
   DisconnectReason,
   Browsers,
 } = require("@whiskeysockets/baileys");
+
 const C = require("./config");
 
-const jobs = new Map(); // job id -> job
-const ipHits = new Map(); // ip -> { start, count }
+const logger = pino({ level: "silent" });
+const log = (...a) => console.log(`[${new Date().toISOString()}] [pair]`, ...a);
+const digits = (s) => String(s || "").replace(/\D/g, "");
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// ------------------------------------------------------------
-//  Session ID helpers (also used by index.js to restore a session)
-// ------------------------------------------------------------
+const jobs = new Map();
+const ipHits = new Map();
+
 const encodeSession = (json) => C.SESSION_PREFIX + Buffer.from(json).toString("base64");
 
 function decodeSession(id) {
   let raw = String(id || "").trim();
   if (raw.startsWith(C.SESSION_PREFIX)) raw = raw.slice(C.SESSION_PREFIX.length);
   const json = Buffer.from(raw, "base64").toString("utf8");
-  JSON.parse(json); // throws if the Session ID is damaged
+  JSON.parse(json);
   return json;
 }
 
-// ------------------------------------------------------------
-//  Job lifecycle
-// ------------------------------------------------------------
 function finish(job, state, message) {
   if (job.done) return;
   job.done = true;
@@ -39,35 +39,26 @@ function finish(job, state, message) {
   job.message = message || "";
   clearTimeout(job.timer);
   try { job.sock && job.sock.end(new Error("pairing finished")); } catch (_) {}
-  // Remove the temp session files shortly after
-  setTimeout(() => {
-    try { fs.rmSync(job.dir, { recursive: true, force: true }); } catch (_) {}
-  }, 1500);
-  // Forget the job after 10 minutes
+  setTimeout(() => { try { fs.rmSync(job.dir, { recursive: true, force: true }); } catch (_) {} }, 1500);
   setTimeout(() => jobs.delete(job.id), 10 * 60 * 1000).unref();
 }
 
-// Called once the visitor has linked the device
 async function onLinked(job, sock) {
   if (job.done || job.linking) return;
   job.linking = true;
   try {
-    await sleep(3000); // give Baileys time to flush creds.json to disk
+    await sleep(3000);
     const json = fs.readFileSync(path.join(job.dir, "creds.json"), "utf8");
     const session = encodeSession(json);
     const jid = `${job.number}@s.whatsapp.net`;
     try {
       await sock.sendMessage(jid, {
-        text:
-          `✅ *${C.BOT_NAME}* linked!\n\n` +
-          "Copy the next message and set it as your *SESSION_ID* when you deploy.\n" +
-          "⚠️ Never share it: whoever has it controls your WhatsApp.",
+        text: `✅ *${C.BOT_NAME}* linked!\n\nCopy the next message and set it as your *SESSION_ID* when you deploy.\n⚠️ Never share it: whoever has it controls your WhatsApp.`,
       });
       await sock.sendMessage(jid, { text: session });
       await sleep(2000);
       finish(job, "linked", "Session ID sent to your WhatsApp.");
     } catch (e) {
-      // Could not message the user: show the ID on the page instead
       log("send failed:", e.message);
       job.session = session;
       finish(job, "linked", "Linked, but the message could not be sent. Copy the Session ID below.");
@@ -78,13 +69,10 @@ async function onLinked(job, sock) {
   }
 }
 
-// Open a socket for a job (called again after code 515 "restart required")
-
 async function connect(job) {
   const { state, saveCreds } = await useMultiFileAuthState(job.dir);
 
-    let version;
-
+  let version;
   try {
     ({ version } = await fetchLatestWaWebVersion());
   } catch (error) {
@@ -109,60 +97,36 @@ async function connect(job) {
 
   job.sock = sock;
 
-  // Process events sequentially so credentials are saved
-  // before handling WhatsApp's 515 restart event.
   sock.ev.process(async (events) => {
     if (job.sock !== sock || job.done) return;
 
     if (events["creds.update"]) {
       try {
         await saveCreds();
-        log("Pairing credentials saved.");
       } catch (error) {
-        log("Credential save failed:", error.message);
         finish(job, "failed", "Could not save pairing credentials. Please try again.");
         return;
       }
     }
 
     if (events["connection.update"]) {
-      const {
-        connection,
-        lastDisconnect,
-        isNewLogin,
-      } = events["connection.update"];
+      const { connection, lastDisconnect, isNewLogin } = events["connection.update"];
+      if (isNewLogin) log("WhatsApp accepted pairing. Preparing reconnection...");
 
-      if (isNewLogin) {
-        log("WhatsApp accepted pairing. Preparing reconnection...");
-      }
-
-      if (
-        connection === "open" &&
-        sock.authState.creds.registered
-      ) {
+      if (connection === "open" && sock.authState.creds.registered) {
         log("Pairing completed successfully.");
         onLinked(job, sock);
       }
 
       if (connection === "close") {
         const code = lastDisconnect?.error?.output?.statusCode;
-
         if (code === DisconnectReason.restartRequired) {
           log("Restart required (515). Reconnecting immediately...");
-
           connect(job).catch((error) => {
-            log("Pairing reconnect failed:", error.message);
             finish(job, "failed", "Reconnect failed. Please request a new code.");
           });
-
         } else {
-          log("Pairing connection closed:", code || "unknown");
-
-          finish(
-            job,
-            "failed",
-            `Connection closed (code ${code || "unknown"}). Please try again.`
-          );
+          finish(job, "failed", `Connection closed (code ${code || "unknown"}). Please try again.`);
         }
       }
     }
@@ -171,8 +135,6 @@ async function connect(job) {
   return sock;
 }
 
-
-// Ask WhatsApp for the pairing code ~3 seconds after the socket exists
 function requestCode(job, sock) {
   return new Promise((resolve, reject) => {
     setTimeout(async () => {
@@ -188,15 +150,7 @@ function requestCode(job, sock) {
 
 async function createJob(number) {
   const id = crypto.randomBytes(12).toString("hex");
-  const job = {
-    id,
-    number,
-    dir: path.join(os.tmpdir(), "pair-" + id),
-    state: "waiting",
-    done: false,
-    sock: null,
-    timer: null,
-  };
+  const job = { id, number, dir: path.join(os.tmpdir(), "pair-" + id), state: "waiting", done: false, sock: null, timer: null };
   jobs.set(id, job);
   job.timer = setTimeout(() => finish(job, "failed", "Code expired. Please request a new one."), C.PAIR_TTL_MS);
   try {
@@ -209,9 +163,6 @@ async function createJob(number) {
   }
 }
 
-// ------------------------------------------------------------
-//  Small HTTP helpers
-// ------------------------------------------------------------
 function send(res, status, body, type) {
   res.writeHead(status, {
     "Content-Type": type || "application/json; charset=utf-8",
@@ -228,7 +179,7 @@ function readBody(req) {
     let data = "";
     req.on("data", (c) => {
       data += c;
-      if (data.length > 2048) req.destroy(); // tiny bodies only
+      if (data.length > 2048) req.destroy();
     });
     req.on("end", () => resolve(data));
     req.on("error", () => resolve(""));
@@ -255,34 +206,36 @@ setInterval(() => {
   for (const [k, v] of ipHits) if (now - v.start > 10 * 60 * 1000) ipHits.delete(k);
 }, 60000).unref();
 
-const esc = (s) =>
-  String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-// ------------------------------------------------------------
-//  Request handler: returns true when the request was handled
-// ------------------------------------------------------------
 function handle(req, res) {
   const url = (req.url || "").split("?")[0];
 
-  // The page
   if (req.method === "GET" && (url === "/" || url === "/pair")) {
     send(res, 200, page(), "text/html; charset=utf-8");
     return true;
   }
 
-  // Start pairing: POST /api/pair { number }
   if (req.method === "POST" && url === "/api/pair") {
     (async () => {
       let number = "";
       try { number = digits(JSON.parse((await readBody(req)) || "{}").number); } catch (_) {}
       
-      // Remove leading zero if they paste it with one (e.g., 0738...)
+      // --- AUTO-FIX START ---
+      // Remove leading zero if they typed 07... instead of 2547...
       if (number.startsWith("0")) number = number.substring(1);
       
-      // Just a basic check to make sure it's not empty
-      if (number.length < 7)
-        return send(res, 400, { error: "Please enter a valid phone number." });
+      // If they typed 9 digits (missing country code), prepend Kenya 254
+      if (number.length === 9) number = "254" + number;
+
+      // --- AUTO-FIX END ---
+
+      if (number.length < 8 || number.length > 15)
+        return send(res, 400, { error: "Enter a valid number with country code, digits only." });
       
+      if (ipLimited(clientIp(req)))
+        return send(res, 429, { error: "Too many attempts. Please wait a few minutes." });
+
       const active = [...jobs.values()].filter((j) => !j.done);
       if (active.some((j) => j.number === number))
         return send(res, 409, { error: "A code was already requested for this number. Wait for it to expire." });
@@ -300,7 +253,6 @@ function handle(req, res) {
     return true;
   }
 
-  // Poll status: GET /api/status?id=...
   if (req.method === "GET" && url === "/api/status") {
     const id = new URL(req.url, "http://x").searchParams.get("id") || "";
     const job = jobs.get(id);
@@ -312,9 +264,6 @@ function handle(req, res) {
   return false;
 }
 
-// ------------------------------------------------------------
-//  The page (dark, mobile friendly, no external files)
-// ------------------------------------------------------------
 function page() {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -377,7 +326,8 @@ function setMsg(t, bad){ var m = $('msg'); m.textContent = t || ''; m.className 
 
 $('go').onclick = function(){
   var n = $('num').value.replace(/\\D/g, '');
-  if (n.length < 8 || n.length > 15) { setMsg('Enter a valid number with country code, digits only.', true); return; }
+  // Allow lenient input. Only check that it's not completely empty.
+  if (n.length < 7) { setMsg('Please enter a valid phone number.', true); return; }
   $('go').disabled = true;
   $('box').style.display = 'none';
   $('sess').style.display = 'none';
