@@ -1,6 +1,9 @@
-# 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 — 𝐅𝐑𝐄𝐄 𝐖𝐇𝐀𝐓'𝐒 𝐀𝐏𝐏 𝐁𝐎𝐓 𝐁𝐘 𝐉𝐀𝐍𝐀𝐌
-
-<p align="center"><i>Like 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥? Tap the ⭐ <b>Star</b> button at the top of this page to support the project.</i></p>
+<div align="center">
+  <h1>🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥A</h1>
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.demolab.com?font=Rockwell&size=45&pause=1000&color=33ff00&center=true&width=800&height=80&lines=June-Official;Multi+Device+Whatsapp+Bot;Made+by+Supreme" alt="Typing SVG" />
+  </a>
+</div>
 
 <p align="center">
   <a href="https://fei-xmd.benfeilab.com">
