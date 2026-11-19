@@ -85,41 +85,98 @@ async function onLinked(job, sock) {
 }
 
 // Open a socket for a job (called again after code 515 "restart required")
+
 async function connect(job) {
   const { state, saveCreds } = await useMultiFileAuthState(job.dir);
+
   let version;
-  try { ({ version } = await fetchLatestBaileysVersion()); } catch (_) {}
+
+  try {
+    ({ version } = await fetchLatestBaileysVersion());
+  } catch (error) {
+    log("Version fetch failed:", error.message);
+  }
 
   const sock = makeWASocket({
     version,
     logger,
-    auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
+    auth: {
+      creds: state.creds,
+      keys: makeCacheableSignalKeyStore(state.keys, logger),
+    },
     browser: Browsers.ubuntu("Chrome"),
     printQRInTerminal: false,
     syncFullHistory: false,
-    markOnlineOnConnect: false,
+    markOnlineOnConnect: true,
+    connectTimeoutMs: 60000,
+    defaultQueryTimeoutMs: 60000,
     getMessage: async () => undefined,
   });
-  job.sock = sock;
-  sock.ev.on("creds.update", saveCreds);
 
-  sock.ev.on("connection.update", ({ connection, lastDisconnect }) => {
+  job.sock = sock;
+
+  // Process events sequentially so credentials are saved
+  // before handling WhatsApp's 515 restart event.
+  sock.ev.process(async (events) => {
     if (job.sock !== sock || job.done) return;
-    if (connection === "open" && sock.authState.creds.registered) {
-      onLinked(job, sock);
+
+    if (events["creds.update"]) {
+      try {
+        await saveCreds();
+        log("Pairing credentials saved.");
+      } catch (error) {
+        log("Credential save failed:", error.message);
+        finish(job, "failed", "Could not save pairing credentials. Please try again.");
+        return;
+      }
     }
-    if (connection === "close") {
-      const code = lastDisconnect?.error?.output?.statusCode;
-      if (code === DisconnectReason.restartRequired) {
-        // Normal right after linking: reopen with the saved credentials
-        connect(job).catch(() => finish(job, "failed", "Reconnect failed. Please try again."));
-      } else {
-        finish(job, "failed", `Connection closed (code ${code || "unknown"}). Please try again.`);
+
+    if (events["connection.update"]) {
+      const {
+        connection,
+        lastDisconnect,
+        isNewLogin,
+      } = events["connection.update"];
+
+      if (isNewLogin) {
+        log("WhatsApp accepted pairing. Preparing reconnection...");
+      }
+
+      if (
+        connection === "open" &&
+        sock.authState.creds.registered
+      ) {
+        log("Pairing completed successfully.");
+        onLinked(job, sock);
+      }
+
+      if (connection === "close") {
+        const code = lastDisconnect?.error?.output?.statusCode;
+
+        if (code === DisconnectReason.restartRequired) {
+          log("Restart required (515). Reconnecting immediately...");
+
+          connect(job).catch((error) => {
+            log("Pairing reconnect failed:", error.message);
+            finish(job, "failed", "Reconnect failed. Please request a new code.");
+          });
+
+        } else {
+          log("Pairing connection closed:", code || "unknown");
+
+          finish(
+            job,
+            "failed",
+            `Connection closed (code ${code || "unknown"}). Please try again.`
+          );
+        }
       }
     }
   });
+
   return sock;
 }
+
 
 // Ask WhatsApp for the pairing code ~3 seconds after the socket exists
 function requestCode(job, sock) {
