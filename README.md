@@ -1,7 +1,7 @@
 
 <div align="center">
 
-  <h1>🔥HIS EXCELLENCY-XMD 01🔥</h1>
+  <h1>🔥H-EXCELLENCY-XMD 01🔥</h1>
 
   <a href="https://git.io/typing-svg">
     <img src="https://readme-typing-svg.demolab.com?font=Rockwell&size=35&pause=1000&color=FFB000&center=true&width=800&height=100&lines=His+Excellency+XMD+01;Next+Generation+WhatsApp+Bot;Developed+by+His+Excellency" alt="Typing SVG"/>
