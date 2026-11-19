@@ -229,11 +229,11 @@ async function connectToWhatsApp() {
       try {
         const decoded = await pair.decodeSession(C.SESSION_ID);
 
-        if (decoded) {
-          fs.writeFileSync(
-            path.join(SESSION_DIR, "creds.json"),
-            JSON.stringify(decoded, null, 2)
-          );
+       fs.writeFileSync(
+              path.join(SESSION_DIR, "creds.json"),
+               decoded,
+              "utf8"
+    );
           log("Session restored from SESSION_ID.");
         }
       } catch (error) {
