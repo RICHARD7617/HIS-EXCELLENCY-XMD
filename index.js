@@ -64,19 +64,29 @@ function askNumber(question) {
   });
 }
 
+
 function startServer() {
   const server = http.createServer((req, res) => {
-    if (req.url === "/health" || req.url === "/") {
-      res.writeHead(200, { "Content-Type": "text/plain" });
+
+    // Render health check
+    if (req.url === "/health") {
+      res.writeHead(200, {
+        "Content-Type": "text/plain"
+      });
       return res.end("HIS EXCELLENCY XMD is running.");
     }
 
+    // Serve the pairing website and its API
     if (pair && typeof pair.handle === "function") {
-      return pair.handle(req, res);
+      const handled = pair.handle(req, res);
+      if (handled) return;
     }
 
-    res.writeHead(404);
-    res.end("Not found");
+    // Unknown routes
+    res.writeHead(404, {
+      "Content-Type": "text/plain"
+    });
+    res.end("Page not found");
   });
 
   server.listen(PORT, "0.0.0.0", () => {
@@ -85,6 +95,7 @@ function startServer() {
 
   return server;
 }
+
 
 const server = startServer();
 
