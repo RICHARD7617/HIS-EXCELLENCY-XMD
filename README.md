@@ -63,10 +63,11 @@
   <a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD">
     <img src="https://img.shields.io/badge/⭐_Star_this_repo-top_right_corner-f1c40f?style=for-the-badge&logo=github&logoColor=white" alt="Star 🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 on GitHub">
   </a>
- 
-<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD">
-  <img src="https://img.shields.io/badge/⭐_STAR-REPOSITORY-FFB000?style=for-the-badge&logo=github&logoColor=white" alt="Star Repository">
+
+<a href="https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD/fork">
+  <img src="https://img.shields.io/badge/Fork%20Repo-FFB000?style=for-the-badge&logo=github&logoColor=white&logoSize=auto"/>
 </a>
+
 
 </p>
 
