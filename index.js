@@ -210,6 +210,7 @@ async function handleMessage(socket, message) {
   }
 }
 
+
 async function connectToWhatsApp() {
   if (stopping || reconnecting) return;
 
@@ -220,6 +221,7 @@ async function connectToWhatsApp() {
       fs.mkdirSync(SESSION_DIR, { recursive: true });
     }
 
+    // Restore session from SESSION_ID
     if (
       C.SESSION_ID &&
       !ignoreSessionId &&
@@ -229,13 +231,13 @@ async function connectToWhatsApp() {
       try {
         const decoded = await pair.decodeSession(C.SESSION_ID);
 
-       fs.writeFileSync(
-              path.join(SESSION_DIR, "creds.json"),
-               decoded,
-              "utf8"
-    );
-          log("Session restored from SESSION_ID.");
-        }
+        fs.writeFileSync(
+          path.join(SESSION_DIR, "creds.json"),
+          decoded,
+          "utf8"
+        );
+
+        log("Session restored from SESSION_ID.");
       } catch (error) {
         log("Session restore failed:", error.message);
       }
@@ -260,33 +262,11 @@ async function connectToWhatsApp() {
       syncFullHistory: false,
     });
 
+    // 1. Credentials listener
     sock.ev.on("creds.update", saveCreds);
 
-    if (!state.creds.registered) {
-      let number =
-        process.env.PAIR_NUMBER ||
-        C.PAIR_NUMBER ||
-        "";
-
-      if (!number && process.stdin.isTTY) {
-        number = await askNumber(
-          "Enter WhatsApp number with country code: "
-        );
-      }
-
-      number = number.replace(/[^0-9]/g, "");
-
-      if (!number) {
-        throw new Error("PAIR_NUMBER is missing. Set it in Render environment variables.");
-      }
-
-      await sleep(2000);
-
-      const code = await sock.requestPairingCode(number);
-      log(`Your WhatsApp pairing code: ${code}`);
-    }
-
-    sock.ev.on("connection.update", async update => {
+    // 2. Connection listener
+    sock.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect } = update;
 
       if (connection === "open") {
@@ -329,7 +309,9 @@ async function connectToWhatsApp() {
             60000
           );
 
-          log(`Connection closed. Reconnecting in ${delay / 1000}s...`);
+          log(
+            `Connection closed. Reconnecting in ${delay / 1000}s...`
+          );
 
           setTimeout(() => {
             connectToWhatsApp().catch(error => {
@@ -340,6 +322,7 @@ async function connectToWhatsApp() {
       }
     });
 
+    // 3. Message listener
     sock.ev.on("messages.upsert", async ({ messages, type }) => {
       if (type !== "notify") return;
 
@@ -347,6 +330,34 @@ async function connectToWhatsApp() {
         await handleMessage(sock, message);
       }
     });
+
+    // 4. Generate pairing code AFTER registering listeners
+    if (!state.creds.registered) {
+      let number =
+        process.env.PAIR_NUMBER ||
+        C.PAIR_NUMBER ||
+        "";
+
+      if (!number && process.stdin.isTTY) {
+        number = await askNumber(
+          "Enter WhatsApp number with country code: "
+        );
+      }
+
+      number = number.replace(/[^0-9]/g, "");
+
+      if (!number) {
+        throw new Error(
+          "PAIR_NUMBER is missing. Set it in Render environment variables."
+        );
+      }
+
+      await sleep(2000);
+
+      const code = await sock.requestPairingCode(number);
+
+      log(`Your WhatsApp pairing code: ${code}`);
+    }
 
   } catch (error) {
     reconnecting = false;
