@@ -40,69 +40,73 @@ const config = {
   PAIR_NUMBER: env("PAIR_NUMBER", "254738993575"), // number to link the bot to
   PREFIX: env("PREFIX", "."),
   MODE: env("MODE", "PUBLIC"), // PUBLIC or PRIVATE (owner only)
-  VERSION: "2.0.0",
-  TIMEZONE: env("TIMEZONE", "Africa/Lagos"),
+  VERSION: "6.2.3",
+  TIMEZONE: env("TIMEZONE", "Africa/Nairobi"),
+
+  // ---- Menu image ----
   BOT_IMAGE: env(
     "BOT_IMAGE",
     "https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg"
   ),
 
+  // ---- Auto-follow channel + auto-join group on startup ----
+  // Channel ID is the part after https://whatsapp.com/channel/
+  CHANNEL_JID: env("CHANNEL_JID", "0029VbBo6eD89inaLb2rjY2A"),
+  // Group invite code is the part after https://chat.whatsapp.com/
+  GROUP_INVITE: env("GROUP_INVITE", "E4mMwAURevxGDkwwyCtOHc"),
+  AUTO_FOLLOW_CHANNEL: env("AUTO_FOLLOW_CHANNEL", "true") === "true",
+  AUTO_JOIN_GROUP: env("AUTO_JOIN_GROUP", "true") === "true",
+
   // ---- Hosting settings ----
-  // Folder for the login session. On Railway/Render with a volume/disk,
-  // set SESSION_DIR to the mounted path, e.g. /data/session
   SESSION_DIR: env("SESSION_DIR", "session"),
-  // Postgres URL (Heroku sets DATABASE_URL automatically). Used to keep the
-  // session alive across restarts on hosts with a temporary filesystem.
   DATABASE_URL: env("DATABASE_URL", ""),
-  // Port for the tiny health-check page (set automatically by the host)
   PORT: env("PORT", env("PAIR_SITE", "false") === "true" ? "3000" : ""),
-  // URL to ping so free web hosts don't sleep (Render sets RENDER_EXTERNAL_URL)
   KEEP_ALIVE_URL: env("KEEP_ALIVE_URL", env("RENDER_EXTERNAL_URL", "")),
-  KEEP_ALIVE_EVERY: 10 * 60 * 1000, // ping every 10 minutes
+  KEEP_ALIVE_EVERY: 10 * 60 * 1000,
   SEND_STARTUP_MSG: env("SEND_STARTUP_MSG", "true") === "true",
 
   // ---- Pairing site ----
-  PAIR_SITE: env("PAIR_SITE", "false") === "true", // serve the pairing website
-  SITE_ONLY: env("SITE_ONLY", "false") === "true", // run ONLY the site (no bot)
-  SESSION_ID: env("SESSION_ID", ""), // paste the Session ID from the site here
+  PAIR_SITE: env("PAIR_SITE", "false") === "true",
+  SITE_ONLY: env("SITE_ONLY", "false") === "true",
+  SESSION_ID: env("SESSION_ID", ""),
   SESSION_PREFIX: env("SESSION_PREFIX", "XMD~"),
-  PAIR_MAX_ACTIVE: num("PAIR_MAX_ACTIVE", 3), // pairings running at once (saves RAM)
-  PAIR_PER_IP: num("PAIR_PER_IP", 3), // attempts per IP per 10 minutes
-  PAIR_TTL_MS: num("PAIR_TTL_MS", 120000), // how long a code stays valid
-  
-  // ---- Anti-spam / safety limits (protect your number and your host) ----
-  COOLDOWN_MS: num("COOLDOWN_MS", 2000), // min gap between commands per user
-  MAX_PER_MIN: num("MAX_PER_MIN", 15), // max commands per user per minute
+  PAIR_MAX_ACTIVE: num("PAIR_MAX_ACTIVE", 3),
+  PAIR_PER_IP: num("PAIR_PER_IP", 3),
+  PAIR_TTL_MS: num("PAIR_TTL_MS", 120000),
 
-  // ---- Technical settings ----
-  RECONNECT_DELAY: 3000, // base delay before reconnecting (grows on repeats)
-  MAX_BACKOFF: 60000, // reconnect delay never exceeds this
-  RESTART_DELAY: 500, // ms for code 515 (restart required)
-  PAIR_DELAY: 3000, // ms after socket creation before requesting the code
-  PROMPT_TIMEOUT: 20000, // ms to wait for typed input
-  PROMPT_RETRY: 15000, // ms before retrying when no number is available
-  KEEPALIVE_MS: 30000, // keep-alive interval
-  DB_SYNC_MS: 60000, // session backup interval (Postgres)
+  // ---- Anti-spam ----
+  COOLDOWN_MS: num("COOLDOWN_MS", 2000),
+  MAX_PER_MIN: num("MAX_PER_MIN", 15),
 
-  // ---- Style: header (top of menu) ----
-  header() {
+  // ---- Technical ----
+  RECONNECT_DELAY: 3000,
+  MAX_BACKOFF: 60000,
+  RESTART_DELAY: 500,
+  PAIR_DELAY: 3000,
+  PROMPT_TIMEOUT: 20000,
+  PROMPT_RETRY: 15000,
+  KEEPALIVE_MS: 30000,
+  DB_SYNC_MS: 60000,
+
+  // ============================================================
+  //  NEW MENU DESIGN — distinct from Levanter's ╭═══ style
+  // ============================================================
+  menuHeader() {
     return (
-      "╭─━─━─━─━─━─━─━─━─━─━╮\n" +
-      `│    ${this.BOT_NAME}\n` +
-      "╰─━─━─━─━─━─━─━─━─━─━╯"
+      "▛▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞\n" +
+      `▌  ${this.BOT_NAME}\n` +
+      `▌  ᴠ${this.VERSION}  •  ᴘʀᴇғɪx ${this.PREFIX}\n` +
+      "▙▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚"
     );
   },
 
-  // ---- Style: section box ----
-  // rows: array of [label, value] pairs or plain strings
-  section(title, rows) {
-    const lines = rows.map((r) =>
-      Array.isArray(r) ? `│ ✦ ${sc(r[0])} : ${r[1]}` : `│ ✦ ${r}`
-    );
+  // Category box — different borders from Levanter
+  category(title, commands) {
+    const body = commands.map((c) => `  ▸ ${this.PREFIX}${c}`).join("\n");
     return (
-      `┌───〔 🔥${bold(title)}🔥〕───┐\n` +
-      lines.join("\n") +
-      "\n└───────────────────┘"
+      `╔═〔 ${sc(title)} 〕══════════════════╗\n` +
+      body +
+      `\n╚═══════════════════════════════════╝`
     );
   },
 
