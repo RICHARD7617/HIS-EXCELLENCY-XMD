@@ -80,7 +80,7 @@
 
 ### **His Excellency**
 
-*Builder of bots. Breaker of limits.*
+*HXMD001 Builder. Record Breaker.*
 
 <a href="https://wa.me/254738993575">
   <img src="https://img.shields.io/badge/Chat_on-WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
@@ -95,14 +95,14 @@
 | 𝐏𝐫𝐨𝐝𝐮𝐜𝐭 𝐃𝐞𝐭𝐚𝐢𝐥 | 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐢𝐧𝐟𝐨 |
 | --- | --- |
 | Product name | 🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 |
-| Full product description | Free WhatsApp bot developed and powered by HisXcellency |
-| Developer and publisher | His excellency |
-| Official pairing website | - |
+| Full product description | Next-Gen whatsapp bot developed by 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 |
+| Developer and publisher | 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 |
+| Official pairing website | https://his-excellency-xmd.onrender.com |
 | Main bot source code | https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD |
 | WhatsApp Channel | [ 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲™](https://whatsapp.com/channel/0029VbBo6eD89inaLb2rjY2A)) |
 | Support | [𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲™](https://wa.me/254738993575) |
 
 
-**🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 — WhatsApp automation by 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘.**
+**🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 — WhatsApp automation by 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲.**
 
 ⚡ *ᴘᴏᴡᴇʀᴇᴅ ʙʏ Wrexustech*
