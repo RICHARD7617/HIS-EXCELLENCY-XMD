@@ -275,15 +275,14 @@ function handle(req, res) {
     (async () => {
       let number = "";
       try { number = digits(JSON.parse((await readBody(req)) || "{}").number); } catch (_) {}
-            // Auto-fix: remove leading zero if it exists
-      if (number.startsWith("0")) number = number.substring(1); 
-      // Auto-fix: prepend country code if they forgot it (optional, assume 254 Kenya based on your bot)
-      if (number.length === 9) number = "254" + number; 
-      if (number.length < 8 || number.length > 15)
-        return send(res, 400, { error: "Enter a valid number with country code, digits only." });
-      if (ipLimited(clientIp(req)))
-        return send(res, 429, { error: "Too many attempts. Please wait a few minutes." });
-
+      
+      // Remove leading zero if they paste it with one (e.g., 0738...)
+      if (number.startsWith("0")) number = number.substring(1);
+      
+      // Just a basic check to make sure it's not empty
+      if (number.length < 7)
+        return send(res, 400, { error: "Please enter a valid phone number." });
+      
       const active = [...jobs.values()].filter((j) => !j.done);
       if (active.some((j) => j.number === number))
         return send(res, 409, { error: "A code was already requested for this number. Wait for it to expire." });
