@@ -80,7 +80,7 @@
 
 ### **His Excellency**
 
-*HXMD001 Builder. Record Breaker.*
+*Hxmd001 Builder. Record Breaker.*
 
 <a href="https://wa.me/254738993575">
   <img src="https://img.shields.io/badge/Chat_on-WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp" />
