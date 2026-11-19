@@ -1,7 +1,3 @@
-const fs = require("fs");
-const path = require("path");
-const readline = require("readline");
-const pino = require("pino");// ============================================================
 //  index.js — Lightweight WhatsApp bot (Baileys, CommonJS)
 //  All settings come from ./config.js (which reads env variables)
 // ============================================================
