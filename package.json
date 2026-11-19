@@ -1,5 +1,5 @@
 {
-    "name": "His excellency 001",
+    "name": "his excellency 001",
     "version": "2.8.8",
     "description": "Next generation whatsapp Bot by His excellency",
     "main": "index.js",
@@ -11,7 +11,7 @@
     },
     "keywords": [
         "whatsapp bot",
-        "His excellency 001",
+        "his excellency 001",
         "bot",
         "baileys",
         "library"
@@ -20,7 +20,7 @@
     "license": "MIT",
     "engines": {
         "node": ">=22.x",
-        "npm": ">=10.x"
+        "npm": ">=10.0.0"
     },
     "dependencies": {
         "@bochilteam/scraper": "^5.0.1",
