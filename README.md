@@ -57,6 +57,7 @@
 </div>
 
 ---
+
 ## 𝐐𝐮𝐢𝐜𝐤 𝐚𝐜𝐭𝐢𝐨𝐧𝐬👽
 
 <p align="center">
@@ -75,7 +76,7 @@
 
 <div align="center">
 
-<img src="https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg" width="110" style="border-radius: 50%;" alt="His Excellency" />
+<img src="https://u.pone.rs/cdbojbls.jpeg" width="110" style="border-radius: 50%;" alt="His Excellency" />
 
 ### **His Excellency**
 
