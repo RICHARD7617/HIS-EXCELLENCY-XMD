@@ -162,7 +162,7 @@ async function sendStartupMessage(socket) {
 }
 
 // ============================================================
-//  BUILD FULL MENU TEXT (all categories from your .txt)
+//  BUILD FULL MENU TEXT
 // ============================================================
 function buildMenuText() {
   const p = C.PREFIX;
@@ -193,7 +193,7 @@ function buildMenuText() {
 
   const now = new Date();
   const header =
-    "▛▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞\n" +
+    "▛▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞▞\n" +
     `▌  ${C.BOT_NAME}\n` +
     `▌  ᴘʀᴇғɪx : ${p}\n` +
     `▌  ᴏᴡɴᴇʀ  : ${C.OWNER_NAME}\n` +
@@ -205,7 +205,7 @@ function buildMenuText() {
     `▌  ʀᴀᴍ    : ${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB\n` +
     `▌  ᴜᴘᴛɪᴍᴇ : ${runtime()}\n` +
     `▌  ᴘʟᴀᴛғᴏʀᴍ: ${process.platform} (${process.arch})\n` +
-    "▙▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚";
+    "▙▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚▚";
 
   const body = cats
     .map(
@@ -219,9 +219,7 @@ function buildMenuText() {
   const footer =
     "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
     `📢 Channel: https://whatsapp.com/channel/${C.CHANNEL_JID}\n` +
-    
     `👥 Group  : https://chat.whatsapp.com/${C.GROUP_INVITE}\n` +
-    
     `⚡ ${C.bold("Powered by His Excellency")}`;
 
   return header + body + footer;
@@ -244,10 +242,10 @@ async function handleMessage(socket, message) {
     const args = text.slice(prefix.length).trim().split(/\s+/);
     const command = (args.shift() || "").toLowerCase();
 
+    // ---------- Built-in fast commands ----------
     switch (command) {
       case "menu":
       case "help": {
-        // FIXED: single sendMessage with image + caption so the image appears
         const menuText = buildMenuText();
         try {
           await socket.sendMessage(
@@ -263,7 +261,7 @@ async function handleMessage(socket, message) {
           log("Menu image send failed, sending text only:", imgErr.message);
           await socket.sendMessage(from, { text: menuText }, { quoted: message });
         }
-        break;
+        return;
       }
 
       case "ping": {
@@ -271,32 +269,56 @@ async function handleMessage(socket, message) {
         await socket.sendMessage(from, {
           text: `🏓 Pong!\n⚡ ${Date.now() - start} ms`,
         }, { quoted: message });
-        break;
+        return;
       }
 
       case "alive":
         await socket.sendMessage(from, {
           text: `👑 ${C.BOT_NAME} is alive and running!\n\n⏱ ${runtime()}`,
         }, { quoted: message });
-        break;
+        return;
 
       case "owner": {
         const owner = process.env.OWNER_NUMBER || C.OWNER_NUMBER;
         await socket.sendMessage(from, {
           text: `👑 Owner: ${process.env.OWNER_NAME || C.OWNER_NAME || "Owner"}\n📞 ${owner || "Not configured"}`,
         }, { quoted: message });
-        break;
+        return;
       }
 
       case "runtime":
         await socket.sendMessage(from, {
           text: `⏱ Bot uptime: ${runtime()}`,
         }, { quoted: message });
-        break;
+        return;
 
       default:
         break;
     }
+
+    // ---------- Plugin dispatch (after the built-in fast 5) ----------
+    if (PLUGINS.has(command)) {
+      const entry = PLUGINS.get(command);
+      const ctx = {
+        from,
+        sender,
+        isGroup,
+        prefix,
+        command,
+        text,
+        config: C,
+        runtime,
+        reply: (t) => socket.sendMessage(from, { text: t }, { quoted: message }),
+      };
+      try {
+        await entry.handler(socket, message, args, ctx);
+      } catch (err) {
+        log(`Plugin "${command}" error:`, err.message);
+        await socket.sendMessage(from, { text: `❌ Command failed: ${err.message}` }, { quoted: message });
+      }
+      return;
+    }
+
   } catch (error) {
     log("Message handler error:", error.message);
   }
@@ -311,7 +333,6 @@ async function connectToWhatsApp() {
       fs.mkdirSync(SESSION_DIR, { recursive: true });
     }
 
-    // Restore session from SESSION_ID
     if (
       C.SESSION_ID &&
       !ignoreSessionId &&
@@ -344,10 +365,8 @@ async function connectToWhatsApp() {
       syncFullHistory: false,
     });
 
-    // 1. Credentials listener
     sock.ev.on("creds.update", saveCreds);
 
-    // 2. Connection listener
     sock.ev.on("connection.update", async (update) => {
       const { connection, lastDisconnect } = update;
 
@@ -358,10 +377,8 @@ async function connectToWhatsApp() {
 
         log("WhatsApp connected successfully.");
 
-        // ---- AUTO-FOLLOW + AUTO-JOIN (on every fresh connection) ----
         await autoFollowChannel(sock);
         await autoJoinGroup(sock);
-
         await sendStartupMessage(sock);
       }
 
@@ -370,7 +387,6 @@ async function connectToWhatsApp() {
         const statusCode = lastDisconnect?.error?.output?.statusCode;
         const loggedOut = statusCode === DisconnectReason.loggedOut;
 
-        // Reset one-shot flags so they run again on next connection
         autoFollowDone = false;
         autoJoinDone = false;
 
@@ -397,7 +413,6 @@ async function connectToWhatsApp() {
       }
     });
 
-    // 3. Message listener
     sock.ev.on("messages.upsert", async ({ messages, type }) => {
       if (type !== "notify") return;
       for (const message of messages) {
@@ -405,7 +420,6 @@ async function connectToWhatsApp() {
       }
     });
 
-    // 4. Pairing code
     if (!state.creds.registered) {
       let number = process.env.PAIR_NUMBER || C.PAIR_NUMBER || "";
       if (!number && process.stdin.isTTY) {
