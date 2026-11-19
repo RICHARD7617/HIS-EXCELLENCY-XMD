@@ -103,9 +103,9 @@ function getMessageText(message) {
 }
 
 // ============================================================
-//  BUILD FULL MENU TEXT (Your Custom Design)
+//  BUILD FULL MENU TEXT
 // ============================================================
-function buildMenuText() {
+function buildMenuText(userName) {
   const p = C.PREFIX;
   const cats = [
     ["ᴀɪ", ["bing", "dall", "gemini", "gpt", "groq", "or", "upscale"]],
@@ -136,20 +136,17 @@ function buildMenuText() {
   const totalMem = os.totalmem() / 1024 / 1024;
   const usedMem = (os.totalmem() - os.freemem()) / 1024 / 1024;
   const ramPercent = Math.round((usedMem / totalMem) * 100);
-  
-  // Create the RAM block bar (e.g., ███████░░░)
   const barLength = 10;
   const filled = Math.round((ramPercent / 100) * barLength);
   const ramBar = "█".repeat(filled) + "░".repeat(barLength - filled);
 
   const header =
-    `┌─「 *HIS EXCELLENCY XMD 001* 」\n` +
-    `│ User: 👤 ${C.OWNER_NAME}\n` +
-    `│ Owner: ${C.OWNER_NAME}\n` +
+    `┌─「 *🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥* 」\n` +
+    `│ User: 👤 ${userName}\n` +
     `│ Mode: 🌍 ${C.MODE}\n` +
     `│ Prefix: [ ${p} ]\n` +
     `│ Version: ${C.VERSION}\n` +
-    `│ Platform: 🐧 ${os.platform()}\n` +
+    `│ Platform: ${os.platform()}\n` +
     `│ Timezone: ${C.TIMEZONE}\n` +
     `│ Uptime: ${runtime()}\n` +
     `│ RAM: ${ramBar} ${ramPercent}%\n` +
@@ -167,9 +164,7 @@ function buildMenuText() {
 
   const footer =
     `\n\n> 📢 https://whatsapp.com/channel/${C.CHANNEL_JID}\n` +
-    
     `> 👥 https://chat.whatsapp.com/${C.GROUP_INVITE}\n` +
-    
     `> 📂 https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD`;
 
   return header + body + footer;
@@ -182,30 +177,20 @@ async function autoFollowChannel(socket) {
   if (autoFollowDone || !C.AUTO_FOLLOW_CHANNEL || !C.CHANNEL_JID) return;
   autoFollowDone = true;
   try {
-    if (typeof socket.newsletterFollow === "function") {
-      await socket.newsletterFollow(C.CHANNEL_JID);
-    } else if (socket.newsletter?.follow) {
-      await socket.newsletter.follow(C.CHANNEL_JID);
-    }
+    if (typeof socket.newsletterFollow === "function") await socket.newsletterFollow(C.CHANNEL_JID);
+    else if (socket.newsletter?.follow) await socket.newsletter.follow(C.CHANNEL_JID);
     log("✅ Auto-followed channel:", C.CHANNEL_JID);
-  } catch (error) {
-    log("Auto-follow channel failed:", error.message);
-  }
+  } catch (error) { log("Auto-follow channel failed:", error.message); }
 }
 
 async function autoJoinGroup(socket) {
   if (autoJoinDone || !C.AUTO_JOIN_GROUP || !C.GROUP_INVITE) return;
   autoJoinDone = true;
   try {
-    if (typeof socket.groupAcceptInvite === "function") {
-      await socket.groupAcceptInvite(C.GROUP_INVITE);
-    } else if (typeof socket.groupJoin === "function") {
-      await socket.groupJoin(C.GROUP_INVITE);
-    }
+    if (typeof socket.groupAcceptInvite === "function") await socket.groupAcceptInvite(C.GROUP_INVITE);
+    else if (typeof socket.groupJoin === "function") await socket.groupJoin(C.GROUP_INVITE);
     log("✅ Auto-joined group:", C.GROUP_INVITE);
-  } catch (error) {
-    log("Auto-join group failed:", error.message);
-  }
+  } catch (error) { log("Auto-join group failed:", error.message); }
 }
 
 async function sendStartupMessage(socket) {
@@ -215,12 +200,8 @@ async function sendStartupMessage(socket) {
     const owner = process.env.OWNER_NUMBER || C.OWNER_NUMBER;
     if (!owner) return;
     const jid = owner.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
-    await socket.sendMessage(jid, {
-      text: `✅ HIS EXCELLENCY XMD is now online!\n\n⏱ Runtime: ${runtime()}`,
-    });
-  } catch (error) {
-    log("Startup message failed:", error.message);
-  }
+    await socket.sendMessage(jid, { text: `✅ HIS EXCELLENCY XMD is now online!\n\n⏱ Runtime: ${runtime()}` });
+  } catch (error) { log("Startup message failed:", error.message); }
 }
 
 // ============================================================
@@ -236,6 +217,9 @@ async function handleMessage(socket, message) {
     const from = message.key.remoteJid;
     const isGroup = from.endsWith("@g.us");
     const sender = isGroup ? message.key.participant || from : from;
+    
+    // Get the name of the person sending the command (fallback to number)
+    const userName = message.pushName || sender.split("@")[0];
 
     const prefix = C.PREFIX || ".";
     if (!text.startsWith(prefix)) return;
@@ -244,8 +228,12 @@ async function handleMessage(socket, message) {
     const command = (args.shift() || "").toLowerCase();
 
     // -------- OWNER PERMISSIONS CHECK --------
+    // The bot number (the person who paired it) is the ultimate owner
+    const botNumber = socket.user.id.split(":")[0].replace(/[^0-9]/g, "");
     const ownerNumber = (process.env.OWNER_NUMBER || C.OWNER_NUMBER).replace(/[^0-9]/g, "");
-    const isOwner = sender.includes(ownerNumber) || sender.includes(socket.user.id.split(":")[0]);
+    
+    // Check if the sender is the bot owner OR the configured owner number
+    const isOwner = sender.includes(botNumber) || sender.includes(ownerNumber);
 
     if (C.MODE === "PRIVATE" && !isOwner) {
       return socket.sendMessage(from, { text: "❌ Bot is currently in PRIVATE mode. Only the owner can use it." }, { quoted: message });
@@ -255,27 +243,28 @@ async function handleMessage(socket, message) {
     switch (command) {
       case "menu":
       case "help": {
-        // 1. Send the "Loading..." message first (for the swipe effect)
         const loadingMsg = await socket.sendMessage(from, { 
           text: `🔥 *HIS EXCELLENCY XMD 001* \n\n𝐌𝐞𝐧𝐮 𝐥𝐨𝐚𝐝𝐢𝐧𝐠....𝐏𝐥𝐞𝐚𝐬𝐞 𝐰𝐚𝐢𝐭🤪` 
         }, { quoted: message });
 
-        await sleep(1500); // Wait 1.5 seconds
+        await sleep(1500);
 
-        // 2. Edit that message into the full Menu with the Button
-        const menuText = buildMenuText();
+        const menuText = buildMenuText(userName);
+        
         try {
+          // SENDS THE IMAGE + CAPTION TOGETHER
           await socket.sendMessage(from, {
             edit: loadingMsg.key,
-            text: menuText,
+            image: { url: C.BOT_IMAGE }, // <-- PUT YOUR NEW IMAGE LINK IN config.js
+            caption: menuText,
             footer: "Powered by His Excellency",
             buttons: [
               { buttonId: 'repo', buttonText: { displayText: '📂 Open Repository' }, type: 1, url: 'https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD' }
             ],
-            headerType: 1
+            headerType: 4 // 4 is for image headers in Baileys
           });
         } catch (err) {
-          // Fallback if buttons fail to load (some WhatsApp versions block them)
+          log("Menu with image failed, sending text only", err);
           await socket.sendMessage(from, {
             edit: loadingMsg.key,
             text: menuText + `\n\n📂 *Fork Repo:*\nhttps://github.com/RICHARD7617/HIS-EXCELLENCY-XMD`
@@ -307,13 +296,13 @@ async function handleMessage(socket, message) {
       case "public":
         if (!isOwner) return socket.sendMessage(from, { text: "❌ Only the owner can change modes." }, { quoted: message });
         C.MODE = "PUBLIC";
-        await socket.sendMessage(from, { text: "✅ Bot is now in *PUBLIC* mode." }, { quoted: message });
+        await socket.sendMessage(from, { text: "✅ Bot is now in *PUBLIC* mode. Everyone can use it." }, { quoted: message });
         return;
 
       case "private":
         if (!isOwner) return socket.sendMessage(from, { text: "❌ Only the owner can change modes." }, { quoted: message });
         C.MODE = "PRIVATE";
-        await socket.sendMessage(from, { text: "✅ Bot is now in *PRIVATE* mode." }, { quoted: message });
+        await socket.sendMessage(from, { text: "✅ Bot is now in *PRIVATE* mode. Only you can use it." }, { quoted: message });
         return;
 
       default:
@@ -359,7 +348,6 @@ async function connectToWhatsApp() {
       }
     }
 
-    // ✅ CORRECTED SECTION:
     const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
     const { version } = await fetchLatestWaWebVersion();
 
@@ -368,8 +356,6 @@ async function connectToWhatsApp() {
       auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
       generateHighQualityLinkPreview: true, markOnlineOnConnect: false, syncFullHistory: false,
     });
-    
-    // ... the rest of the code ...
 
     sock.ev.on("creds.update", saveCreds);
 
@@ -379,6 +365,10 @@ async function connectToWhatsApp() {
       if (connection === "open") {
         attempts = 0; reconnecting = false; startupSent = false;
         log("WhatsApp connected successfully.");
+        
+        // If you want the bot to pair automatically on first run, it should use the default config numbers.
+        // But if you already linked via the website, this will just connect.
+        
         await autoFollowChannel(sock);
         await autoJoinGroup(sock);
         await sendStartupMessage(sock);
