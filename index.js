@@ -15,6 +15,7 @@ const {
 
 const C = require("./config");
 const pair = require("./pair");
+const { loadPlugins } = require("./plugins/loader");
 
 const logger = pino({ level: "silent" });
 
@@ -84,6 +85,10 @@ function startServer() {
 }
 
 const server = startServer();
+
+// Load all plugins once
+const PLUGINS = loadPlugins(log);
+log(`Plugin commands available: ${PLUGINS.size}`);
 
 function getMessageText(message) {
   const msg = message.message || {};
@@ -214,7 +219,9 @@ function buildMenuText() {
   const footer =
     "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
     `📢 Channel: https://whatsapp.com/channel/${C.CHANNEL_JID}\n` +
+    
     `👥 Group  : https://chat.whatsapp.com/${C.GROUP_INVITE}\n` +
+    
     `⚡ ${C.bold("Powered by His Excellency")}`;
 
   return header + body + footer;
