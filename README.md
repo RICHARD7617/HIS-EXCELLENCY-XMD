@@ -96,28 +96,7 @@
 | Official pairing website | - |
 | Main bot source code | https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD |
 | WhatsApp Channel | [ 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲™](https://whatsapp.com/channel/0029VbBo6eD89inaLb2rjY2A)) |
-| YouTube | - |
-| Telegram | - |
 | Support | [𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲™](https://wa.me/254738993575) |
-| Bot artwork | [Official FEI XMD image](https://res.cloudinary.com/dqxlb29uz/image/upload/v1794998818/avatars/url-ff1f3e4e-396b-4bb3-866c-8417344022a8.jpg) |
-
-
-## 𝐅𝐫𝐞𝐪𝐮𝐞𝐧𝐭𝐥𝐲 𝐚𝐬𝐤𝐞𝐝 𝐪𝐮𝐞𝐬𝐭𝐢𝐨𝐧𝐬❓
-
-### 𝐰𝐡𝐚𝐭 𝐢𝐬 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏?
-
-𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 is a free, modular WhatsApp bot developed and powered by His Excellency. It provides AI chat and media tools, downloads, news, group utilities, games, anime features and other commands inside WhatsApp.
-
-### 𝐖𝐡𝐞𝐫𝐞 𝐢𝐬 𝐭𝐡𝐞 𝐨𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 𝐩𝐚𝐢𝐫𝐢𝐧𝐠 𝐰𝐞𝐛𝐬𝐢𝐭𝐞?
-
-The official pairing portal is (-----).
-
-### 𝐖𝐡𝐞𝐫𝐞 𝐜𝐚𝐧 𝐈 𝐟𝐢𝐧𝐝 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 𝐬𝐨𝐮𝐫𝐜𝐞 𝐜𝐨𝐝𝐞?
-
-The canonical main bot source repository is (https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD).
-
-### 𝐖𝐡𝐨 𝐝𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐝 𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏?
-𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏 is developed and powered by (His Excellency).
 
 
 **🔥𝐇𝐢𝐬 𝐄𝐱𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐱𝐦𝐝 𝟎𝟎𝟏🔥 — WhatsApp automation by 𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘.**
