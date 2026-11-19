@@ -40,7 +40,7 @@ function finish(job, state, message) {
   clearTimeout(job.timer);
   try { job.sock && job.sock.end(new Error("pairing finished")); } catch (_) {}
   setTimeout(() => { try { fs.rmSync(job.dir, { recursive: true, force: true }); } catch (_) {} }, 1500);
-  setTimeout(() => jobs.delete(job.id), 10 * 60 * 1000).unref();
+  setTimeout(() => jobs.delete(job.id), 5 * 60 * 1000).unref();
 }
 
 async function onLinked(job, sock) {
@@ -69,7 +69,7 @@ async function onLinked(job, sock) {
   }
 }
 
-async function connect(job) {
+async function connect(job, useQR = false) {
   const { state, saveCreds } = await useMultiFileAuthState(job.dir);
 
   let version;
@@ -104,13 +104,18 @@ async function connect(job) {
       try {
         await saveCreds();
       } catch (error) {
-        finish(job, "failed", "Could not save pairing credentials. Please try again.");
+        finish(job, "failed", "Could not save pairing credentials.");
         return;
       }
     }
 
     if (events["connection.update"]) {
-      const { connection, lastDisconnect, isNewLogin } = events["connection.update"];
+      const { connection, lastDisconnect, isNewLogin, qr } = events["connection.update"];
+      
+      if (qr && useQR) {
+        job.qr = qr; // Store QR code for the frontend to fetch
+      }
+
       if (isNewLogin) log("WhatsApp accepted pairing. Preparing reconnection...");
 
       if (connection === "open" && sock.authState.creds.registered) {
@@ -121,12 +126,11 @@ async function connect(job) {
       if (connection === "close") {
         const code = lastDisconnect?.error?.output?.statusCode;
         if (code === DisconnectReason.restartRequired) {
-          log("Restart required (515). Reconnecting immediately...");
-          connect(job).catch((error) => {
+          connect(job, useQR).catch((error) => {
             finish(job, "failed", "Reconnect failed. Please request a new code.");
           });
-        } else {
-          finish(job, "failed", `Connection closed (code ${code || "unknown"}). Please try again.`);
+        } else if (!job.done) {
+          finish(job, "failed", `Connection closed. Please try again.`);
         }
       }
     }
@@ -144,21 +148,26 @@ function requestCode(job, sock) {
       } catch (e) {
         reject(e);
       }
-    }, C.PAIR_DELAY);
+    }, 3000);
   });
 }
 
-async function createJob(number) {
+async function createJob(number, type) {
   const id = crypto.randomBytes(12).toString("hex");
-  const job = { id, number, dir: path.join(os.tmpdir(), "pair-" + id), state: "waiting", done: false, sock: null, timer: null };
+  const job = { id, number, type, dir: path.join(os.tmpdir(), "pair-" + id), state: "waiting", done: false, sock: null, timer: null };
   jobs.set(id, job);
-  job.timer = setTimeout(() => finish(job, "failed", "Code expired. Please request a new one."), C.PAIR_TTL_MS);
+  
+  // Expire exactly after 60 seconds (1 minute)
+  job.timer = setTimeout(() => finish(job, "failed", "Code expired after 1 minute. Please try again."), 60000);
+  
   try {
-    const sock = await connect(job);
-    job.code = await requestCode(job, sock);
+    const sock = await connect(job, type === "qr");
+    if (type === "code") {
+      job.code = await requestCode(job, sock);
+    }
     return job;
   } catch (e) {
-    finish(job, "failed", "Could not get a pairing code.");
+    finish(job, "failed", "Could not generate. Please try again.");
     throw e;
   }
 }
@@ -169,7 +178,7 @@ function send(res, status, body, type) {
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "no-referrer",
-    "Content-Security-Policy": "default-src 'self' 'unsafe-inline'; img-src 'self' data: https:",
+    "Content-Security-Policy": "default-src 'self' 'unsafe-inline'; img-src 'self' data: https:;",
   });
   res.end(typeof body === "string" ? body : JSON.stringify(body));
 }
@@ -177,10 +186,7 @@ function send(res, status, body, type) {
 function readBody(req) {
   return new Promise((resolve) => {
     let data = "";
-    req.on("data", (c) => {
-      data += c;
-      if (data.length > 2048) req.destroy();
-    });
+    req.on("data", (c) => { data += c; if (data.length > 2048) req.destroy(); });
     req.on("end", () => resolve(data));
     req.on("error", () => resolve(""));
   });
@@ -194,10 +200,7 @@ function clientIp(req) {
 function ipLimited(ip) {
   const now = Date.now();
   let h = ipHits.get(ip);
-  if (!h || now - h.start > 10 * 60 * 1000) {
-    h = { start: now, count: 0 };
-    ipHits.set(ip, h);
-  }
+  if (!h || now - h.start > 10 * 60 * 1000) { h = { start: now, count: 0 }; ipHits.set(ip, h); }
   h.count++;
   return h.count > C.PAIR_PER_IP;
 }
@@ -218,36 +221,31 @@ function handle(req, res) {
 
   if (req.method === "POST" && url === "/api/pair") {
     (async () => {
-      let number = "";
-      try { number = digits(JSON.parse((await readBody(req)) || "{}").number); } catch (_) {}
+      let data = {};
+      try { data = JSON.parse((await readBody(req)) || "{}"); } catch (_) {}
       
-      // --- AUTO-FIX START ---
-      // Remove leading zero if they typed 07... instead of 2547...
+      let number = digits(data.number);
+      const type = data.type || "code";
+
       if (number.startsWith("0")) number = number.substring(1);
-      
-      // If they typed 9 digits (missing country code), prepend Kenya 254
       if (number.length === 9) number = "254" + number;
 
-      // --- AUTO-FIX END ---
-
-      if (number.length < 8 || number.length > 15)
-        return send(res, 400, { error: "Enter a valid number with country code, digits only." });
+      if (type === "code" && (number.length < 8 || number.length > 15))
+        return send(res, 400, { error: "Enter a valid number with country code." });
       
       if (ipLimited(clientIp(req)))
-        return send(res, 429, { error: "Too many attempts. Please wait a few minutes." });
+        return send(res, 429, { error: "Too many attempts. Wait a few minutes." });
 
       const active = [...jobs.values()].filter((j) => !j.done);
-      if (active.some((j) => j.number === number))
-        return send(res, 409, { error: "A code was already requested for this number. Wait for it to expire." });
       if (active.length >= C.PAIR_MAX_ACTIVE)
         return send(res, 503, { error: "Server is busy. Try again in a minute." });
 
       try {
-        const job = await createJob(number);
-        send(res, 200, { id: job.id, code: job.code });
+        const job = await createJob(number, type);
+        send(res, 200, { id: job.id, code: job.code || null });
       } catch (e) {
         log("create failed:", e.message);
-        send(res, 500, { error: "Could not get a pairing code. Check the number and try again." });
+        send(res, 500, { error: "Could not generate code. Try again." });
       }
     })();
     return true;
@@ -257,7 +255,7 @@ function handle(req, res) {
     const id = new URL(req.url, "http://x").searchParams.get("id") || "";
     const job = jobs.get(id);
     if (!job) return send(res, 404, { state: "failed", message: "Unknown or expired request." }), true;
-    send(res, 200, { state: job.state, message: job.message, session: job.session || undefined });
+    send(res, 200, { state: job.state, message: job.message, session: job.session || undefined, qr: job.qr || undefined });
     return true;
   }
 
@@ -272,79 +270,157 @@ function page() {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(C.BOT_NAME)} · Pair</title>
 <style>
-  :root{--bg:#0d0d12;--card:#17171f;--text:#f2f2f5;--mute:#9a9aa8;--acc:#ff6a2b;--ok:#3ddc84;--bad:#ff5c5c}
+  :root{--bg:#0a0a0f;--card:#12121a;--text:#f2f2f5;--mute:#8b8b9e;--acc:#ff6a2b;--ok:#3ddc84;--bad:#ff5c5c;--border:#252533}
   *{box-sizing:border-box}
   body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;
-    background:radial-gradient(circle at top,#2a1408,var(--bg) 60%);color:var(--text);
+    background:radial-gradient(circle at 50% 0%,#1a0d05,var(--bg) 70%);color:var(--text);
     font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-  .card{width:100%;max-width:420px;background:var(--card);border:1px solid #2a2a36;border-radius:18px;padding:26px 22px;
-    box-shadow:0 10px 40px rgba(0,0,0,.5)}
-  h1{font-size:20px;margin:0 0 4px;text-align:center}
-  p.sub{margin:0 0 20px;text-align:center;color:var(--mute);font-size:14px}
-  label{font-size:13px;color:var(--mute)}
-  input{width:100%;margin:6px 0 14px;padding:13px;border-radius:10px;border:1px solid #2f2f3d;background:#0f0f15;
-    color:var(--text);font-size:16px;outline:none}
-  input:focus{border-color:var(--acc)}
-  button{width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font-size:16px;
-    font-weight:600;cursor:pointer}
-  button:disabled{opacity:.5;cursor:not-allowed}
-  #msg{min-height:20px;margin-top:12px;text-align:center;font-size:14px}
+  .card{width:100%;max-width:440px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px 24px;
+    box-shadow:0 20px 50px rgba(0,0,0,.6); position:relative; overflow:hidden;}
+  .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--acc), #ff9b66); }
+  h1{font-size:22px;margin:0 0 6px;text-align:center;letter-spacing:-0.5px}
+  p.sub{margin:0 0 24px;text-align:center;color:var(--mute);font-size:14px}
+  .tabs { display:flex; gap:8px; margin-bottom:20px; background:#0a0a0f; padding:6px; border-radius:12px; border:1px solid var(--border); }
+  .tab { flex:1; text-align:center; padding:10px; font-size:13px; font-weight:600; border-radius:8px; cursor:pointer; color:var(--mute); transition:0.2s; user-select:none; }
+  .tab.active { background:var(--border); color:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.2); }
+  label{font-size:13px;color:var(--mute); display:block; margin-bottom:6px;}
+  input{width:100%;margin:0 0 16px;padding:14px;border-radius:12px;border:1px solid var(--border);background:#0a0a0f;
+    color:var(--text);font-size:16px;outline:none; transition:0.2s;}
+  input:focus{border-color:var(--acc); box-shadow: 0 0 0 2px rgba(255,106,43,0.2);}
+  button{width:100%;padding:15px;border:0;border-radius:12px;background:var(--acc);color:#fff;font-size:16px;
+    font-weight:600;cursor:pointer; transition:0.2s;}
+  button:hover { background: #ff7b42; }
+  button:disabled{opacity:.5;cursor:not-allowed; background:var(--acc)}
+  #msg{min-height:20px;margin-top:16px;text-align:center;font-size:14px; font-weight:500;}
   .ok{color:var(--ok)} .bad{color:var(--bad)}
-  #box{display:none;margin-top:18px;text-align:center}
-  #code{font-size:34px;font-weight:700;letter-spacing:4px;padding:14px;border-radius:12px;background:#0f0f15;
-    border:1px dashed var(--acc);user-select:all}
-  ol{text-align:left;color:var(--mute);font-size:14px;line-height:1.7;padding-left:20px}
-  textarea{display:none;width:100%;height:110px;margin-top:10px;background:#0f0f15;color:var(--text);
-    border:1px solid #2f2f3d;border-radius:10px;padding:10px;font-size:12px}
-  small{display:block;margin-top:16px;text-align:center;color:var(--mute);font-size:12px}
+  #box{display:none;margin-top:20px;text-align:center; animation: fadeIn 0.4s;}
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .code-box { font-size:34px;font-weight:800;letter-spacing:6px;padding:16px;border-radius:14px;background:#0a0a0f;
+    border:2px dashed var(--acc);user-select:all; color:var(--acc); cursor:pointer; position:relative; }
+  .code-box:hover::after { content:'Click to copy'; position:absolute; bottom:4px; right:8px; font-size:10px; font-weight:400; color:var(--mute); letter-spacing:0; }
+  ol{text-align:left;color:var(--mute);font-size:13px;line-height:1.8;padding-left:24px; margin-top:20px; background:#0a0a0f; padding:16px 16px 16px 36px; border-radius:12px;}
+  textarea{display:none;width:100%;height:110px;margin-top:12px;background:#0a0a0f;color:var(--text);
+    border:1px solid var(--border);border-radius:12px;padding:12px;font-size:12px; outline:none;}
+  small{display:block;margin-top:20px;text-align:center;color:var(--mute);font-size:11px; opacity:0.7;}
 </style>
 </head>
 <body>
 <div class="card">
   <h1>${esc(C.BOT_NAME)}</h1>
-  <p class="sub">Link your WhatsApp and get your Session ID</p>
-  <label for="num">WhatsApp number (country code, digits only)</label>
-  <input id="num" type="tel" inputmode="numeric" placeholder="254700000000" autocomplete="off">
-  <button id="go">Get pairing code</button>
+  <p class="sub">Secure Device Pairing & Session Generator</p>
+  
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('code')">Pair Code</div>
+    <div class="tab" onclick="switchTab('alt')">Alt. Code</div>
+    <div class="tab" onclick="switchTab('qr')">QR Code</div>
+  </div>
+
+  <div id="form-code" class="form-section">
+    <label for="num">WhatsApp Number (Country Code)</label>
+    <input id="num" type="tel" inputmode="numeric" placeholder="254700000000" autocomplete="off">
+    <button id="go-code">Generate Pairing Code</button>
+  </div>
+
+  <div id="form-alt" class="form-section" style="display:none;">
+    <label for="num-alt">WhatsApp Number (No +)</label>
+    <input id="num-alt" type="tel" inputmode="numeric" placeholder="254700000000" autocomplete="off">
+    <button id="go-alt">Generate Alternative Code</button>
+  </div>
+
+  <div id="form-qr" class="form-section" style="display:none;">
+    <p style="text-align:center; color:var(--mute); font-size:13px; margin-bottom:16px;">Click Generate and scan the QR code with WhatsApp.</p>
+    <button id="go-qr">Generate QR Code</button>
+  </div>
+
   <div id="msg"></div>
+  
   <div id="box">
-    <div id="code"></div>
-    <ol>
-      <li>Open WhatsApp on that phone</li>
-      <li>Settings &gt; Linked Devices &gt; Link a Device</li>
-      <li>Tap “Link with phone number instead”</li>
-      <li>Enter the code above</li>
+    <div id="code-display" class="code-box" onclick="copyCode()"></div>
+    <div id="qr-display" style="display:none; text-align:center; margin-top:16px;">
+      <img id="qr-img" src="" style="width:250px; height:250px; border-radius:12px; border:4px solid #fff; display:inline-block;" alt="QR Code">
+    </div>
+    <ol id="instructions">
+      <li>Open WhatsApp on your phone</li>
+      <li>Go to <b>Linked Devices</b> &gt; <b>Link a Device</b></li>
+      <li id="inst-text">Tap “Link with phone number instead”</li>
+      <li id="inst-text-2">Enter the code above</li>
     </ol>
     <textarea id="sess" readonly></textarea>
   </div>
-  <small>Your Session ID gives full access to your WhatsApp. Never share it.</small>
+  <small>Code expires in 60 seconds. Do not share your Session ID.</small>
 </div>
 <script>
 var timer = null;
+var currentTab = 'code';
 function $(i){ return document.getElementById(i); }
 function setMsg(t, bad){ var m = $('msg'); m.textContent = t || ''; m.className = bad ? 'bad' : 'ok'; }
 
-$('go').onclick = function(){
-  var n = $('num').value.replace(/\\D/g, '');
-  // Allow lenient input. Only check that it's not completely empty.
-  if (n.length < 7) { setMsg('Please enter a valid phone number.', true); return; }
-  $('go').disabled = true;
+function switchTab(type) {
+  currentTab = type;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  $('form-code').style.display = type === 'code' ? 'block' : 'none';
+  $('form-alt').style.display = type === 'alt' ? 'block' : 'none';
+  $('form-qr').style.display = type === 'qr' ? 'block' : 'none';
+  
+  $('box').style.display = 'none';
+  setMsg('', false);
+  
+  if (type === 'qr') {
+    $('code-display').style.display = 'none';
+    $('qr-display').style.display = 'block';
+    $('inst-text').innerHTML = 'Scan the QR Code above';
+    $('inst-text-2').style.display = 'none';
+  } else {
+    $('code-display').style.display = 'block';
+    $('qr-display').style.display = 'none';
+    $('inst-text').innerHTML = 'Tap “Link with phone number instead”';
+    $('inst-text-2').style.display = 'block';
+  }
+}
+
+function startPair(type, num) {
+  $('go-'+type).disabled = true;
   $('box').style.display = 'none';
   $('sess').style.display = 'none';
-  setMsg('Requesting code...', false);
-  fetch('/api/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: n }) })
+  setMsg('Initializing connection...', false);
+  
+  fetch('/api/pair', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: num, type: type }) })
     .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
     .then(function(x){
       if (!x.ok) throw new Error(x.d.error || 'Request failed');
-      $('code').textContent = x.d.code;
-      $('box').style.display = 'block';
       setMsg('Waiting for you to link...', false);
-      poll(x.d.id);
+      poll(x.d.id, type, x.d.code);
     })
-    .catch(function(e){ setMsg(e.message, true); $('go').disabled = false; });
+    .catch(function(e){ setMsg(e.message, true); $('go-'+type).disabled = false; });
+}
+
+$('go-code').onclick = function(){ 
+  var n = $('num').value.replace(/\\D/g, '');
+  if (n.length < 7) { setMsg('Enter a valid number.', true); return; }
+  startPair('code', n); 
 };
 
-function poll(id){
+$('go-alt').onclick = function(){ 
+  var n = $('num-alt').value.replace(/\\D/g, '');
+  if (n.length < 7) { setMsg('Enter a valid number.', true); return; }
+  startPair('alt', n); 
+};
+
+$('go-qr').onclick = function(){ startPair('qr', ''); };
+
+function copyCode() {
+  var code = $('code-display').textContent;
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(function() {
+    setMsg('✅ Code copied to clipboard!', false);
+  }).catch(function() {
+    setMsg('⚠️ Please copy manually.', true);
+  });
+}
+
+function poll(id, type, initialCode){
   clearInterval(timer);
   timer = setInterval(function(){
     fetch('/api/status?id=' + id)
@@ -353,17 +429,30 @@ function poll(id){
         if (d.state === 'linked') {
           clearInterval(timer);
           setMsg(d.message, false);
-          $('go').disabled = false;
+          $('go-'+type).disabled = false;
           if (d.session) { $('sess').value = d.session; $('sess').style.display = 'block'; }
         } else if (d.state === 'failed') {
           clearInterval(timer);
           setMsg(d.message || 'Failed. Try again.', true);
           $('box').style.display = 'none';
-          $('go').disabled = false;
+          $('go-'+type).disabled = false;
+        } else {
+          $('box').style.display = 'block';
+          if (type === 'qr' && d.qr) {
+             // Load QR via external renderer
+             $('qr-img').src = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(d.qr);
+          } else if (initialCode) {
+             $('code-display').textContent = initialCode;
+             // AUTO COPY TO CLIPBOARD IMMEDIATELY
+             navigator.clipboard.writeText(initialCode).then(function(){
+                setMsg('✅ Code generated & copied to clipboard!', false);
+             }).catch(function(){});
+             initialCode = null; // clear so it doesn't copy multiple times
+          }
         }
       })
       .catch(function(){});
-  }, 3000);
+  }, 2000);
 }
 </script>
 </body>
