@@ -12,7 +12,6 @@ const {
   fetchLatestWaWebVersion,
   DisconnectReason,
   Browsers,
-  downloadMediaMessage,
 } = require("@whiskeysockets/baileys");
 
 const C = require("./config");
@@ -28,15 +27,11 @@ let autoJoinDone = false;
 let attempts = 0;
 let stopping = false;
 let ignoreSessionId = false;
-
-// THIS IS THE KEY FIX: We use a global variable that never resets
-// so the bot only announces itself ONCE per deployment.
 let hasAnnouncedStartup = false; 
 
 const SESSION_DIR = path.join(__dirname, "session");
 const PORT = process.env.PORT || C.PORT || 3000;
 
-// Database setup for group settings (antilink, antistatus)
 const dbPath = path.join(__dirname, "database.json");
 function getDB() {
   if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ groups: {} }));
@@ -115,71 +110,77 @@ function getMessageText(message) {
 }
 
 // ============================================================
-//  BUILD FULL MENU TEXT
+//  EXACT MENU DESIGN YOU REQUESTED
 // ============================================================
 function buildMenuText(userName) {
-  const p = C.PREFIX;
-  const cats = [
-    ["ᴀɪ", ["bing", "dall", "gemini", "gpt", "groq", "or", "upscale"]],
-    ["ᴀᴜᴅɪᴏ", ["avec", "bass", "black", "blown", "cut", "deep", "earrape", "fast", "fat", "histo", "low", "nightcore", "pitch", "robot", "slow", "smooth", "treble", "tupai", "vector"]],
-    ["ᴀᴜᴛᴏʀᴇᴘʟʏ", ["filter", "gfilter", "gstop", "pfilter", "pstop", "stop"]],
-    ["ʙᴏᴛ", ["backup", "gauth", "gupload", "reminder", "task", "tog", "update", "update-now", "ytlogin"]],
-    ["ʙᴜᴅɢᴇᴛ", ["budget", "delbudget", "expense", "income", "summary"]],
-    ["ᴅᴏᴄᴜᴍᴇɴᴛ", ["page", "pdf"]],
-    ["ᴅᴏᴡɴʟᴏᴀᴅ", ["apk", "fb", "fullss", "insta", "mediafire", "pinterest", "play", "reddit", "song", "spotify", "ss", "story", "tiktok", "twitter", "upload", "video", "yta", "ytv"]],
-    ["ᴇᴅɪᴛᴏʀ", ["bloody", "bokeh", "cartoon", "color", "dark", "demon", "enhance", "gandm", "horned", "kiss", "look", "makeup", "pencil", "sketch", "skull", "wanted", "zombie"]],
-    ["ɢᴀᴍᴇ", ["tictactoe", "wcg", "wrg"]],
-    ["ɢʀᴏᴜᴘ", ["add", "amute", "antifake", "antigm", "antistatus", "antilink", "antispam", "antiword", "aunmute", "common", "demote", "ginfo", "goodbye", "gpp", "gstatus", "inactive", "invite", "join", "kick", "msgs", "mute", "pdm", "promote", "reset", "revoke", "tag", "unmute", "vote", "warn", "welcome"]],
-    ["ʟᴏɢɪᴀ", ["ope", "yami", "zushi"]],
-    ["ᴍɪsᴄ", ["afk", "alive", "avm", "calc", "delcmd", "fancy", "forward", "getcmd", "lydia", "mention", "mforward", "news", "ping", "qr", "reboot", "rmbg", "save", "setcmd", "tts", "url", "whois"]],
-    ["ᴘᴇʀsᴏɴᴀʟ", ["delgreet", "getgreet", "setgreet"]],
-    ["ᴘʟᴜɢɪɴ", ["plugin", "remove"]],
-    ["sᴄʜᴇᴅᴜʟᴇ", ["delschedule", "getschedule", "setschedule"]],
-    ["sᴇᴀʀᴄʜ", ["emix", "emoji", "find", "ig", "img", "ison", "jean", "movie", "time", "trt", "weather", "yts"]],
-    ["sᴛɪᴄᴋᴇʀ", ["circle", "exif", "mp4", "photo", "sticker", "take", "tg"]],
-    ["ᴛᴇxᴛᴍᴀᴋᴇʀ", ["3d", "angel", "avenger", "blub", "bpink", "cat", "glitch", "glitter", "graffiti", "hacker", "light", "marvel", "neon", "sci", "sign", "tattoo", "watercolor"]],
-    ["ᴜsᴇʀ", ["block", "fullpp", "gjid", "jid", "left", "pp", "unblock"]],
-    ["ᴠᴀʀs", ["allvar", "delsudo", "delvar", "getsudo", "getvar", "setsudo", "setvar"]],
-    ["ᴠɪᴅᴇᴏ", ["compress", "crop", "merge", "mp3", "reverse", "rotate", "trim"]],
-    ["ᴡʜᴀᴛsᴀᴘᴘ", ["antiedit", "call", "caption", "cinfo", "clear", "create", "delete", "dlt", "doc", "online", "poll", "react", "read", "scstatus", "setstatus", "status", "vv"]],
-  ];
-
+  const p = C.PREFIX || ".";
   const now = new Date();
+  const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: C.TIMEZONE });
+  const day = now.toLocaleDateString("en-US", { weekday: "long", timeZone: C.TIMEZONE });
+  const date = now.toLocaleDateString("en-GB", { timeZone: C.TIMEZONE });
+  
   const totalMem = os.totalmem() / 1024 / 1024;
-  const usedMem = (os.totalmem() - os.freemem()) / 1024 / 1024;
-  const ramPercent = Math.round((usedMem / totalMem) * 100);
-  const barLength = 10;
-  const filled = Math.round((ramPercent / 100) * barLength);
-  const ramBar = "█".repeat(filled) + "░".repeat(barLength - filled);
+  const freeMem = os.freemem() / 1024 / 1024;
+  const usedMem = totalMem - freeMem;
+  const ramText = `${Math.round(usedMem)}/${Math.round(totalMem)}MB`;
 
   const header =
-    `┌─「 *HIS EXCELLENCY XMD 001* 」\n` +
-    `│ User: 👤 ${userName}\n` +
-    `│ Mode: 🌍 ${C.MODE}\n` +
-    `│ Prefix: [ ${p} ]\n` +
-    `│ Version: ${C.VERSION}\n` +
-    `│ Platform: 🐧 ${os.platform()}\n` +
-    `│ Timezone: ${C.TIMEZONE}\n` +
-    `│ Uptime: ${runtime()}\n` +
-    `│ RAM: ${ramBar} ${ramPercent}%\n` +
-    `│ Memory: ${usedMem.toFixed(1)}MB / ${totalMem.toFixed(1)}MB\n` +
-    `└────────────────────`;
+    `╭═══ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 ═══⊷\n` +
+    `┃❃╭──────────────\n` +
+    `┃❃│ 𝐏𝐫𝐞𝐟𝐢𝐱 : ${p}\n` +
+    `┃❃│ 𝐔𝐬𝐞𝐫 : ${userName}\n` +
+    `┃❃│ 𝐓𝐢𝐦𝐞 : ${time}\n` +
+    `┃❃│ 𝐃𝐚𝐲 : ${day}\n` +
+    `┃❃│ 𝐃𝐚𝐭𝐞 : ${date}\n` +
+    `┃❃│ 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 : ${C.VERSION}\n` +
+    `┃❃│ 𝐏𝐥𝐮𝐠𝐢𝐧𝐬 : ${PLUGINS.size}\n` +
+    `┃❃│ 𝐑𝐚𝐦 : ${ramText}\n` +
+    `┃❃│ 𝐔𝐩𝐭𝐢𝐦𝐞 : ${runtime()}\n` +
+    `┃❃│ 𝐏𝐥𝐚𝐭𝐟𝐨𝐫𝐦 : ${os.platform()}\n` +
+    `┃❃╰───────────────\n` +
+    `╰═════════════════⊷`;
 
-  const body = cats
-    .map(
-      ([title, cmds]) =>
-        `\n╭─「 ${C.sc(title)} 」\n` +
-        cmds.map(c => `│ ▸ ${p}${c}`).join("\n") +
-        `\n╰────────────────────`
-    )
-    .join("\n");
+  const cats = [
+    ["ᴀɪ", ["BING", "DALL", "GEMINI", "GPT", "GROQ", "OR", "UPSCALE"]],
+    ["ᴀᴜᴅɪᴏ", ["AVEC", "BASS", "BLACK", "BLOWN", "CUT", "DEEP", "EARRAPE", "FAST", "FAT", "HISTO", "LOW", "NIGHTCORE", "PITCH", "ROBOT", "SLOW", "SMOOTH", "TREBLE", "TUPAI", "VECTOR"]],
+    ["ᴀᴜᴛᴏʀᴇᴘʟʏ", ["FILTER", "GFILTER", "GSTOP", "PFILTER", "PSTOP", "STOP"]],
+    ["ʙᴏᴛ", ["BACKUP", "GAUTH", "GUPLOAD", "REMINDER", "TASK", "TOG", "UPDATE", "UPDATE NOW", "YTLOGIN"]],
+    ["ʙᴜᴅɢᴇᴛ", ["BUDGET", "DELBUDGET", "EXPENSE", "INCOME", "SUMMARY"]],
+    ["ᴅᴏᴄᴜᴍᴇɴᴛ", ["PAGE", "PDF"]],
+    ["ᴅᴏᴡɴʟᴏᴀᴅ", ["APK", "FB", "FULLSS", "INSTA", "MEDIAFIRE", "PINTEREST", "PLAY", "REDDIT", "SONG", "SPOTIFY", "SS", "STORY", "TIKTOK", "TWITTER", "UPLOAD", "VIDEO", "YTA", "YTV"]],
+    ["ᴇᴅɪᴛᴏʀ", ["BLOODY", "BOKEH", "CARTOON", "COLOR", "DARK", "DEMON", "ENHANCE", "GANDM", "HORNED", "KISS", "LOOK", "MAKEUP", "PENCIL", "SKETCH", "SKULL", "WANTED", "ZOMBIE"]],
+    ["ɢᴀᴍᴇ", ["TICTACTOE", "WCG", "WRG"]],
+    ["ɢʀᴏᴜᴘ", ["ADD", "AMUTE", "ANTIFAKE", "ANTIGM", "ANTIGSTATUS", "ANTILINK", "ANTISPAM", "ANTIWORD", "AUNMUTE", "COMMON", "DEMOTE", "GINFO", "GOODBYE", "GPP", "GSTATUS", "INACTIVE", "INVITE", "JOIN", "KICK", "MSGS", "MUTE", "PDM", "PROMOTE", "RESET", "REVOKE", "TAG", "UNMUTE", "VOTE", "WARN", "WELCOME"]],
+    ["ʟᴏɢɪᴀ", ["OPE", "YAMI", "ZUSHI"]],
+    ["ᴍɪsᴄ", ["AFK", "ALIVE", "AVM", "CALC", "DELCMD", "FANCY", "FORWARD", "GETCMD", "LYDIA", "MENTION", "MFORWARD", "NEWS", "PING", "QR", "REBOOT", "RMBG", "SAVE", "SETCMD", "TTS", "URL", "WHOIS"]],
+    ["ᴘᴇʀsᴏɴᴀʟ", ["DELGREET", "GETGREET", "SETGREET"]],
+    ["ᴘʟᴜɢɪɴ", ["PLUGIN", "REMOVE"]],
+    ["sᴄʜᴇᴅᴜʟᴇ", ["DELSCHEDULE", "GETSCHEDULE", "SETSCHEDULE"]],
+    ["sᴇᴀʀᴄʜ", ["EMIX", "EMOJI", "FIND", "IG", "IMG", "ISON", "JEAN", "MOVIE", "TIME", "TRT", "WEATHER", "YTS"]],
+    ["sᴛɪᴄᴋᴇʀ", ["CIRCLE", "EXIF", "MP4", "PHOTO", "STICKER", "TAKE", "TG"]],
+    ["ᴛᴇxᴛᴍᴀᴋᴇʀ", ["3D", "ANGEL", "AVENGER", "BLUB", "BPINK", "CAT", "GLITCH", "GLITTER", "GRAFFITI", "HACKER", "LIGHT", "MARVEL", "NEON", "SCI", "SIGN", "TATTOO", "WATERCOLOR"]],
+    ["ᴜsᴇʀ", ["BLOCK", "FULLPP", "GJID", "JID", "LEFT", "PP", "UNBLOCK"]],
+    ["ᴠᴀʀs", ["ALLVAR", "DELSUDO", "DELVAR", "GETSUDO", "GETVAR", "SETSUDO", "SETVAR"]],
+    ["ᴠɪᴅᴇᴏ", ["COMPRESS", "CROP", "MERGE", "MP3", "REVERSE", "ROTATE", "TRIM"]],
+    ["ᴡʜᴀᴛsᴀᴘᴘ", ["ANTIEDIT", "CALL", "CAPTION", "CINFO", "CLEAR", "CREATE", "DELETE", "DLT", "DOC", "ONLINE", "POLL", "REACT", "READ", "SCSTATUS", "SETSTATUS", "STATUS", "VV"]],
+  ];
 
-  const footer =
-    `\n\n> 📢 https://whatsapp.com/channel/${C.CHANNEL_JID}\n` +
-    `> 👥 https://chat.whatsapp.com/${C.GROUP_INVITE}\n` +
-    `> 📂 https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD`;
+  const body = cats.map(([title, cmds]) => {
+    const list = cmds.map(c => ` │ ${boldText(c)}`).join("\n");
+    return ` ╭─❏ ${smallCaps(title)} ❏\n${list}\n ╰─────────────────`;
+  }).join("\n");
 
-  return header + body + footer;
+  return header + "\n" + body;
+}
+
+function smallCaps(text) {
+  const map = { a: "ᴀ", b: "ʙ", c: "ᴄ", d: "ᴅ", e: "ᴇ", f: "ғ", g: "ɢ", h: "ʜ", i: "ɪ", j: "ᴊ", k: "ᴋ", l: "ʟ", m: "ᴍ", n: "ɴ", o: "ᴏ", p: "ᴘ", q: "ǫ", r: "ʀ", s: "𝐬", t: "ᴛ", u: "ᴜ", v: "ᴠ", w: "ᴡ", x: "𝐱", y: "ʏ", z: "ᴢ" };
+  return text.toLowerCase().split("").map(c => map[c] || c).join("");
+}
+
+function boldText(text) {
+  const map = { A: "𝙰", B: "𝙱", C: "𝙲", D: "𝙳", E: "𝙴", F: "𝙵", G: "𝙶", H: "𝙷", I: "𝙸", J: "𝙹", K: "𝙺", L: "𝙻", M: "𝙼", N: "𝙽", O: "𝙾", P: "𝙿", Q: "𝚀", R: "𝚁", S: "𝚂", T: "𝚃", U: "𝚄", V: "𝚅", W: "𝚆", X: "𝚇", Y: "𝚈", Z: "𝚉" };
+  return text.split("").map(c => map[c] || c).join("");
 }
 
 // ============================================================
@@ -206,21 +207,13 @@ async function autoJoinGroup(socket) {
 }
 
 async function sendStartupMessage(socket) {
-  // Only send if we haven't announced yet, and if the config allows it.
   if (hasAnnouncedStartup || !C.SEND_STARTUP_MSG) return;
-  
-  // Set the flag immediately so it never triggers again this session
   hasAnnouncedStartup = true; 
-  
   try {
-    // FIXED: Send to the bot's own number (the person who deployed/paired it)
     const botNumber = socket.user.id.split(":")[0].replace(/[^0-9]/g, "");
     const jid = `${botNumber}@s.whatsapp.net`;
-    
     await socket.sendMessage(jid, { text: `✅ HIS EXCELLENCY XMD is now online!\n\n⏱ Runtime: ${runtime()}` });
-  } catch (error) { 
-    log("Startup message failed:", error.message); 
-  }
+  } catch (error) { log("Startup message failed:", error.message); }
 }
 
 // ============================================================
@@ -235,10 +228,8 @@ async function handleMessage(socket, message) {
     const sender = isGroup ? message.key.participant || from : from;
     const userName = message.pushName || sender.split("@")[0];
 
-    // ---------- AUTO READ ----------
     try { await socket.readMessages([message.key]); } catch (err) {}
 
-    // ---------- ANTI-LINK & ANTI-STATUS ----------
     if (isGroup) {
       const db = getDB();
       const groupSettings = db.groups[from] || {};
@@ -258,7 +249,6 @@ async function handleMessage(socket, message) {
       }
     }
 
-    // ---------- COMMAND PROCESSING ----------
     const text = getMessageText(message);
     if (!text) return;
 
@@ -271,6 +261,7 @@ async function handleMessage(socket, message) {
     // -------- OWNER PERMISSIONS CHECK --------
     const botNumber = socket.user.id.split(":")[0].replace(/[^0-9]/g, "");
     const ownerNumber = (process.env.OWNER_NUMBER || C.OWNER_NUMBER).replace(/[^0-9]/g, "");
+    // Allow BOTH the paired number and the configured OWNER_NUMBER to control the bot
     const isOwner = sender.includes(botNumber) || sender.includes(ownerNumber);
 
     if (C.MODE === "PRIVATE" && !isOwner) {
@@ -289,20 +280,16 @@ async function handleMessage(socket, message) {
         const menuText = buildMenuText(userName);
         
         try {
+          // Send image with caption correctly
           await socket.sendMessage(from, {
             edit: loadingMsg.key,
-            image: { url: C.BOT_IMAGE }, 
-            caption: menuText,
-            footer: "Powered by His Excellency",
-            buttons: [
-              { buttonId: 'repo', buttonText: { displayText: '📂 Open Repository' }, type: 1, url: 'https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD' }
-            ],
-            headerType: 4 
+            image: { url: C.BOT_IMAGE },
+            caption: menuText
           });
         } catch (err) {
           await socket.sendMessage(from, {
             edit: loadingMsg.key,
-            text: menuText + `\n\n📂 *Fork Repo:*\nhttps://github.com/RICHARD7617/HIS-EXCELLENCY-XMD`
+            text: menuText
           });
         }
         return;
@@ -397,7 +384,6 @@ async function connectToWhatsApp() {
 
       if (connection === "open") {
         attempts = 0; reconnecting = false;
-        
         log("WhatsApp connected successfully.");
         
         await autoFollowChannel(sock);
