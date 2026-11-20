@@ -1,5 +1,3 @@
-// plugins/loader.js
-// Scans the plugins folder and returns a Map of commandName -> handler
 const fs = require("fs");
 const path = require("path");
 
@@ -7,42 +5,69 @@ function loadPlugins(log = console.log) {
   const registry = new Map();
   const dir = __dirname;
 
-  const files = fs
-    .readdirSync(dir)
-    .filter(f => f.endsWith(".js") && f !== "loader.js");
+  if (!fs.existsSync(dir)) {
+    log("[loader] Plugins directory not found.");
+    return registry;
+  }
+
+  const files = fs.readdirSync(dir)
+    .filter(file =>
+      file.endsWith(".js") &&
+      file !== "loader.js"
+    )
+    .sort();
 
   for (const file of files) {
     try {
-      const mod = require(path.join(dir, file));
+      const filePath = path.join(dir, file);
+      const mod = require(filePath);
 
-      // Each plugin file exports either:
-      //   { commands: { name: handler, ... } }   OR
-      //   { name: handler, otherName: handler }   OR
-      //   a function(sock, message, args, ctx) for stubs
       const commands = mod.commands || mod;
 
-      if (typeof commands !== "object" && typeof commands !== "function") {
-        log(`[loader] skip ${file} (bad export)`);
+      if (
+        !commands ||
+        typeof commands !== "object" ||
+        Array.isArray(commands)
+      ) {
+        log(`[loader] Skipped ${file}: invalid exports.`);
         continue;
       }
 
+      let loaded = 0;
+
       for (const [name, handler] of Object.entries(commands)) {
         if (typeof handler !== "function") continue;
-        const key = name.toLowerCase();
+
+        const key = name.toLowerCase().trim();
+
+        if (!key) continue;
+
         if (registry.has(key)) {
-          log(`[loader] duplicate command "${key}" in ${file}, keeping first`);
+          log(
+            `[loader] Duplicate command "${key}" in ${file}.`
+          );
           continue;
         }
-        registry.set(key, { handler, source: file });
+
+        registry.set(key, {
+          handler,
+          source: file,
+        });
+
+        loaded++;
       }
 
-      log(`[loader] loaded ${file} (${Object.keys(commands).length} commands)`);
-    } catch (err) {
-      log(`[loader] FAILED to load ${file}:`, err.message);
+      log(`[loader] Loaded ${file}: ${loaded} commands.`);
+
+    } catch (error) {
+      log(
+        `[loader] FAILED ${file}: ${error.stack || error.message}`
+      );
     }
   }
 
-  log(`[loader] total commands registered: ${registry.size}`);
+  log(`[loader] Total commands registered: ${registry.size}`);
+
   return registry;
 }
 
