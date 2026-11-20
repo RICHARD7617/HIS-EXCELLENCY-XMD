@@ -165,45 +165,55 @@ function buildMenuText(userName) {
   const ramText = `${Math.round(usedMem)}/${Math.round(totalMem)}MB`;
 
   const header =
-    `╭───────〔  🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥〕───────╮\n` +
-    `│ 🔹 Prefix : ${p}\n` +
-    `│ 🔹 User   : ${userName}\n` +
-    `│ 🔹 Time   : ${time}\n` +
-    `│ 🔹 Day    : ${day}\n` +
-    `│ 🔹 Date   : ${date}\n` +
-    `│ 🔹 Version: ${C.VERSION || "1.0.0"}\n` +
-    `│ 🔹 Plugins: ${PLUGINS.size}\n` +
-    `│ 🔹 RAM    : ${ramText}\n` +
-    `│ 🔹 Uptime : ${runtime()}\n` +
-    `│ 🔹 OS     : ${os.platform()}\n` +
-    `╰──────────────────────────────────────╯\n\n`;
+   ╭═══ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 ═══⊷
+┃❃╭──────────────
+┃❃│ 𝐏𝐫𝐞𝐟𝐢𝐱 : .
+┃❃│ 𝐔𝐬𝐞𝐫 : ᬼ⃝⃪𝐇𝐈𝐒ᬼ⃝⃪ᬼ⃝ 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 ⃝⃪
+┃❃│ 𝐓𝐢𝐦𝐞 : 06:25 PM
+┃❃│ 𝐃𝐚𝐲 : Friday
+┃❃│ 𝐃𝐚𝐭𝐞 : 20/11/2026
+┃❃│ 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 : 1.1.7
+┃❃│ 𝐏𝐥𝐮𝐠𝐢𝐧𝐬 : 200
+┃❃│ 𝐑𝐚𝐦 : 23686/63258MB
+┃❃│ 𝐔𝐩𝐭𝐢𝐦𝐞 : 0d 4h 2m 28s
+┃❃│ 𝐏𝐥𝐚𝐭𝐟𝐨𝐫𝐦 : linux
+┃❃╰───────────────
+╰═════════════════⊷
 
   const cats = [
-    ["AI TOOLS", ["BING", "DALL", "GEMINI", "GPT", "GROQ", "OR", "UPSCALE"]],
-    ["AUDIO", ["AVEC", "BASS", "BLACK", "BLOWN", "CUT", "DEEP", "EARRAPE", "FAST", "FAT", "HISTO", "LOW", "NIGHTCORE", "PITCH", "ROBOT", "SLOW", "SMOOTH", "TREBLE", "TUPAI", "VECTOR"]],
-    ["AUDIO FX", ["FILTER", "GFILTER", "GSTOP", "PFILTER", "PSTOP", "STOP"]],
-    ["BACKUP", ["BACKUP", "GAUTH", "GUPLOAD", "REMINDER", "TASK", "TOG", "UPDATE", "UPDATE NOW", "YTLOGIN"]],
-    ["BUDGET", ["BUDGET", "DELBUDGET", "EXPENSE", "INCOME", "SUMMARY"]],
-    ["CONVERT", ["PAGE", "PDF"]],
-    ["DOWNLOADER", ["APK", "FB", "FULLSS", "INSTA", "MEDIAFIRE", "PINTEREST", "PLAY", "REDDIT", "SONG", "SPOTIFY", "SS", "STORY", "TIKTOK", "TWITTER", "UPLOAD", "VIDEO", "YTA", "YTV"]],
-    ["EFFECTS", ["BLOODY", "BOKEH", "CARTOON", "COLOR", "DARK", "DEMON", "ENHANCE", "GANDM", "HORNED", "KISS", "LOOK", "MAKEUP", "PENCIL", "SKETCH", "SKULL", "WANTED", "ZOMBIE"]],
-    ["GAMES", ["TICTACTOE", "WCG", "WRG"]],
-    ["GROUP", ["ADD", "AMUTE", "ANTIFAKE", "ANTIGM", "ANTIGSTATUS", "ANTILINK", "ANTISPAM", "ANTIWORD", "AUNMUTE", "COMMON", "DEMOTE", "GINFO", "GOODBYE", "GPP", "GSTATUS", "INACTIVE", "INVITE", "JOIN", "KICK", "MSGS", "MUTE", "PDM", "PROMOTE", "RESET", "REVOKE", "TAG", "UNMUTE", "VOTE", "WARN", "WELCOME"]],
-    ["HENTAI", ["OPE", "YAMI", "ZUSHI"]],
-    ["MAIN", ["AFK", "ALIVE", "AVM", "CALC", "DELCMD", "FANCY", "FORWARD", "GETCMD", "LYDIA", "MENTION", "MFORWARD", "NEWS", "PING", "QR", "REBOOT", "RMBG", "SAVE", "SETCMD", "TTS", "URL", "WHOIS"]],
-    ["GREETINGS", ["DELGREET", "GETGREET", "SETGREET"]],
-    ["PLUGINS", ["PLUGIN", "REMOVE"]],
-    ["SCHEDULE", ["DELSCHEDULE", "GETSCHEDULE", "SETSCHEDULE"]],
-    ["SEARCH", ["EMIX", "EMOJI", "FIND", "IG", "IMG", "ISON", "JEAN", "MOVIE", "TIME", "TRT", "WEATHER", "YTS"]],
-    ["STICKER", ["CIRCLE", "EXIF", "MP4", "PHOTO", "STICKER", "TAKE", "TG"]],
-    ["TEXT FX", ["3D", "ANGEL", "AVENGER", "BLUB", "BPINK", "CAT", "GLITCH", "GLITTER", "GRAFFITI", "HACKER", "LIGHT", "MARVEL", "NEON", "SCI", "SIGN", "TATTOO", "WATERCOLOR"]],
-    ["USER", ["BLOCK", "FULLPP", "GJID", "JID", "LEFT", "PP", "UNBLOCK"]],
-    ["VARS", ["ALLVAR", "DELSUDO", "DELVAR", "GETSUDO", "GETVAR", "SETSUDO", "SETVAR"]],
-    ["VIDEO", ["COMPRESS", "CROP", "MERGE", "MP3", "REVERSE", "ROTATE", "TRIM"]],
-    ["WHATSAPP", ["ANTIEDIT", "CALL", "CAPTION", "CINFO", "CLEAR", "CREATE", "DELETE", "DLT", "DOC", "ONLINE", "POLL", "REACT", "READ", "SCSTATUS", "SETSTATUS", "STATUS", "VV"]],
-    ["EPHOTO TEXT", ["NEON", "COLORFULGLOW", "ADVANCEDGLOW", "NEONONLINE", "BLUENEON", "NEONTEXT", "NEONLIGHT", "GREENNEON", "GREENLIGHTNEON", "BLUENEONLOGO", "GALAXYNEON", "RETRONEON", "MULTICOLORNEON", "HACKERNEON", "DEVILWINGS", "GLOWTEXT", "BLACKPINKNEON", "NEONGLITCH", "COLORFULNEONLIGHT", "WOODEN3D", "CUBIC3D", "WOODEN3DONLINE", "WATER3D", "CUONGTHI3D", "TEXT3D", "GRAFFITI3D", "SILVER3D", "STYLE3D", "METAL3D", "RUBY3D", "BIRTHDAY3D", "METALLOGO3D", "PIG3D", "AVENGERS3D", "HOLOGRAM3D", "GRADIENT3D", "STONE3D", "SPACE3D", "SAND3D", "GRADIENTTEXT3D", "LIGHTBULB3D", "SNOW3D", "PAPERCUT3D", "UNDERWATER3D", "SHINYMETALLIC3D", "GRADIENTSTYLE3D", "BEACH3D", "CRACK3D", "WOOD3D", "AMERICANFLAG3D", "CHRISTMAS3D", "NIGERIAFLAG3D", "CHRISTMASS␃NOW3D", "GOLDENCHRISTMAS3D", "DECORATIVEMETAL3D", "COLORFULPAINT3D", "GLOSSYSILVER3D", "BALLOON3D", "COMIC3D", "EPHOTOMENU"]]
-  ];
-
+  ["GROUP MANAGEMENT", ["add", "promote", "promoteall", "demote", "demoteall", "kick", "kickall", "ban", "unban", "clearbanlist", "warn", "resetwarn", "setwarn", "warnings", "mute", "unmute", "gctime", "antileave", "antilink", "addbadword", "removebadword", "listbadword", "welcome", "goodbye", "joinapproval", "onlyadmins", "leave", "creategroup"]],
+  ["AUTO MODERATION", ["antisticker", "antiimage", "antivideo", "antiaudio", "antimention", "antistatusmention", "antigrouplink", "antidemote", "antipromote", "antibadword", "antigroupcall", "antispam"]],
+  ["GROUP INFO & TOOLS", ["groupinfo", "grouplink", "tagadmin", "tagall", "hidetag", "link", "invite", "revoke", "setdesc", "fangtrace", "getgpp", "getdesc", "listadmins", "togstatus", "getparticipants", "listonline", "listinactive", "approveall", "rejectall", "disp"]],
+  ["MENU SETTINGS", ["menu", "menu2", "menustyle", "togglemenuinfo", "setmenuimage", "restoremenuimage"]],
+  ["OWNER CONTROLS", ["setbotname", "resetbotname", "setowner", "resetowner", "setprefix", "prefix", "iamowner", "about", "owner", "block", "unblock", "blockdetect", "blockall", "unblockall", "silent", "anticall", "mode", "setpp", "setfooter", "repo", "pair", "antidelete", "antideletestatus", "antiedit", "chatbot", "shutdown", "broadcast"]],
+  ["CHANNEL MODE", ["setchannel", "resetchannel"]],
+  ["SYSTEM & MAINTENANCE", ["restart", "workingreload", "reloadenv", "getsettings", "setsetting", "test", "disk", "hostip", "findcommands", "latestupdates", "panel", "debugchat", "ls", "pwd", "cat", "head", "tail", "find", "grep", "stat", "du", "df", "ps", "envkeys", "exec", "package"]],
+  ["CPANEL", ["setlink", "setkey", "nestconfig", "createuser", "createpanel", "createunlimited", "setpayment", "prompt", "cpanelmenu"]],
+  ["SUDO", ["addsudo", "delsudo", "listsudo", "getsudo", "checksudo", "clearsudo", "sudomode", "sudoinfo", "mysudo", "sudodebug", "linksudo"]],
+  ["AUTOMATION", ["autoread", "autotyping", "autorecording", "autorecordtyping", "autoreact", "autoreactstatus", "autoviewstatus", "autobio", "autorec", "reactowner"]],
+  ["PRIVACY CONTROLS", ["online", "privacy", "receipt", "profilepic", "viewer", "lastseen"]],
+  ["GENERAL UTILITIES", ["alive", "ping", "ping2", "time", "uptime", "videocall", "voicecall", "define", "remind", "sessioninfo", "genmusic", "genlyrics", "musicprompt", "news", "covid", "weather", "wiki", "translate", "iplookup", "getip", "getpp", "getgpp", "getdesc", "listadmins", "prefixinfo", "platform", "onwhatsapp", "country"]],
+  ["CONVERSION & MEDIA", ["shorturl", "url", "fetch", "qrencode", "take", "imgbb", "save", "rename", "screenshot", "inspect", "toimage", "tosticker", "toaudio", "tovoice", "tts", "trebleboost", "jarvis", "topdf", "extractpdf", "toword", "extractword", "toexcel", "extractexcel", "toppt", "extractppt"]],
+  ["CONTACT TOOLS", ["vcf", "viewvcf", "vv", "vv2"]],
+  ["MUSIC", ["play", "song", "video", "videodoc", "lyrics", "shazam", "spotify"]],
+  ["MEDIA DOWNLOADS", ["tiktok", "instagram", "facebook", "snapchat", "apk", "yts", "ytplay", "ytmp3", "ytv", "ytmp4", "ytvdoc", "videodl", "playlist", "xvideos", "xnxx", "mediafire", "downloadurl"]],
+  ["AI COMMANDS", ["gpt", "chatgpt", "gemini", "cohere", "copilot", "bing", "bard", "claudeai", "grok", "groq", "blackbox", "mistral", "metai", "perplexity", "qwenai", "ilama", "venice", "wormgpt", "deepseek", "chatbot"]],
+  ["OPEN SOURCE AI", ["falcon", "wizard", "vicuna", "zephyr", "mixtral", "dolphin", "phi", "nous", "openchat", "orca", "codellama", "solar", "starcoder", "yi", "internlm", "chatglm", "nemotron", "neural", "openhermes", "command", "tinyllama", "replitai"]],
+  ["AI GENERATION", ["imagine", "imagegen", "flux", "analyze", "suno", "speechwriter", "humanizer", "summarize", "totext", "removebg", "enlarger", "erase", "vision", "visionpro"]],
+  ["AI TOOLS", ["videogen", "aiscanner", "aimenu", "brandlogo", "companylogo", "logoai"]],
+  ["AI VIDEO EFFECTS", ["tigervideo", "introvideo", "lightningpubg", "lovevideo", "videogen"]],
+  ["IMAGE TOOLS", ["image", "imagegen", "imagine", "anime", "art", "real", "remini", "vision", "visionpro"]],
+  ["SPORTS", ["football", "matchstats", "sportsnews", "teamnews", "basketball", "cricket", "f1", "nfl", "mma", "tennis", "baseball", "hockey", "golf", "sportsmenu"]],
+  ["ETHICAL HACKING", ["whois", "dnslookup", "subdomain", "reverseip", "geoip", "portscan", "headers", "traceroute", "asnlookup", "shodan", "pinghost", "latency", "sslcheck", "tlsinfo", "openports", "firewallcheck", "maclookup", "bandwidthtest", "securityheaders", "wafdetect", "robotscheck", "sitemap", "cmsdetect", "techstack", "cookiescan", "redirectcheck", "xsscheck", "sqlicheck", "csrfcheck", "clickjackcheck", "directoryscan", "exposedfiles", "misconfigcheck", "cvecheck", "hashidentify", "hashcheck", "bcryptcheck", "passwordstrength", "leakcheck", "metadata", "filehash", "malwarecheck", "urlscan", "phishcheck", "nmap", "ipinfo", "nglattack", "securitymenu"]],
+  ["LOGO DESIGN STUDIO", ["goldlogo", "silverlogo", "platinumlogo", "chromelogo", "diamondlogo", "bronzelogo", "steellogo", "copperlogo", "titaniumlogo", "firelogo", "icelogo", "iceglowlogo", "lightninglogo", "aqualogo", "rainbowlogo", "sunlogo", "moonlogo", "dragonlogo", "phoenixlogo", "wizardlogo", "crystallogo", "darkmagiclogo", "shadowlogo", "smokelogo", "bloodlogo", "neonlogo", "glowlogo", "gradientlogo", "matrixlogo"]],
+  ["GITHUB TOOLS", ["gitclone", "repanalyze", "zip", "update", "repo"]],
+  ["ANIME REACTIONS", ["animemenu", "awoo", "bully", "cringe", "cry", "cuddle", "dance", "glomp", "highfive", "hug", "kill", "kiss", "lick", "megumin", "neko", "pat", "shinobu", "trap", "trap2", "waifu", "wink", "yeet"]],
+  ["GAMES", ["wordle", "hangman", "numberguess", "memory", "slots", "blackjack", "trivia", "chess", "snake", "quiz", "tictactoe", "emojimix", "truth", "dare", "truthdetector", "joke", "quote"]],
+  ["FUN & TOOLS", ["bf", "gf", "couple", "gay", "getjid", "device", "movie", "trailer", "readsite", "goodmorning", "goodnight", "channelstatus", "hack"]],
+  ["ECONOMY", ["balance", "daily", "work", "deposit", "withdraw", "pay", "rob", "gamble", "leaderboard", "profile", "economymenu"]],
+  ["QUICK COMMANDS", ["p", "up"]],
+  ["EPHOTO TEXT EFFECTS", ["neon", "colorfulglow", "advancedglow", "neononline", "blueneon", "neontext", "neonlight", "greenneon", "greenlightneon", "blueneonlogo", "galaxyneon", "retroneon", "multicolorneon", "hackerneon", "devilwings", "glowtext", "blackpinkneon", "neonglitch", "colorfulneonlight", "wooden3d", "cubic3d", "wooden3donline", "water3d", "cuongthi3d", "text3d", "graffiti3d", "silver3d", "style3d", "metal3d", "ruby3d", "birthday3d", "metallogo3d", "pig3d", "avengers3d", "hologram3d", "gradient3d", "stone3d", "space3d", "sand3d", "gradienttext3d", "lightbulb3d", "snow3d", "papercut3d", "underwater3d", "shinymetallic3d", "gradientstyle3d", "beach3d", "crack3d", "wood3d", "americanflag3d", "christmas3d", "nigeriaflag3d", "christmassnow3d", "goldenchristmas3d", "decorativemetal3d", "colorfulpaint3d", "glossysilver3d", "balloon3d", "comic3d", "ephotomenu"]]
+];
   const body = cats.map(([title, cmds]) => {
     const list = cmds.map(c => ` │ ${c}`).join("\n");
     return ` ╭─❏ ${title} ❏\n${list}\n ╰─────────────────`;
