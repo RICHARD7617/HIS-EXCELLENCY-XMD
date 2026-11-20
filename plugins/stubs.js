@@ -14,7 +14,6 @@ function makeStub(category, needs) {
   };
 }
 
-const ai = makeStub("AI", "an AI API key (OpenAI / Gemini / Groq)");
 const dl = makeStub("Download", "a downloader API key or the official site API");
 const editor = makeStub("Editor", "an image-editing API key");
 const textmaker = makeStub("TextMaker", "a textmaker API (e.g. mumaker, ephoto)");
@@ -36,7 +35,6 @@ const whatsapp = makeStub("WhatsApp", "a WhatsApp Business API");
 
 module.exports = {
   commands: {
-
     // ---- Audio ----
     avec: audio, bass: audio, black: audio, blown: audio, cut: audio,
     deep: audio, earrape: audio, fast: audio, fat: audio, histo: audio,
@@ -115,11 +113,9 @@ module.exports = {
     compress: audio, crop: audio, merge: audio, mp3: audio,
     reverse: audio, rotate: audio, trim: audio,
 
-    // ---- WhatsApp ----
+    // ---- WhatsApp (Remaining ones) ----
     antiedit: whatsapp, call: whatsapp, caption: whatsapp, cinfo: whatsapp,
-    clear: whatsapp, create: whatsapp, delete: whatsapp, dlt: whatsapp,
-    doc: whatsapp, online: whatsapp, poll: whatsapp, react: whatsapp,
-    read: whatsapp, scstatus: whatsapp, setstatus: whatsapp,
-    status: whatsapp, vv: whatsapp,
+    create: whatsapp, delete: whatsapp, dlt: whatsapp,
+    doc: whatsapp, online: whatsapp, poll: whatsapp, scstatus: whatsapp, status: whatsapp,
   },
 };
