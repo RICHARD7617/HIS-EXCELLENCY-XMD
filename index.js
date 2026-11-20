@@ -52,65 +52,7 @@ function log(...args) {
 // DATABASE
 // ============================================================
 
-function getDB() {
-  try {
-    if (!fs.existsSync(DB_PATH)) {
-      const initial = {
-        groups: {},
-        bot: { mode: String(C.MODE || "PUBLIC").toUpperCase() }
-      };
-
-      fs.writeFileSync(DB_PATH, JSON.stringify(initial, null, 2));
-      return initial;
-    }
-
-    const data = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
-
-    if (!data.groups || typeof data.groups !== "object") {
-      data.groups = {};
-    }
-
-    if (!data.bot || typeof data.bot !== "object") {
-      data.bot = {};
-    }
-
-    if (!data.bot.mode) {
-      data.bot.mode = String(C.MODE || "PUBLIC").toUpperCase();
-    }
-
-    return data;
-  } catch (error) {
-    log("Database read error:", error.message);
-    return {
-      groups: {},
-      bot: { mode: String(C.MODE || "PUBLIC").toUpperCase() }
-    };
-  }
-}
-
-function saveDB(db) {
-  try {
-    const tempPath = `${DB_PATH}.tmp`;
-    fs.writeFileSync(tempPath, JSON.stringify(db, null, 2));
-    fs.renameSync(tempPath, DB_PATH);
-    return true;
-  } catch (error) {
-    log("Database save error:", error.message);
-    return false;
-  }
-}
-
-function getMode() {
-  const db = getDB();
-  return String(db.bot.mode || C.MODE || "PUBLIC").toUpperCase();
-}
-
-function setMode(mode) {
-  const db = getDB();
-  db.bot.mode = mode;
-  C.MODE = mode;
-  return saveDB(db);
-}
+const { getDB, saveDB, getMode, setMode } = require("./lib/db");
 
 fs.mkdirSync(SESSION_DIR, { recursive: true });
 
@@ -872,8 +814,7 @@ async function connectToWhatsApp() {
     // INCOMING MESSAGES
     // --------------------------------------------------------
 
-    currentSocket.ev.on("messages.upsert", async ({ messages, type }) => {
-      if (type !== "notify" && type !== "append") return;
+    if (type !== "notify") return;
 
       for (const message of messages || []) {
         handleMessage(currentSocket, message).catch(error => {
