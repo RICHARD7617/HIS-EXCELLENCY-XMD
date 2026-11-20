@@ -1,6 +1,6 @@
-
 "use strict";
 
+const { registerEventHandlers } = require("./lib/event-handlers");
 const fs = require("fs");
 const http = require("http");
 const path = require("path");
@@ -741,6 +741,9 @@ async function connectToWhatsApp() {
     sock = currentSocket;
 
     currentSocket.ev.on("creds.update", saveCreds);
+
+    // Register all plugin-owned event listeners (welcome, goodbye, anti-mod, anti-call)
+registerEventHandlers(currentSocket, log);
 
     // --------------------------------------------------------
     // CONNECTION EVENTS
