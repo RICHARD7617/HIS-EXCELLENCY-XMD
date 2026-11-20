@@ -12,6 +12,7 @@ const {
   fetchLatestWaWebVersion,
   DisconnectReason,
   Browsers,
+  downloadMediaMessage,
 } = require("@whiskeysockets/baileys");
 
 const C = require("./config");
@@ -32,6 +33,7 @@ let hasAnnouncedStartup = false;
 const SESSION_DIR = path.join(__dirname, "session");
 const PORT = process.env.PORT || C.PORT || 3000;
 
+// Database setup for group settings (antilink, antistatus)
 const dbPath = path.join(__dirname, "database.json");
 function getDB() {
   if (!fs.existsSync(dbPath)) fs.writeFileSync(dbPath, JSON.stringify({ groups: {} }));
@@ -110,7 +112,7 @@ function getMessageText(message) {
 }
 
 // ============================================================
-//  EXACT MENU DESIGN YOU REQUESTED
+//  EXACT MENU DESIGN
 // ============================================================
 function buildMenuText(userName) {
   const p = C.PREFIX || ".";
@@ -217,7 +219,7 @@ async function sendStartupMessage(socket) {
 }
 
 // ============================================================
-//  MESSAGE HANDLER (Includes Auto-Read, Anti-Link, etc.)
+//  MESSAGE HANDLER
 // ============================================================
 async function handleMessage(socket, message) {
   try {
@@ -258,10 +260,13 @@ async function handleMessage(socket, message) {
     const args = text.slice(prefix.length).trim().split(/\s+/);
     const command = (args.shift() || "").toLowerCase();
 
-    // -------- OWNER PERMISSIONS CHECK --------
-    const botNumber = socket.user.id.split(":")[0].replace(/[^0-9]/g, "");
+    // -------- FIXED OWNER PERMISSIONS CHECK --------
+    // Safely get the bot's number without the device suffix (e.g. "12345:1" becomes "12345")
+    const botIdRaw = socket.user.id.split("@")[0]; 
+    const botNumber = botIdRaw.split(":")[0].replace(/[^0-9]/g, "");
     const ownerNumber = (process.env.OWNER_NUMBER || C.OWNER_NUMBER).replace(/[^0-9]/g, "");
-    // Allow BOTH the paired number and the configured OWNER_NUMBER to control the bot
+    
+    // Check if sender is the bot owner OR the configured owner number
     const isOwner = sender.includes(botNumber) || sender.includes(ownerNumber);
 
     if (C.MODE === "PRIVATE" && !isOwner) {
@@ -272,25 +277,24 @@ async function handleMessage(socket, message) {
     switch (command) {
       case "menu":
       case "help": {
-        const loadingMsg = await socket.sendMessage(from, { 
+        // Send the loading message
+        await socket.sendMessage(from, { 
           text: `🔥 *HIS EXCELLENCY XMD 001* \n\n𝐌𝐞𝐧𝐮 𝐥𝐨𝐚𝐝𝐢𝐧𝐠....𝐏𝐥𝐞𝐚𝐬𝐞 𝐰𝐚𝐢𝐭🤪` 
         }, { quoted: message });
 
         await sleep(1500);
         const menuText = buildMenuText(userName);
         
+        // FIXED: We now send a brand new message containing the image and caption. 
+        // This guarantees the image shows up perfectly.
         try {
-          // Send image with caption correctly
           await socket.sendMessage(from, {
-            edit: loadingMsg.key,
             image: { url: C.BOT_IMAGE },
             caption: menuText
-          });
+          }, { quoted: message });
         } catch (err) {
-          await socket.sendMessage(from, {
-            edit: loadingMsg.key,
-            text: menuText
-          });
+          log("Menu image failed, sending text only:", err.message);
+          await socket.sendMessage(from, { text: menuText }, { quoted: message });
         }
         return;
       }
