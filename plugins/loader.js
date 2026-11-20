@@ -5,69 +5,46 @@ function loadPlugins(log = console.log) {
   const registry = new Map();
   const dir = __dirname;
 
-  if (!fs.existsSync(dir)) {
-    log("[loader] Plugins directory not found.");
-    return registry;
-  }
-
-  const files = fs.readdirSync(dir)
-    .filter(file =>
-      file.endsWith(".js") &&
-      file !== "loader.js"
-    )
-    .sort();
+  const files = fs
+    .readdirSync(dir)
+    .filter(f => f.endsWith(".js") && f !== "loader.js");
 
   for (const file of files) {
     try {
-      const filePath = path.join(dir, file);
-      const mod = require(filePath);
-
+      const mod = require(path.join(dir, file));
+      
+      // Get the commands object (either mod.commands or mod itself)
       const commands = mod.commands || mod;
 
-      if (
-        !commands ||
-        typeof commands !== "object" ||
-        Array.isArray(commands)
-      ) {
-        log(`[loader] Skipped ${file}: invalid exports.`);
+      if (typeof commands !== "object") {
+        log(`[loader] skip ${file} (bad export)`);
         continue;
       }
 
-      let loaded = 0;
-
       for (const [name, handler] of Object.entries(commands)) {
-        if (typeof handler !== "function") continue;
-
-        const key = name.toLowerCase().trim();
-
-        if (!key) continue;
-
-        if (registry.has(key)) {
-          log(
-            `[loader] Duplicate command "${key}" in ${file}.`
-          );
-          continue;
+        // Ensure handler is a function. If it's an object with a run method, extract it.
+        let finalHandler = handler;
+        if (typeof handler !== "function") {
+            if (typeof handler?.run === "function") finalHandler = handler.run.bind(handler);
+            else if (typeof handler?.handler === "function") finalHandler = handler.handler;
+            else continue; // Skip if it's not callable
         }
 
-        registry.set(key, {
-          handler,
-          source: file,
-        });
-
-        loaded++;
+        const key = name.toLowerCase();
+        if (registry.has(key)) {
+          log(`[loader] duplicate command "${key}" in ${file}, keeping first`);
+          continue;
+        }
+        registry.set(key, { handler: finalHandler, source: file });
       }
 
-      log(`[loader] Loaded ${file}: ${loaded} commands.`);
-
-    } catch (error) {
-      log(
-        `[loader] FAILED ${file}: ${error.stack || error.message}`
-      );
+      log(`[loader] loaded ${file} (${Object.keys(commands).length} commands)`);
+    } catch (err) {
+      log(`[loader] FAILED to load ${file}:`, err.message);
     }
   }
 
-  log(`[loader] Total commands registered: ${registry.size}`);
-
+  log(`[loader] total commands registered: ${registry.size}`);
   return registry;
 }
 
