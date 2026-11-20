@@ -41,7 +41,7 @@ const config = {
   VERSION: "1.1.7",
   TIMEZONE: env("TIMEZONE", "Africa/Nairobi"),
   
-  BOT_IMAGE: env("BOT_IMAGE", "https://i.ibb.co/YOUR-NEW-IMAGE-LINK.jpg"),
+  BOT_IMAGE: env("BOT_IMAGE", "https://i.ibb.co/PZymJjXN/upload-1795157206525-4cfed1df-jpg.jpg"),
 
   CHANNEL_JID: env("CHANNEL_JID", "0029VbBo6eD89inaLb2rjY2A"),
   GROUP_INVITE: env("GROUP_INVITE", "E4mMwAURevxGDkwwyCtOHc"),
