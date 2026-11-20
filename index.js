@@ -618,6 +618,8 @@ async function handleMessage(socket, message) {
         text,
         config: C,
         runtime,
+        db: getDB, 
+        saveDB,           
         reply: replyText =>
           socket.sendMessage(from, {
             text: String(replyText)
@@ -739,6 +741,18 @@ async function connectToWhatsApp() {
 
     const currentSocket = makeWASocket(socketOptions);
     sock = currentSocket;
+    
+    // Run plugin init hooks against THIS socket (re-runs on every reconnect).
+(async () => {
+  for (const { file, fn } of PLUGINS.__initHooks || []) {
+    try {
+      await fn(currentSocket);
+      log(`[init] ${file} ready`);
+    } catch (err) {
+      log(`[init] ${file} failed:`, err.message);
+    }
+  }
+})();
 
     currentSocket.ev.on("creds.update", saveCreds);
 
