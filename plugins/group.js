@@ -52,9 +52,12 @@ async function metadata(sock, ctx) {
 async function permissions(sock, ctx, message, requireBotAdmin = true) {
   const meta = await metadata(sock, ctx);
   const sender = String(ctx.sender || "").split(":")[0];
-  const self = String(sock.user?.id || "").split(":")[0];
-  const senderP = meta.participants.find(p => p.id === sender || p.jid === sender || jidNumber(p.id) === jidNumber(sender));
-  const botP = meta.participants.find(p => p.id === self || p.jid === self || jidNumber(p.id) === jidNumber(self));
+const self = String(sock.user?.id || "").split(":")[0];
+const selfJid = self.includes("@") ? self : `${self}@s.whatsapp.net`;
+const botP = meta.participants.find(p => 
+  p.id === selfJid || p.jid === selfJid || 
+  jidNumber(p.id) === jidNumber(selfJid)
+);
   if (!ctx.isOwner && !isAdmin(senderP)) throw new Error("Only group admins can use this command.");
   if (requireBotAdmin && !isAdmin(botP)) throw new Error("Please make the bot a group admin first.");
   return meta;
