@@ -61,6 +61,7 @@ const config = {
     YT: env("YT_API_KEY", ""),
     MONGODB_URI: env("MONGODB_URI", ""),
     POSTGRES_URL: env("POSTGRES_URL", ""),
+    APIX: env("APIX_API_KEY", ""), 
   },
 
   SESSION_DIR: env("SESSION_DIR", "session"),
