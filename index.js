@@ -308,7 +308,6 @@ function buildMenuText(userName) {
 ┃❃╭──────────────
 ┃❃│ 𝐏𝐫𝐞𝐟𝐢𝐱 : ${p}
 ┃❃│ 𝐔𝐬𝐞𝐫 : ${userName || "User"}
-┃❃│ 𝐁𝐨𝐭 : ${C.BOT_NAME || "HIS EXCELLENCY XMD"}
 ┃❃│ 𝐌𝐨𝐝𝐞 : ${getMode()}
 ┃❃│ 𝐓𝐢𝐦𝐞 : ${time}
 ┃❃│ 𝐃𝐚𝐲 : ${day}
