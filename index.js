@@ -138,7 +138,7 @@ function getMessageText(message) {
 }
 
 // ============================================================
-// MENU DESIGN (Fixed Encoding & Formatting)
+// MENU DESIGN
 // ============================================================
 function buildMenuText(userName) {
   const p = C.PREFIX || ".";
@@ -147,16 +147,16 @@ function buildMenuText(userName) {
   const time = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
-    timeZone: C.TIMEZONE || "UTC",
+    timeZone: C.TIMEZONE || "Africa/Nairobi",
   });
 
   const day = now.toLocaleDateString("en-US", {
     weekday: "long",
-    timeZone: C.TIMEZONE || "UTC",
+    timeZone: C.TIMEZONE || "Africa/Nairobi",
   });
 
   const date = now.toLocaleDateString("en-GB", {
-    timeZone: C.TIMEZONE || "UTC",
+    timeZone: C.TIMEZONE || "Africa/Nairobi",
   });
 
   const totalMem = os.totalmem() / 1024 / 1024;
@@ -201,14 +201,15 @@ function buildMenuText(userName) {
     ["VARS", ["ALLVAR", "DELSUDO", "DELVAR", "GETSUDO", "GETVAR", "SETSUDO", "SETVAR"]],
     ["VIDEO", ["COMPRESS", "CROP", "MERGE", "MP3", "REVERSE", "ROTATE", "TRIM"]],
     ["WHATSAPP", ["ANTIEDIT", "CALL", "CAPTION", "CINFO", "CLEAR", "CREATE", "DELETE", "DLT", "DOC", "ONLINE", "POLL", "REACT", "READ", "SCSTATUS", "SETSTATUS", "STATUS", "VV"]],
+    ["EPHOTO TEXT", ["NEON", "COLORFULGLOW", "ADVANCEDGLOW", "NEONONLINE", "BLUENEON", "NEONTEXT", "NEONLIGHT", "GREENNEON", "GREENLIGHTNEON", "BLUENEONLOGO", "GALAXYNEON", "RETRONEON", "MULTICOLORNEON", "HACKERNEON", "DEVILWINGS", "GLOWTEXT", "BLACKPINKNEON", "NEONGLITCH", "COLORFULNEONLIGHT", "WOODEN3D", "CUBIC3D", "WOODEN3DONLINE", "WATER3D", "CUONGTHI3D", "TEXT3D", "GRAFFITI3D", "SILVER3D", "STYLE3D", "METAL3D", "RUBY3D", "BIRTHDAY3D", "METALLOGO3D", "PIG3D", "AVENGERS3D", "HOLOGRAM3D", "GRADIENT3D", "STONE3D", "SPACE3D", "SAND3D", "GRADIENTTEXT3D", "LIGHTBULB3D", "SNOW3D", "PAPERCUT3D", "UNDERWATER3D", "SHINYMETALLIC3D", "GRADIENTSTYLE3D", "BEACH3D", "CRACK3D", "WOOD3D", "AMERICANFLAG3D", "CHRISTMAS3D", "NIGERIAFLAG3D", "CHRISTMASS␃NOW3D", "GOLDENCHRISTMAS3D", "DECORATIVEMETAL3D", "COLORFULPAINT3D", "GLOSSYSILVER3D", "BALLOON3D", "COMIC3D", "EPHOTOMENU"]]
   ];
 
   const body = cats.map(([title, cmds]) => {
     const list = cmds.map(c => ` │ ${c}`).join("\n");
-    return `╭─「 ${title} 」\n${list}\n╰──────────────────────`;
+    return ` ╭─❏ ${title} ❏\n${list}\n ╰─────────────────`;
   }).join("\n");
 
-  return header + body + `\n\n> Powered by HIS EXCELLENCY XMD`;
+  return header + body + `\n\n *Powered by HIS EXCELLENCY XMD* ✅`;
 }
 
 // ============================================================
