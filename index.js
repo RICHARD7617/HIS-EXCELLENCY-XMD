@@ -830,6 +830,7 @@ registerEventHandlers(currentSocket, log);
     // INCOMING MESSAGES
     // --------------------------------------------------------
 
+    currentSocket.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type !== "notify") return;
 
       for (const message of messages || []) {
