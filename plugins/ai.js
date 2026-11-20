@@ -1,64 +1,74 @@
+"use strict";
+
 const axios = require("axios");
+const C = require("../config");
 
-// If APIX has a specific URL, replace this. Otherwise, it usually mimics OpenAI.
-const APIX_URL = "https://api.apix.com/v1/chat/completions"; 
+async function askOpenAI(prompt) {
+  const key = C.API_KEYS?.OPENAI;
+  if (!key) throw new Error("OPENAI_API_KEY not set.");
+  const r = await axios.post(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 800
+    },
+    { headers: { Authorization: `Bearer ${key}` }, timeout: 30000 }
+  );
+  return r.data.choices?.[0]?.message?.content?.trim();
+}
 
-async function queryAI(prompt, model, sock, message, ctx) {
-  const apiKey = ctx.config.API_KEYS.APIX;
-  if (!apiKey) {
-    return ctx.reply("⚠️ APIX API key is missing. Add `APIX_API_KEY` to your environment variables.");
-  }
+async function askGemini(prompt) {
+  const key = C.API_KEYS?.GEMINI;
+  if (!key) throw new Error("GEMINI_API_KEY not set.");
+  const r = await axios.post(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+    { contents: [{ parts: [{ text: prompt }] }] },
+    { timeout: 30000 }
+  );
+  return r.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+}
 
-  try {
-    await sock.sendMessage(ctx.from, { text: "🤖 *Thinking...*" }, { quoted: message });
-    
-    const response = await axios.post(
-      APIX_URL,
-      {
-        model: model, // e.g., gpt-3.5-turbo, gemini-pro
-        messages: [{ role: "user", content: prompt }],
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        timeout: 20000, // 20 seconds timeout
-      }
-    );
+async function askGroq(prompt) {
+  const key = C.API_KEYS?.GROQ;
+  if (!key) throw new Error("GROQ_API_KEY not set.");
+  const r = await axios.post(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 800
+    },
+    { headers: { Authorization: `Bearer ${key}` }, timeout: 30000 }
+  );
+  return r.data.choices?.[0]?.message?.content?.trim();
+}
 
-    const replyText = response.data.choices[0].message.content;
-    await ctx.reply(replyText);
-  } catch (error) {
-    console.error("[AI ERROR]", error.response?.data || error.message);
-    await ctx.reply(`❌ AI Error: ${error.response?.data?.error?.message || error.message}`);
-  }
+function withProvider(name, fn) {
+  return async (sock, message, args, ctx) => {
+    const prompt = args.join(" ").trim();
+    if (!prompt) {
+      return ctx.reply(`Usage: ${ctx.prefix}${ctx.command} <your question>`);
+    }
+    try {
+      const answer = await fn(prompt);
+      if (!answer) return ctx.reply(`⚠️ ${name} returned an empty reply.`);
+      return ctx.reply(`🤖 *${name}*\n\n${answer}`);
+    } catch (err) {
+      return ctx.reply(`❌ ${name} error: ${err.message}`);
+    }
+  };
 }
 
 const commands = {
-  async gpt(sock, message, args, ctx) {
-    const prompt = args.join(" ");
-    if (!prompt) return ctx.reply("Usage: .gpt What is the capital of France?");
-    await queryAI(prompt, "gpt-3.5-turbo", sock, message, ctx);
-  },
-
-  async gemini(sock, message, args, ctx) {
-    const prompt = args.join(" ");
-    if (!prompt) return ctx.reply("Usage: .gemini Write a poem about the moon.");
-    await queryAI(prompt, "gemini-pro", sock, message, ctx);
-  },
-
-  async bing(sock, message, args, ctx) {
-    const prompt = args.join(" ");
-    if (!prompt) return ctx.reply("Usage: .bing Who won the world cup in 2022?");
-    await queryAI(prompt, "bing-search", sock, message, ctx);
-  },
-
-  async groq(sock, message, args, ctx) {
-    const prompt = args.join(" ");
-    if (!prompt) return ctx.reply("Usage: .groq Explain quantum physics.");
-    await queryAI(prompt, "llama3-70b-8192", sock, message, ctx);
-  }
+  gpt: withProvider("OpenAI", askOpenAI),
+  chatgpt: withProvider("OpenAI", askOpenAI),
+  ai: withProvider("OpenAI", askOpenAI),
+  gemini: withProvider("Gemini", askGemini),
+  bard: withProvider("Gemini", askGemini),
+  groq: withProvider("Groq", askGroq),
+  ilama: withProvider("Groq", askGroq),
+  llama: withProvider("Groq", askGroq)
 };
 
 module.exports = { commands };
