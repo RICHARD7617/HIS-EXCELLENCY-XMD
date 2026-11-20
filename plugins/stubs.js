@@ -36,8 +36,6 @@ const whatsapp = makeStub("WhatsApp", "a WhatsApp Business API");
 
 module.exports = {
   commands: {
-    // ---- AI ----
-    bing: ai, dall: ai, gemini: ai, gpt: ai, groq: ai, or: ai, upscale: editor,
 
     // ---- Audio ----
     avec: audio, bass: audio, black: audio, blown: audio, cut: audio,
