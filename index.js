@@ -443,9 +443,8 @@ async function handleMessage(socket, message) {
       const db = getDB();
       const settings = db.groups[from] || {};
 
-      const isLink =
-        /(chat\.whatsapp\.com|wa\.me|t\.me|https?:\/\/|www\.)/i.test(text);
-
+     const isLink =
+  /(https?:\/\/[^\s]+|www\.[^\s]+|chat\.whatsapp\.com\/[A-Za-z0-9_-]+|wa\.me\/[0-9]+|t\.me\/[A-Za-z0-9_]+)/i.test(text);
       if (settings.antilink && isLink) {
         try {
           const metadata = await socket.groupMetadata(from);
