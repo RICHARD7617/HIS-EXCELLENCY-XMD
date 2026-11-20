@@ -73,21 +73,124 @@ async function participantAction(sock, message, ctx, args, action, verb) {
   await permissions(sock, ctx, message, true);
   const ids = targets(message, args);
   if (!ids.length) return reply(ctx, `Usage: ${ctx.prefix}${ctx.command} @user (or reply to their message)`);
-  const result = await sock.groupParticipantsUpdate(ctx.from, ids, action);
-  const failed = result.filter(x => x.status && ![200, 201].includes(Number(x.status)));
-  return reply(ctx, `${failed.length ? "⚠️" : "✅"} ${verb}: ${ids.map(jidNumber).map(n => `@${n}`).join(", ")}${failed.length ? `\nFailed: ${failed.length}` : ""}`);
-}
 
+  const ok = [];
+  const failed = [];
+
+  for (const id of ids) {
+    try {
+      const result = await sock.groupParticipantsUpdate(ctx.from, [id], action);
+      const status = Number(result?.[0]?.status);
+      if (!status || [200, 201].includes(status)) ok.push(id);
+      else failed.push({ id, status });
+    } catch (err) {
+      failed.push({ id, error: err.message });
+    }
+  }
+
+  const lines = [];
+  if (ok.length) lines.push(`✅ ${verb}: ${ok.map(jidNumber).map(n => `@${n}`).join(", ")}`);
+  if (failed.length) {
+    lines.push(`⚠️ Failed (${failed.length}):`);
+    for (const f of failed) {
+      const reason = f.error ? f.error : `status ${f.status}`;
+      lines.push(`  • ${jidNumber(f.id)} — ${reason}`);
+    }
+  }
+  return reply(ctx, lines.join("\n"));
+}
 const commands = {
   // GROUP MEMBERSHIP / ADMINISTRATION
   add: async (s,m,a,c) => participantAction(s,m,c,a,"add","Add request sent"),
   promote: async (s,m,a,c) => participantAction(s,m,c,a,"promote","Promoted"),
   demote: async (s,m,a,c) => participantAction(s,m,c,a,"demote","Demoted"),
   kick: async (s,m,a,c) => participantAction(s,m,c,a,"remove","Removed"),
-  promoteall: async (s,m,a,c) => { const meta=await permissions(s,c,m,true); const ids=meta.participants.filter(p=>!isAdmin(p) && jidNumber(p.id)!==jidNumber(s.user?.id)).map(p=>p.id); if(!ids.length)return reply(c,"No members need promotion."); for(const id of ids) await s.groupParticipantsUpdate(c.from,[id],"promote"); return reply(c,`✅ Promoted ${ids.length} members.`); },
-  demoteall: async (s,m,a,c) => { const meta=await permissions(s,c,m,true); const ids=meta.participants.filter(p=>isAdmin(p) && jidNumber(p.id)!==jidNumber(s.user?.id)).map(p=>p.id); if(!ids.length)return reply(c,"No admins available to demote."); for(const id of ids) await s.groupParticipantsUpdate(c.from,[id],"demote"); return reply(c,`✅ Demoted ${ids.length} admins.`); },
-  kickall: async (s,m,a,c) => { const meta=await permissions(s,c,m,true); const ids=meta.participants.filter(p=>jidNumber(p.id)!==jidNumber(s.user?.id) && jidNumber(p.id)!==jidNumber(c.sender)).map(p=>p.id); if(!ids.length)return reply(c,"No removable members found."); for(const id of ids) await s.groupParticipantsUpdate(c.from,[id],"remove"); return reply(c,`✅ Removal requests sent for ${ids.length} members.`); },
-  leave: async (s,m,a,c) => { await permissions(s,c,m,false); await reply(c,"👋 The bot is leaving this group."); return s.groupLeave(c.from); },
+  promoteall: async (s, m, a, c) => {
+  const meta = await permissions(s, c, m, true);
+  const botNum = jidNumber(s.user?.id);
+  const ids = meta.participants
+    .filter(p => !isAdmin(p) && jidNumber(p.id || p.jid || p.lid) !== botNum)
+    .map(p => p.id || p.jid || p.lid)
+    .filter(Boolean);
+
+  if (!ids.length) return reply(c, "No members need promotion.");
+
+  let ok = 0, fail = 0;
+  for (const id of ids) {
+    try {
+      const r = await s.groupParticipantsUpdate(c.from, [id], "promote");
+      const status = Number(r?.[0]?.status);
+      if (!status || [200, 201].includes(status)) ok++;
+      else fail++;
+    } catch {
+      fail++;
+    }
+  }
+  return reply(c, `✅ Promoted ${ok} member(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
+}
+ demoteall: async (s, m, a, c) => {
+  const meta = await permissions(s, c, m, true);
+  const botNum = jidNumber(s.user?.id);
+  const ids = meta.participants
+    .filter(p => isAdmin(p) && jidNumber(p.id || p.jid || p.lid) !== botNum)
+    .map(p => p.id || p.jid || p.lid)
+    .filter(Boolean);
+
+  if (!ids.length) return reply(c, "No admins available to demote.");
+
+  let ok = 0, fail = 0;
+  for (const id of ids) {
+    try {
+      const r = await s.groupParticipantsUpdate(c.from, [id], "demote");
+      const status = Number(r?.[0]?.status);
+      if (!status || [200, 201].includes(status)) ok++;
+      else fail++;
+    } catch {
+      fail++;
+    }
+  }
+  return reply(c, `✅ Demoted ${ok} admin(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
+}
+  kickall: async (s, m, a, c) => {
+  const meta = await permissions(s, c, m, true);
+
+  const botNum = jidNumber(s.user?.id);
+  const senderNum = jidNumber(c.sender);
+
+  const ids = meta.participants
+    .filter(p => {
+      const n = jidNumber(p.id || p.jid || p.lid);
+      if (n === botNum) return false;
+      if (n === senderNum) return false;
+      if (isAdmin(p)) return false;           // don't touch admins
+      if (meta.owner && jidNumber(meta.owner) === n) return false;
+      return true;
+    })
+    .map(p => p.id || p.jid || p.lid)
+    .filter(Boolean);
+
+  if (!ids.length) return reply(c, "No removable members found.");
+
+  const ok = [];
+  const failed = [];
+
+  for (const id of ids) {
+    try {
+      const result = await s.groupParticipantsUpdate(c.from, [id], "remove");
+      const status = Number(result?.[0]?.status);
+      if (!status || [200, 201].includes(status)) ok.push(id);
+      else failed.push({ id, status });
+    } catch (err) {
+      failed.push({ id, error: err.message });
+    }
+  }
+
+  return reply(
+    c,
+    `✅ Removed ${ok.length} member(s).` +
+      (failed.length ? `\n⚠️ ${failed.length} failed (protected or owner).` : "")
+  );
+}
   mute: async (s,m,a,c) => { await permissions(s,c,m,true); await s.groupSettingUpdate(c.from,"announcement"); return reply(c,"🔇 Only admins can now send messages."); },
   unmute: async (s,m,a,c) => { await permissions(s,c,m,true); await s.groupSettingUpdate(c.from,"not_announcement"); return reply(c,"🔊 All members can now send messages."); },
   onlyadmins: async (s,m,a,c) => { const mode=(a[0]||"").toLowerCase(); if(!mode)return reply(c,`Usage: ${c.prefix}onlyadmins on/off`); await permissions(s,c,m,true); await s.groupSettingUpdate(c.from,mode==="on"?"announcement":"not_announcement"); return reply(c,mode==="on"?"🔒 Admin-only messaging enabled.":"🔓 Member messaging enabled."); },
@@ -142,8 +245,43 @@ const commands = {
   getgpp: async (s,m,a,c) => { await metadata(s,c); try { const url=await s.profilePictureUrl(c.from,"image"); return s.sendMessage(c.from,{image:{url},caption:"🖼️ Group profile picture"},{quoted:m}); } catch { return reply(c,"This group has no public profile picture."); } },
   gpp: async (s,m,a,c) => commands.getgpp(s,m,a,c),
   getjid: async (s,m,a,c) => reply(c,`Group JID: ${c.from}`),
-  approveall: async (s,m,a,c) => { await permissions(s,c,m,true); if(typeof s.groupRequestParticipantsList!=="function"||typeof s.groupRequestParticipantsUpdate!=="function")return reply(c,"❌ Join-request approval is not supported by this Baileys build."); const req=await s.groupRequestParticipantsList(c.from); if(!req.length)return reply(c,"No pending join requests."); for(const p of req)await s.groupRequestParticipantsUpdate(c.from,[p.jid||p.id],"approve"); return reply(c,`✅ Approved ${req.length} request(s).`); },
-  rejectall: async (s,m,a,c) => { await permissions(s,c,m,true); if(typeof s.groupRequestParticipantsList!=="function"||typeof s.groupRequestParticipantsUpdate!=="function")return reply(c,"❌ Join-request management is not supported by this Baileys build."); const req=await s.groupRequestParticipantsList(c.from); if(!req.length)return reply(c,"No pending join requests."); for(const p of req)await s.groupRequestParticipantsUpdate(c.from,[p.jid||p.id],"reject"); return reply(c,`✅ Rejected ${req.length} request(s).`); },
+  approveall: async (s, m, a, c) => {
+  await permissions(s, c, m, true);
+  if (typeof s.groupRequestParticipantsList !== "function")
+    return reply(c, "❌ Join-request approval is not supported by this Baileys build.");
+  const req = await s.groupRequestParticipantsList(c.from);
+  if (!req.length) return reply(c, "No pending join requests.");
+  let ok = 0, fail = 0;
+  for (const p of req) {
+    const id = p.jid || p.id;
+    try {
+      await s.groupRequestParticipantsUpdate(c.from, [id], "approve");
+      ok++;
+    } catch {
+      fail++;
+    }
+  }
+  return reply(c, `✅ Approved ${ok} request(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
+},
+
+  rejectall: async (s, m, a, c) => {
+  await permissions(s, c, m, true);
+  if (typeof s.groupRequestParticipantsList !== "function")
+    return reply(c, "❌ Join-request management is not supported by this Baileys build.");
+  const req = await s.groupRequestParticipantsList(c.from);
+  if (!req.length) return reply(c, "No pending join requests.");
+  let ok = 0, fail = 0;
+  for (const p of req) {
+    const id = p.jid || p.id;
+    try {
+      await s.groupRequestParticipantsUpdate(c.from, [id], "reject");
+      ok++;
+    } catch {
+      fail++;
+    }
+  }
+  return reply(c, `✅ Rejected ${ok} request(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
+}
   listonline: async (s,m,a,c) => { const meta=await metadata(s,c); const ids=meta.participants.filter(p=>p.presence?.lastKnownPresence==="available").map(p=>p.id); return reply(c,ids.length?"🟢 *Online participants*\n"+ids.map(jidNumber).join("\n"):"WhatsApp has not provided online presence for this group."); },
   listinactive: async (s,m,a,c) => { const meta=await metadata(s,c); return reply(c,`WhatsApp does not provide reliable last-active timestamps for all members. Group currently has ${meta.participants.length} participants.`); },
   fangtrace: async (s,m,a,c) => { const meta=await metadata(s,c); return reply(c,`🔎 Group trace\nName: ${meta.subject}\nJID: ${meta.id}\nMembers: ${meta.participants.length}\nAdmins: ${meta.participants.filter(isAdmin).length}`); },
