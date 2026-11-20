@@ -23,12 +23,15 @@ const logger = pino({ level: "silent" });
 
 let sock = null;
 let reconnecting = false;
-let startupSent = false;
 let autoFollowDone = false;
 let autoJoinDone = false;
 let attempts = 0;
 let stopping = false;
 let ignoreSessionId = false;
+
+// THIS IS THE KEY FIX: We use a global variable that never resets
+// so the bot only announces itself ONCE per deployment.
+let hasAnnouncedStartup = false; 
 
 const SESSION_DIR = path.join(__dirname, "session");
 const PORT = process.env.PORT || C.PORT || 3000;
@@ -203,14 +206,21 @@ async function autoJoinGroup(socket) {
 }
 
 async function sendStartupMessage(socket) {
-  if (startupSent || !C.SEND_STARTUP_MSG) return;
-  startupSent = true;
+  // Only send if we haven't announced yet, and if the config allows it.
+  if (hasAnnouncedStartup || !C.SEND_STARTUP_MSG) return;
+  
+  // Set the flag immediately so it never triggers again this session
+  hasAnnouncedStartup = true; 
+  
   try {
-    const owner = process.env.OWNER_NUMBER || C.OWNER_NUMBER;
-    if (!owner) return;
-    const jid = owner.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+    // FIXED: Send to the bot's own number (the person who deployed/paired it)
+    const botNumber = socket.user.id.split(":")[0].replace(/[^0-9]/g, "");
+    const jid = `${botNumber}@s.whatsapp.net`;
+    
     await socket.sendMessage(jid, { text: `✅ HIS EXCELLENCY XMD is now online!\n\n⏱ Runtime: ${runtime()}` });
-  } catch (error) { log("Startup message failed:", error.message); }
+  } catch (error) { 
+    log("Startup message failed:", error.message); 
+  }
 }
 
 // ============================================================
@@ -386,7 +396,8 @@ async function connectToWhatsApp() {
       const { connection, lastDisconnect } = update;
 
       if (connection === "open") {
-        attempts = 0; reconnecting = false; startupSent = false;
+        attempts = 0; reconnecting = false;
+        
         log("WhatsApp connected successfully.");
         
         await autoFollowChannel(sock);
