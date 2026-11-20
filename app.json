@@ -1,31 +1,59 @@
 {
-  "name": "His Excellency xmd 001",
-  "description": "His Excellency xmd 001 - Next Generation WhatsApp bot powered by Baileys",
-  "repository": "https://github.com/Vinpink2/June-Ultra",
-  "logo": "",
-  "keywords": ["whatsapp", "baileys", "bot", "node", "md", "june-ultra"],
-  "stack": "heroku-26",
-  "buildpacks": [
-    {
-      "url": "https://github.com/heroku/heroku-buildpack-nodejs.git"
+  "name": "HIS EXCELLENCY XMD 001",
+  "description": "Professional WhatsApp Bot with auto-session authentication",
+  "logo": "https://u.pone.rs/vruliovd.jpeg",
+  "keywords": ["whatsapp", "bot", "his-excellency", "baileys", "session"],
+  "repository": "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD.git",
+  "scripts": {
+    "start": "node --no-warnings --experimental-global-webcrypto index.js"
+  },
+  "env": {
+    "SESSION_ID": {
+      "description": "REQUIRED: Your WhatsApp session ID. Must begin with 'XMD~'",
+      "value": "",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "OPTIONAL: PostgreSQL connection string for persistent storage.",
+      "value": "",
+      "required": false
+    },
+    "MONGODB_URI": {
+      "description": "OPTIONAL: MongoDB Atlas connection string for persistent cloud storage.",
+      "value": "",
+      "required": false
+    },
+    "BOT_MODE": {
+      "description": "OPTIONAL: Bot operating mode. Options: public, private, group, solo, sudo, super, buttons, channel. Defaults to 'public'.",
+      "value": "public",
+      "required": false
+    },
+    "OWNER_NUMBER": {
+      "description": "OPTIONAL: Your WhatsApp number with country code (e.g., 254700000000).",
+      "value": "",
+      "required": false
+    },
+    "APIX_API_KEY": {
+      "description": "OPTIONAL: APIX AI and media API key. Leave blank to use the default fallback key.",
+      "value": "wxa_fallback_key_placeholder", 
+      "required": false
     }
-  ],
+  },
   "formation": {
     "web": {
       "quantity": 1,
       "size": "basic"
     }
   },
-  "env": {
-    "SESSION_ID": {
-      "description": "His Excellency xmd 001 session string. Accepted formats: HIS-EXCELLENCY:~, Thee-Baddest:~, Janam-Ler:~",
-      "required": false,
-      "value": ""
-    }
-  },
-  "addons": [
+  "buildpacks": [
     {
-      "plan": "heroku-postgresql"
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git"
+    },
+    {
+      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
     }
   ]
 }
