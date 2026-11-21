@@ -85,17 +85,56 @@ const commands = {
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
     const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    if (!quoted) return c.reply("❌ Reply to a View Once.");
-    let msg = quoted.viewOnceMessageV2?.message || quoted.viewOnceMessageV2Extension?.message || quoted.viewOnceMessage?.message || quoted;
-    const type = Object.keys(msg)[0];
-    if (!["imageMessage", "videoMessage"].includes(type)) return c.reply("❌ Not a View Once media.");
+    if (!quoted) return c.reply("❌ Please reply to a View Once image or video.");
+
+    // 1. Dig into the wrappers to find the actual image/video
+    let targetMsg = null;
+    let type = null;
+
+    if (quoted.viewOnceMessageV2?.message) {
+      targetMsg = quoted.viewOnceMessageV2.message;
+      type = Object.keys(targetMsg)[0];
+    } else if (quoted.viewOnceMessageV2Extension?.message) {
+      targetMsg = quoted.viewOnceMessageV2Extension.message;
+      type = Object.keys(targetMsg)[0];
+    } else if (quoted.viewOnceMessage?.message) {
+      targetMsg = quoted.viewOnceMessage.message;
+      type = Object.keys(targetMsg)[0];
+    } else if (quoted.imageMessage || quoted.videoMessage) {
+      // If they somehow sent it without the wrapper but it's still media
+      targetMsg = quoted;
+      type = quoted.imageMessage ? "imageMessage" : "videoMessage";
+    }
+
+    // 2. Check if we found valid media
+    if (!targetMsg || !type || !["imageMessage", "videoMessage"].includes(type)) {
+      return c.reply("❌ The replied message is not a View Once image or video.");
+    }
+
     try {
       const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
-      const stream = await downloadContentFromMessage(msg[type], type.replace("Message", ""));
+      
+      // 3. Extract the media data (contains the url, mediaKey, directPath)
+      const media = targetMsg[type];
+      
+      // 4. Download the stream directly from the media object
+      const stream = await downloadContentFromMessage(media, type.replace("Message", ""));
+      
       let buffer = Buffer.from([]);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      await s.sendMessage(c.from, { [type.replace("Message", "")]: buffer, caption: `📸 View Once Opened` }, { quoted: m });
-    } catch (err) { c.reply(`❌ Failed: ${err.message}`); }
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
+      
+      // 5. Send it back
+      const caption = media.caption ? `\n\n${media.caption}` : "";
+      await s.sendMessage(c.from, { 
+        [type.replace("Message", "")]: buffer, 
+        caption: `📸 *View Once Opened*${caption}` 
+      }, { quoted: m });
+
+    } catch (err) { 
+      c.reply(`❌ Failed to open View Once: ${err.message}`); 
+    }
   },
 
   save: async (s, m, a, c) => {
