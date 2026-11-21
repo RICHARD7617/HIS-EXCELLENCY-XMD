@@ -891,13 +891,14 @@ async function connectToWhatsApp() {
           await currentSocket.readMessages([msg.key]).catch(() => {});
           
           // Auto React Status
-          if (bot.autoreactstatus && msg.key.participant) {
+                   if (bot.autoreactstatus && msg.key.participant) {
+            const statusEmojis = ["❤️", "🔥", "👍", "😂", "😮", "😢", "🙏", "💯", "✨", "🎉", "👏", "💔", "🤩", "🥰", "😎", "🤯", "🤔", "🫡", "💯", "⚡"];
+            const randomStatusEmoji = statusEmojis[Math.floor(Math.random() * statusEmojis.length)];
+            
             await currentSocket.sendMessage(msg.key.participant, {
-              react: { text: "🔥", key: msg.key }
+              react: { text: randomStatusEmoji, key: msg.key }
             }).catch(() => {});
           }
-          continue; // Skip the rest for statuses
-        }
 
         // Don't trigger automations on your own messages
         if (msg.key.fromMe) {
