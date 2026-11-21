@@ -2,6 +2,7 @@
 
 const C = require("../config");
 
+// UNIVERSAL TOGGLE HELPER
 async function handleToggle(ctx, key, label) {
   const db = ctx.db();
   if (!db.bot) db.bot = {};
@@ -10,37 +11,28 @@ async function handleToggle(ctx, key, label) {
   const isGroup = ctx.isGroup;
   const targetObj = isGroup ? (db.groups[ctx.from] ||= {}) : db.bot;
   
-  // 1. Get the requested state from args (e.g., "on" or "off")
   const requested = ctx.args?.[0]?.toLowerCase();
-  
-  // 2. Default current state to true if it's undefined (Except for group moderations which default to false)
   const defaultValue = isGroup ? false : true;
   let currentState = targetObj[key] ?? defaultValue;
   
-  // 3. Apply the new state
   if (requested === "on") {
     targetObj[key] = true;
   } else if (requested === "off") {
     targetObj[key] = false;
   } else {
-    targetObj[key] = !currentState; // Just flip it if no args provided
+    targetObj[key] = !currentState;
   }
 
-  // 4. Save to DB
   ctx.saveDB(db);
-
-  // 5. Reply
   ctx.reply(`${targetObj[key] ? "✅ Enabled" : "❌ Disabled"} *${label || key}*`);
 }
+
 const commands = {
   // ================= OWNER CONTROLS =================
   setprefix: async (s, m, a, c) => {
     if (!c.isOwner) return;
     if (!a[0]) return c.reply("Provide a prefix.");
-    const db = c.db();
-    db.bot.prefix = a[0];
-    c.saveDB(db);
-    C.PREFIX = a[0];
+    const db = c.db(); db.bot.prefix = a[0]; c.saveDB(db); C.PREFIX = a[0];
     c.reply(`✅ Prefix set to: *${a[0]}*`);
   },
   prefix: async (s, m, a, c) => c.reply(`Current prefix: *${c.prefix}*`),
@@ -56,7 +48,6 @@ const commands = {
     const db = c.db(); db.bot.mode = "PRIVATE"; c.saveDB(db); C.MODE = "PRIVATE";
     c.reply("🔒 Bot is now in *PRIVATE* mode.");
   },
-
   pair: async (s, m, a, c) => {
     if (!c.isOwner) return;
     if (!a[0]) return c.reply("Usage: .pair 254712345678");
@@ -65,8 +56,6 @@ const commands = {
       c.reply(`🔑 Pairing Code: *${code}*`);
     } catch (e) { c.reply(`❌ Failed: ${e.message}`); }
   },
-
-  antidelete: async (s, m, a, c) => toggleAuto(c, "antidelete"),
 
   // ================= SYSTEM =================
   restart: async (s, m, a, c) => {
@@ -78,30 +67,20 @@ const commands = {
     if (!c.isOwner) return;
     const bot = c.db().bot || {};
     const automations = ["autoread", "autotyping", "autorecording", "autorecordtyping", "autoreact", "autoreactstatus", "autoviewstatus", "antidelete"]
-      .map(k => `${bot[k] ? "✅" : "❌"} ${k}`).join("\n");
+      .map(k => `${bot[k] ?? true ? "✅" : "❌"} ${k}`).join("\n");
     c.reply(`⚙️ *Settings*\nMode: *${C.MODE}*\nPrefix: *${C.PREFIX}*\n\n*Automations:*\n${automations}`);
-  },
-  setsettings: async (s, m, a, c) => {
-    if (!c.isOwner) return;
-    const key = a[0]?.toLowerCase();
-    const val = a[1]?.toLowerCase() === "true";
-    if (!key) return c.reply("Usage: .setsettings <setting> <true/false>");
-    const db = c.db();
-    if (!db.bot) db.bot = {};
-    db.bot[key] = val;
-    c.saveDB(db);
-    c.reply(`✅ Setting *${key}* updated to: *${val}*`);
   },
   test: async (s, m, a, c) => c.reply("✅ Bot is responding perfectly!"),
 
   // ================= AUTOMATION =================
-  autoread: async (s, m, a, c) => toggleAuto(c, "autoread"),
-  autotyping: async (s, m, a, c) => toggleAuto(c, "autotyping"),
-  autorecording: async (s, m, a, c) => toggleAuto(c, "autorecording"),
-  autorecordtyping: async (s, m, a, c) => toggleAuto(c, "autorecordtyping"),
-  autoreact: async (s, m, a, c) => toggleAuto(c, "autoreact"),
-  autoreactstatus: async (s, m, a, c) => toggleAuto(c, "autoreactstatus"),
-  autoviewstatus: async (s, m, a, c) => toggleAuto(c, "autoviewstatus"),
+  autoread: async (s, m, a, c) => handleToggle(c, "autoread", "Auto Read"),
+  autotyping: async (s, m, a, c) => handleToggle(c, "autotyping", "Auto Typing"),
+  autorecording: async (s, m, a, c) => handleToggle(c, "autorecording", "Auto Recording"),
+  autorecordtyping: async (s, m, a, c) => handleToggle(c, "autorecordtyping", "Auto Record & Typing"),
+  autoreact: async (s, m, a, c) => handleToggle(c, "autoreact", "Auto React"),
+  autoreactstatus: async (s, m, a, c) => handleToggle(c, "autoreactstatus", "Auto React Status"),
+  autoviewstatus: async (s, m, a, c) => handleToggle(c, "autoviewstatus", "Auto View Status"),
+  antidelete: async (s, m, a, c) => handleToggle(c, "antidelete", "Anti-Delete"),
 
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
@@ -117,6 +96,37 @@ const commands = {
       for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
       await s.sendMessage(c.from, { [type.replace("Message", "")]: buffer, caption: `📸 View Once Opened` }, { quoted: m });
     } catch (err) { c.reply(`❌ Failed: ${err.message}`); }
+  },
+
+  save: async (s, m, a, c) => {
+    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!quoted) return c.reply("❌ Reply to media to save it.");
+    
+    let msg = quoted.viewOnceMessageV2?.message || 
+              quoted.viewOnceMessageV2Extension?.message || 
+              quoted.viewOnceMessage?.message || 
+              quoted;
+
+    const type = Object.keys(msg)[0];
+    const validTypes = ["imageMessage", "videoMessage", "audioMessage", "documentMessage"];
+    if (!validTypes.includes(type)) return c.reply("❌ Not a savable media file.");
+
+    try {
+      const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
+      const stream = await downloadContentFromMessage(msg[type], type.replace("Message", ""));
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+      
+      const caption = msg[type].caption ? msg[type].caption : "";
+      
+      await s.sendMessage(c.from, { 
+        [type.replace("Message", "")]: buffer, 
+        caption: `📥 *Media Saved*\n\n${caption}` 
+      }, { quoted: m });
+      
+    } catch (err) { 
+      c.reply(`❌ Failed to save: ${err.message}`); 
+    }
   }
 };
 
