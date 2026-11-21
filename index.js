@@ -898,7 +898,6 @@ async function connectToWhatsApp() {
     });
 
         // ANTI-DELETE LISTENER
-    const msgCache = new Map();
     currentSocket.ev.on("messages.upsert", ({ messages }) => {
       for (const m of messages) {
         if (m.key?.id) msgCache.set(m.key.id, m);
