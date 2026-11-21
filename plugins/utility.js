@@ -26,6 +26,73 @@ const commands = {
     );
     await c.reply(lines.length ? lines.join("\n") : "No external IPv4 interfaces.");
   },
+    repo: async (s, m, a, c) => {
+    const repoUrl = "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD";
+    const imageUrl = "https://i.ibb.co/m5XvzLZn/789312781119.jpg";
+    const ownerJid = "254738993575@s.whatsapp.net"; // Replace with your actual JID if needed
+
+    const caption = `╭─⌈ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘-𝐗𝐌𝐃|𝟎𝟎𝟏🔥 ⌋
+│
+│ ✧ *𝐍𝐚𝐦𝐞* : 𝐇𝐢𝐬 𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐗𝐦𝐝𝟎𝟎𝟏
+│ ✧ *𝐎𝐰𝐧𝐞𝐫* : 𝐇𝐢𝐬 𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲
+│ ✧ *𝐒𝐭𝐚𝐫𝐬* : 1 ⭐
+│ ✧ *𝐅𝐨𝐫𝐤𝐬* : 3 🍴
+│ ✧ *𝐒𝐢𝐳𝐞* : 𝟏𝟔𝟏 𝐊𝐁
+│ ✧   𝐃𝐨𝐧'𝐭 𝐟𝐨𝐫𝐠𝐞𝐭🔥
+│  𝐭𝐨 𝐟𝐨𝐫𝐤 𝐚𝐧𝐝 𝐬𝐭𝐚𝐫 𝐭𝐡𝐞 𝐫𝐞𝐩𝐨.🙏
+╰──=
+𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅`;
+
+    // The interactive message payload with hidden buttons
+    const messagePayload = {
+      interactiveMessage: {
+        body: { text: caption },
+        footer: { text: "HIS EXCELLENCY XMD" },
+        nativeFlowMessage: {
+          buttons: [
+            {
+              name: "cta_url",
+              buttonParamsJson: JSON.stringify({
+                display_text: "🌐 Fork Repo",
+                url: repoUrl,
+                merchant_url: repoUrl
+              })
+            },
+            {
+              name: "cta_url",
+              buttonParamsJson: JSON.stringify({
+                display_text: "🚀 Pair Site",
+                url: "https://his-excellency-xmd.onrender.com", // Update if your pair site is different
+                merchant_url: "https://his-excellency-xmd.onrender.com"
+              })
+            }
+          ]
+        }
+      }
+    };
+
+    try {
+      // 1. Send the message with the image link preview
+      await s.sendMessage(c.from, {
+        text: caption,
+        linkPreview: {
+          "matched-text": repoUrl,
+          title: "HIS EXCELLENCY XMD",
+          description: "Click to view the repository",
+          jpegThumbnail: null, // We let WhatsApp fetch the thumbnail
+          highQualityThumbnail: imageUrl,
+          previewType: "IMAGE"
+        },
+        mentions: [ownerJid]
+      }, { quoted: m });
+
+      // 2. Send the interactive message right below it
+      await s.sendMessage(c.from, messagePayload, { quoted: m });
+      
+    } catch (err) {
+      c.reply(`❌ Failed to send repo menu: ${err.message}`);
+    }
+  },
 
   // ================= WHATSAPP NATIVE ACTIONS =================
   block: async (s, m, a, c) => {
