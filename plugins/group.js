@@ -127,7 +127,7 @@ const commands = {
     }
   }
   return reply(c, `✅ Promoted ${ok} member(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
-}
+},
  demoteall: async (s, m, a, c) => {
   const meta = await permissions(s, c, m, true);
   const botNum = jidNumber(s.user?.id);
@@ -150,7 +150,7 @@ const commands = {
     }
   }
   return reply(c, `✅ Demoted ${ok} admin(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
-}
+},
   kickall: async (s, m, a, c) => {
   const meta = await permissions(s, c, m, true);
 
@@ -190,7 +190,7 @@ const commands = {
     `✅ Removed ${ok.length} member(s).` +
       (failed.length ? `\n⚠️ ${failed.length} failed (protected or owner).` : "")
   );
-}
+},
   mute: async (s,m,a,c) => { await permissions(s,c,m,true); await s.groupSettingUpdate(c.from,"announcement"); return reply(c,"🔇 Only admins can now send messages."); },
   unmute: async (s,m,a,c) => { await permissions(s,c,m,true); await s.groupSettingUpdate(c.from,"not_announcement"); return reply(c,"🔊 All members can now send messages."); },
   onlyadmins: async (s,m,a,c) => { const mode=(a[0]||"").toLowerCase(); if(!mode)return reply(c,`Usage: ${c.prefix}onlyadmins on/off`); await permissions(s,c,m,true); await s.groupSettingUpdate(c.from,mode==="on"?"announcement":"not_announcement"); return reply(c,mode==="on"?"🔒 Admin-only messaging enabled.":"🔓 Member messaging enabled."); },
@@ -281,7 +281,7 @@ const commands = {
     }
   }
   return reply(c, `✅ Rejected ${ok} request(s).` + (fail ? `\n⚠️ ${fail} failed.` : ""));
-}
+},
   listonline: async (s,m,a,c) => { const meta=await metadata(s,c); const ids=meta.participants.filter(p=>p.presence?.lastKnownPresence==="available").map(p=>p.id); return reply(c,ids.length?"🟢 *Online participants*\n"+ids.map(jidNumber).join("\n"):"WhatsApp has not provided online presence for this group."); },
   listinactive: async (s,m,a,c) => { const meta=await metadata(s,c); return reply(c,`WhatsApp does not provide reliable last-active timestamps for all members. Group currently has ${meta.participants.length} participants.`); },
   fangtrace: async (s,m,a,c) => { const meta=await metadata(s,c); return reply(c,`🔎 Group trace\nName: ${meta.subject}\nJID: ${meta.id}\nMembers: ${meta.participants.length}\nAdmins: ${meta.participants.filter(isAdmin).length}`); },
