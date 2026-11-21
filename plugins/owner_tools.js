@@ -86,6 +86,51 @@ const commands = {
   autoviewstatus: async (s, m, a, c) => toggleAuto(c, "autoviewstatus"),
 
   // ================= CONTACT TOOLS =================
+    save: async (s, m, a, c) => {
+    // 1. Get the quoted message (the status/media you replied to)
+    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!quoted) return c.reply("❌ Please reply to an image, video, or View Once status to save it.");
+
+    // 2. Unwrap it (in case it's a View Once)
+    let msg = quoted.viewOnceMessageV2?.message || 
+              quoted.viewOnceMessageV2Extension?.message || 
+              quoted.viewOnceMessage?.message || 
+              quoted;
+
+    // 3. Check if it's media
+    const type = Object.keys(msg)[0];
+    const validTypes = ["imageMessage", "videoMessage", "audioMessage", "documentMessage"];
+
+    if (!validTypes.includes(type)) {
+      return c.reply("❌ The replied message is not a savable media file.");
+    }
+
+    try {
+      const { downloadMediaMessage } = require("@whiskeysockets/baileys");
+      
+      // 4. Download the media buffer
+      const fakeMsg = { message: msg, key: m.key };
+      const buffer = await downloadMediaMessage(fakeMsg, "buffer", {}, { logger: console, reuploadRequest: s.updateMediaMessage });
+      
+      // 5. Prepare the caption
+      const caption = msg[type].caption ? msg[type].caption : "";
+      const finalCaption = `📥 *Media Saved*\n\n${caption}`;
+
+      // 6. Send it back to the chat (or to your DM)
+      // If you want it sent to the chat:
+      await s.sendMessage(c.from, {
+        [type.replace("Message", "")]: buffer, // Converts 'imageMessage' to 'image'
+        caption: finalCaption
+      }, { quoted: m });
+
+      // Optional: If you want it sent to your OWN inbox instead, uncomment the lines below:
+      // const ownerJid = process.env.OWNER_NUMBER + "@s.whatsapp.net";
+      // await s.sendMessage(ownerJid, { [type.replace("Message", "")]: buffer, caption: finalCaption });
+
+    } catch (err) {
+      c.reply(`❌ Failed to save media: ${err.message}`);
+    }
+  },
   vv: async (s, m, a, c) => {
     // 1. Dig deep into the message context to find the view-once message
     const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
