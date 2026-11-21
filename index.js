@@ -490,8 +490,31 @@ async function handleMessage(socket, message) {
     // --------------------------------------------------------
     // MODE PERMISSIONS
     // --------------------------------------------------------
+    // --------------------------------------------------------
+    // MODE PERMISSIONS
+    // --------------------------------------------------------
 
-    if (getMode() === "PRIVATE" && !isOwner) return;
+    const currentMode = getMode();
+    
+    // If in PRIVATE mode, block everyone except the Owner and Group Admins
+    if (currentMode === "PRIVATE" && !isOwner) {
+      // Allow if the user is a group admin
+      if (isGroup) {
+        try {
+          const meta = await socket.groupMetadata(from);
+          const participant = meta.participants.find(
+            p => normalizeNumber(p.id) === normalizeNumber(sender)
+          );
+          const isAdmin = participant && (participant.admin === "admin" || participant.admin === "superadmin");
+          
+          if (!isAdmin) return; // Block normal members
+        } catch (e) {
+          return; // Block if we can't verify admin
+        }
+      } else {
+        return; // Block if it's a DM and not the owner
+      }
+    }
 
     // --------------------------------------------------------
     // BUILT-IN COMMANDS
