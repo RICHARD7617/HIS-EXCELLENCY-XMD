@@ -930,6 +930,7 @@ async function connectToWhatsApp() {
           await currentSocket.sendMessage(msg.key.remoteJid, { 
             react: { text: randomEmoji, key: msg.key } 
           }).catch(() => {});
+          continue;
         }
 
         // --- HANDLE COMMANDS ---
