@@ -832,13 +832,73 @@ async function connectToWhatsApp() {
     // INCOMING MESSAGES
     // --------------------------------------------------------
 
+       // --------------------------------------------------------
+    // INCOMING MESSAGES & AUTOMATION
+    // --------------------------------------------------------
+
     currentSocket.ev.on("messages.upsert", async ({ messages, type }) => {
       if (type !== "notify") return;
+
+      // AUTOMATION LISTENER ===
+      const db = getDB();
+      if (db.bot) {
+        for (const msg of messages) {
+          if (!msg.key?.remoteJid) continue;
+          
+          // Auto Read
+          if (db.bot.autoread) {
+            currentSocket.readMessages([msg.key]).catch(() => {});
+          }
+          // Auto View Status
+          if (db.bot.autoviewstatus && msg.key.remoteJid === "status@broadcast") {
+            currentSocket.readMessages([msg.key]).catch(() => {});
+          }
+          // Auto Typing
+          if (db.bot.autotyping && !msg.key.fromMe) {
+            currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {});
+          }
+        }
+      }
+      // ====================================
 
       for (const message of messages || []) {
         handleMessage(currentSocket, message).catch(error => {
           log("Message processing error:", error.message);
         });
+      }
+    });
+
+        // ANTI-DELETE LISTENER
+    const msgCache = new Map();
+    currentSocket.ev.on("messages.upsert", ({ messages }) => {
+      for (const m of messages) {
+        if (m.key?.id) msgCache.set(m.key.id, m);
+      }
+    });
+
+    currentSocket.ev.on("messages.update", async (updates) => {
+      const db = getDB();
+      if (!db.bot?.antidelete) return;
+      
+      for (const update of updates) {
+        if (update.update?.message === null) { // Message deleted
+          const cached = msgCache.get(update.key.id);
+          if (cached && cached.message) {
+            const from = update.key.remoteJid;
+            await currentSocket.sendMessage(from, { 
+              text: `🚫 *Anti-Delete Triggered!*\n\nA message was deleted. Here is what it said:`,
+            }).catch(()=>{});
+            
+            // Resend text or media
+            if (cached.message.conversation) {
+              await currentSocket.sendMessage(from, { text: cached.message.conversation }).catch(()=>{});
+            } else if (cached.message.extendedTextMessage) {
+              await currentSocket.sendMessage(from, { text: cached.message.extendedTextMessage.text }).catch(()=>{});
+            } else {
+              await currentSocket.sendMessage(from, { forward: cached, forceForward: true }).catch(()=>{});
+            }
+          }
+        }
       }
     });
 
