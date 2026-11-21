@@ -284,7 +284,7 @@ function buildMenuText(userName) {
     ["PRIVACY CONTROLS", ["online", "privacy", "receipt", "profilepic", "viewer", "lastseen"]],
     ["GENERAL UTILITIES", ["alive", "ping", "ping2", "time", "uptime", "runtime", "videocall", "voicecall", "define", "remind", "sessioninfo", "genmusic", "genlyrics", "musicprompt", "news", "covid", "weather", "wiki", "translate", "iplookup", "getip", "getpp", "getgpp", "getdesc", "listadmins", "prefixinfo", "platform", "onwhatsapp", "country"]],
     ["CONVERSION & MEDIA", ["shorturl", "url", "fetch", "qrencode", "take", "imgbb", "save", "rename", "screenshot", "inspect", "toimage", "tosticker", "toaudio", "tovoice", "tts", "trebleboost", "jarvis", "topdf", "extractpdf", "toword", "extractword", "toexcel", "extractexcel", "toppt", "extractppt"]],
-    ["CONTACT TOOLS", ["vcf", "viewvcf", "vv", "vv2"]],
+    ["CONTACT TOOLS", ["vcf", "viewvcf", "vv", "save", "vv2"]],
     ["MUSIC", ["play", "song", "video", "videodoc", "lyrics", "shazam", "spotify"]],
     ["MEDIA DOWNLOADS", ["tiktok", "instagram", "facebook", "snapchat", "apk", "yts", "ytplay", "ytmp3", "ytv", "ytmp4", "ytvdoc", "videodl", "playlist", "xvideos", "xnxx", "mediafire", "downloadurl"]],
     ["AI COMMANDS", ["gpt", "chatgpt", "gemini", "cohere", "copilot", "bing", "bard", "claudeai", "grok", "groq", "blackbox", "mistral", "metai", "perplexity", "qwenai", "ilama", "venice", "wormgpt", "deepseek", "chatbot"]],
