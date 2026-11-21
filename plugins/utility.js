@@ -26,10 +26,10 @@ const commands = {
     );
     await c.reply(lines.length ? lines.join("\n") : "No external IPv4 interfaces.");
   },
-    repo: async (s, m, a, c) => {
+  repo: async (s, m, a, c) => {
     const repoUrl = "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD";
     const imageUrl = "https://i.ibb.co/m5XvzLZn/789312781119.jpg";
-    const ownerJid = "`https://wa.me/254738993575?text=Hi%20there";
+    const ownerJid = process.env.OWNER_NUMBER ? `${process.env.OWNER_NUMBER}@s.whatsapp.net` : "254738993575@s.whatsapp.net";
 
     const caption = `╭─⌈ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘-𝐗𝐌𝐃|𝟎𝟎𝟏🔥 ⌋
 │
@@ -43,33 +43,50 @@ const commands = {
 ╰──=
 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅`;
 
-    // The interactive message payload with hidden buttons
-    const messagePayload = {
-      interactiveMessage: {
-        body: { text: caption },
-        footer: { text: "HIS EXCELLENCY XMD" },
-        nativeFlowMessage: {
-          buttons: [
-            {
-              name: "cta_url",
-              buttonParamsJson: JSON.stringify({
-                display_text: "🌐 Fork Repo",
-                url: repoUrl,
-                merchant_url: repoUrl
-              })
-            },
-            {
-              name: "cta_url",
-              buttonParamsJson: JSON.stringify({
-                display_text: "🚀 Pair Site",
-                url: "https://his-excellency-xmd.onrender.com",
-                merchant_url: "https://his-excellency-xmd.onrender.com"
-              })
+    try {
+      // 1. Send the Image + Caption first
+      await s.sendMessage(c.from, { 
+        image: { url: imageUrl }, 
+        caption: caption,
+        mentions: [ownerJid]
+      }, { quoted: m });
+
+      // 2. Send the Interactive Message with the hidden link buttons
+      await s.sendMessage(c.from, {
+        viewOnceMessage: {
+          message: {
+            interactiveMessage: {
+              body: { text: "Click a button below to proceed:" },
+              footer: { text: "HIS EXCELLENCY XMD" },
+              nativeFlowMessage: {
+                buttons: [
+                  {
+                    name: "cta_url",
+                    buttonParamsJson: JSON.stringify({
+                      display_text: "🌐 Fork Repo",
+                      url: repoUrl,
+                      merchant_url: repoUrl
+                    })
+                  },
+                  {
+                    name: "cta_url",
+                    buttonParamsJson: JSON.stringify({
+                      display_text: "🚀 Pair Site",
+                      url: "https://his-excellency-xmd.onrender.com",
+                      merchant_url: "https://his-excellency-xmd.onrender.com"
+                    })
+                  }
+                ]
+              }
             }
-          ]
+          }
         }
-      }
-    };
+      }, { quoted: m });
+
+    } catch (err) {
+      c.reply(`❌ Failed to send repo menu: ${err.message}`);
+    }
+  },
 
     try {
       // 1. Send the message with the image link preview
