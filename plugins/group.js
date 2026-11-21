@@ -51,15 +51,41 @@ async function metadata(sock, ctx) {
 }
 async function permissions(sock, ctx, message, requireBotAdmin = true) {
   const meta = await metadata(sock, ctx);
-  const sender = String(ctx.sender || "").split(":")[0];
-  const self = String(sock.user?.id || "").split(":")[0];
   
-  const senderP = meta.participants.find(p => p.id === sender || p.jid === sender || jidNumber(p.id) === jidNumber(sender));
+  // 1. Get raw string numbers
+  const senderNum = jidNumber(ctx.sender);
+  const selfNum = jidNumber(sock.user?.id);
   
-  const botP = meta.participants.find(p => p.id === self || p.jid === self || jidNumber(p.id) === jidNumber(self));
+  // 2. Get the FULL JID of the bot (handles the @s.whatsapp.net part)
+  const selfJid = sock.user?.id.split(":")[0] + "@s.whatsapp.net";
+
+  // 3. Find the sender
+  const senderP = meta.participants.find(p => 
+    jidNumber(p.id) === senderNum || 
+    jidNumber(p.jid) === senderNum || 
+    jidNumber(p.lid) === senderNum
+  );
   
-  if (!ctx.isOwner && !isAdmin(senderP)) throw new Error("Only group admins can use this command.");
-  if (requireBotAdmin && !isAdmin(botP)) throw new Error("Please make the bot a group admin first.");
+  // 4. Find the bot (Checks ID, JID, LID, and number matching)
+  const botP = meta.participants.find(p => 
+    p.id === sock.user?.id ||
+    p.id === selfJid ||
+    p.jid === selfJid ||
+    p.lid === selfJid ||
+    jidNumber(p.id) === selfNum || 
+    jidNumber(p.jid) === selfNum || 
+    jidNumber(p.lid) === selfNum
+  );
+  
+  // 5. Check permissions
+  if (!ctx.isOwner && !isAdmin(senderP)) {
+    throw new Error("Only group admins can use this command.");
+  }
+  
+  if (requireBotAdmin && !isAdmin(botP)) {
+    throw new Error("Please make the bot a group admin first.");
+  }
+  
   return meta;
 }
 async function reply(ctx, text) { return ctx.reply(text); }
