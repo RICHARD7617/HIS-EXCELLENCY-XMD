@@ -667,7 +667,7 @@ async function handleMessage(socket, message) {
         runtime,
         db: getDB,
         saveDB,
-        args: args
+        args: args,
         reply: replyText =>
           socket.sendMessage(from, {
             text: String(replyText)
