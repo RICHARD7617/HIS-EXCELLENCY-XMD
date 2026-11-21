@@ -886,12 +886,17 @@ async function connectToWhatsApp() {
         // --- ANTI-DELETE CACHE ---
         if (msg.key.id) msgCache.set(msg.key.id, msg);
 
-        // --- AUTO VIEW STATUS ---
-        if (bot.autoviewstatus && msg.key.remoteJid === "status@broadcast") {
-          await currentSocket.readMessages([msg.key]).catch(() => {});
+         // --- AUTO VIEW STATUS & REACT ---
+        if (msg.key.remoteJid === "status@broadcast") {
+          // Default to TRUE if not set
+          const viewStatus = bot.autoviewstatus ?? true;
+          const reactStatus = bot.autoreactstatus ?? true;
+
+          if (viewStatus) {
+            await currentSocket.readMessages([msg.key]).catch(() => {});
+          }
           
-          // Auto React Status
-                   if (bot.autoreactstatus && msg.key.participant) {
+          if (reactStatus && msg.key.participant) {
             const statusEmojis = ["❤️", "🔥", "👍", "😂", "😮", "😢", "🙏", "💯", "✨", "🎉", "👏", "💔", "🤩", "🥰", "😎", "🤯", "🤔", "🫡", "💯", "⚡"];
             const randomStatusEmoji = statusEmojis[Math.floor(Math.random() * statusEmojis.length)];
             
@@ -899,7 +904,7 @@ async function connectToWhatsApp() {
               react: { text: randomStatusEmoji, key: msg.key }
             }).catch(() => {});
           }
-           continue;
+          continue; // Skip the rest of the loop for statuses
         }
 
         // Don't trigger automations on your own messages
