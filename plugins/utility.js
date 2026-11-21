@@ -44,67 +44,48 @@ const commands = {
 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅`;
 
     try {
-      // 1. Send the Image + Caption
+      // 1. Send Image
       await s.sendMessage(c.from, { 
         image: { url: imageUrl }, 
         caption: caption,
         mentions: [ownerJid]
       }, { quoted: m });
 
-      // 2. Send the Interactive Buttons (Template Message)
+      // 2. Send Interactive Buttons (The exact format for v7)
       await s.sendMessage(c.from, {
-        text: "🔗 *Quick Links*",
-        footer: "HIS EXCELLENCY XMD",
-        templateMessage: {
-          hydratedTemplate: {
-            hydratedContentText: "Select an option below:",
-            hydratedFooterText: "HIS EXCELLENCY XMD",
-            hydratedButtons: [
-              {
-                urlButton: {
-                  displayText: "🌐 Fork Repo",
-                  url: repoUrl
-                }
-              },
-              {
-                urlButton: {
-                  displayText: "🚀 Pair Site",
-                  url: "https://his-excellency-xmd.onrender.com"
-                }
+        viewOnceMessage: {
+          message: {
+            interactiveMessage: {
+              body: { text: "👇 *Click below to visit:*" },
+              footer: { text: "HIS EXCELLENCY XMD" },
+              nativeFlowMessage: {
+                buttons: [
+                  {
+                    name: "cta_url",
+                    buttonParamsJson: JSON.stringify({
+                      display_text: "🌐 Fork Repo",
+                      url: repoUrl
+                    })
+                  },
+                  {
+                    name: "cta_url",
+                    buttonParamsJson: JSON.stringify({
+                      display_text: "🚀 Pair Site",
+                      url: "https://his-excellency-xmd.onrender.com"
+                    })
+                  }
+                ]
               }
-            ]
+            }
           }
         }
       }, { quoted: m });
 
     } catch (err) {
-      // If buttons fail, send the links as plain text so it NEVER fails
-      await c.reply(`❌ Interactive buttons failed.\n\n🌐 *Repo:* ${repoUrl}\n🚀 *Pair Site:* https://his-excellency-xmd.onrender.com`);
+      // IF IT FAILS, SEND THIS SO WE KNOW WHY
+      await c.reply(`❌ Error: ${err.message}`);
     }
   },
-    try {
-      // 1. Send the message with the image link preview
-      await s.sendMessage(c.from, {
-        text: caption,
-        linkPreview: {
-          "matched-text": repoUrl,
-          title: "HIS EXCELLENCY XMD",
-          description: "Click to view the repository",
-          jpegThumbnail: null, // We let WhatsApp fetch the thumbnail
-          highQualityThumbnail: imageUrl,
-          previewType: "IMAGE"
-        },
-        mentions: [ownerJid]
-      }, { quoted: m });
-
-      // 2. Send the interactive message right below it
-      await s.sendMessage(c.from, messagePayload, { quoted: m });
-      
-    } catch (err) {
-      c.reply(`❌ Failed to send repo menu: ${err.message}`);
-    }
-  },
-
   // ================= WHATSAPP NATIVE ACTIONS =================
   block: async (s, m, a, c) => {
     if (!c.isOwner) return;
