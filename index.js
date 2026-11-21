@@ -25,11 +25,11 @@ const fetchLatestVersion =
 const C = require("./config");
 const pair = require("./pair");
 const { loadPlugins } = require("./plugins/loader");
+const { getDB, saveDB, getMode, setMode } = require("./lib/db");
 
 const logger = pino({ level: "silent" });
 
 const SESSION_DIR = path.join(__dirname, "session");
-const DB_PATH = path.join(__dirname, "database.json");
 const PORT = Number(process.env.PORT || C.PORT || 3000);
 
 let sock = null;
@@ -47,12 +47,6 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 function log(...args) {
   console.log("[HIS EXCELLENCY XMD]", ...args);
 }
-
-// ============================================================
-// DATABASE
-// ============================================================
-
-const { getDB, saveDB, getMode, setMode } = require("./lib/db");
 
 fs.mkdirSync(SESSION_DIR, { recursive: true });
 
@@ -121,27 +115,41 @@ log(`Loaded ${PLUGINS.size} plugins.`);
 // WEB SERVER / RENDER HEALTH CHECK / PAIRING ROUTE
 // ============================================================
 
-const server = http.createServer((req, res) => {
-  if (req.url === "/" || req.url === "/health") {
+const server = http.createServer(async (req, res) => {
+  const reqPath = (req.url || "/").split("?")[0];
+
+  if (reqPath === "/health") {
     res.writeHead(200, { "Content-Type": "text/plain" });
-    return res.end("HIS EXCELLENCY XMD is running.");
+    return res.end("OK");
   }
 
   if (pair && typeof pair.handle === "function") {
     try {
-      // The pairing module may respond synchronously or asynchronously.
-      Promise.resolve(pair.handle(req, res)).catch(error => {
-        log("Pairing route error:", error.message);
-
-        if (!res.writableEnded) {
-          res.writeHead(500, { "Content-Type": "text/plain" });
-          res.end("Pairing service error.");
-        }
+      const handled = await pair.handle(req, res, {
+        getSock: () => sock,
+        normalizeNumber,
+        sessionDir: SESSION_DIR,
+        config: C,
+        log
       });
-      return;
+
+      if (handled !== false || res.writableEnded) {
+        return;
+      }
     } catch (error) {
       log("Pairing route error:", error.message);
+
+      if (!res.headersSent && !res.writableEnded) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error.message || "Pairing service error." }));
+      }
+      return;
     }
+  }
+
+  if (reqPath === "/" && !res.writableEnded) {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    return res.end("HIS EXCELLENCY XMD is running.");
   }
 
   if (!res.writableEnded) {
@@ -167,7 +175,6 @@ function getMessageText(message) {
 
   let msg = message.message;
 
-  // Unwrap common WhatsApp message containers.
   for (let i = 0; i < 8; i++) {
     const inner =
       msg.ephemeralMessage?.message ||
@@ -443,8 +450,9 @@ async function handleMessage(socket, message) {
       const db = getDB();
       const settings = db.groups[from] || {};
 
-     const isLink =
-  /(https?:\/\/[^\s]+|www\.[^\s]+|chat\.whatsapp\.com\/[A-Za-z0-9_-]+|wa\.me\/[0-9]+|t\.me\/[A-Za-z0-9_]+)/i.test(text);
+      const isLink =
+        /(https?:\/\/[^\s]+|www\.[^\s]+|chat\.whatsapp\.com\/[A-Za-z0-9_-]+|wa\.me\/[0-9]+|t\.me\/[A-Za-z0-9_]+)/i.test(text);
+
       if (settings.antilink && isLink) {
         try {
           const metadata = await socket.groupMetadata(from);
@@ -596,7 +604,6 @@ async function handleMessage(socket, message) {
     if (PLUGINS.has(command)) {
       const entry = PLUGINS.get(command);
 
-      // Support either { handler } plugin exports or direct functions.
       const handler =
         typeof entry === "function"
           ? entry
@@ -617,8 +624,8 @@ async function handleMessage(socket, message) {
         text,
         config: C,
         runtime,
-        db: getDB, 
-        saveDB,           
+        db: getDB,
+        saveDB,
         reply: replyText =>
           socket.sendMessage(from, {
             text: String(replyText)
@@ -679,7 +686,6 @@ async function connectToWhatsApp() {
   try {
     fs.mkdirSync(SESSION_DIR, { recursive: true });
 
-    // Restore encoded session if configured and no local credentials exist.
     const credentialsPath = path.join(SESSION_DIR, "creds.json");
 
     if (
@@ -707,7 +713,6 @@ async function connectToWhatsApp() {
 
     const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
 
-    // Fetch the latest supported WhatsApp Web version when possible.
     let version;
 
     if (typeof fetchLatestVersion === "function") {
@@ -740,23 +745,21 @@ async function connectToWhatsApp() {
 
     const currentSocket = makeWASocket(socketOptions);
     sock = currentSocket;
-    
-    // Run plugin init hooks against THIS socket (re-runs on every reconnect).
-(async () => {
-  for (const { file, fn } of PLUGINS.__initHooks || []) {
-    try {
-      await fn(currentSocket);
-      log(`[init] ${file} ready`);
-    } catch (err) {
-      log(`[init] ${file} failed:`, err.message);
-    }
-  }
-})();
+
+    (async () => {
+      for (const { file, fn } of PLUGINS.__initHooks || []) {
+        try {
+          await fn(currentSocket);
+          log(`[init] ${file} ready`);
+        } catch (err) {
+          log(`[init] ${file} failed:`, err.message);
+        }
+      }
+    })();
 
     currentSocket.ev.on("creds.update", saveCreds);
 
-    // Register all plugin-owned event listeners (welcome, goodbye, anti-mod, anti-call)
-registerEventHandlers(currentSocket, log);
+    registerEventHandlers(currentSocket, log);
 
     // --------------------------------------------------------
     // CONNECTION EVENTS
@@ -787,7 +790,6 @@ registerEventHandlers(currentSocket, log);
       }
 
       if (connection === "close") {
-        // Ignore events from an old socket.
         if (sock !== currentSocket) return;
 
         reconnecting = false;
@@ -818,7 +820,7 @@ registerEventHandlers(currentSocket, log);
             log("Session cleanup failed:", error.message);
           }
 
-          log("A new pairing is required. Check PAIR_NUMBER and restart the service.");
+          log("A new pairing is required. Pair via the web site or set PAIR_NUMBER and restart.");
           return;
         }
 
@@ -831,7 +833,7 @@ registerEventHandlers(currentSocket, log);
     // --------------------------------------------------------
 
     currentSocket.ev.on("messages.upsert", async ({ messages, type }) => {
-    if (type !== "notify") return;
+      if (type !== "notify") return;
 
       for (const message of messages || []) {
         handleMessage(currentSocket, message).catch(error => {
@@ -858,20 +860,18 @@ registerEventHandlers(currentSocket, log);
 
       number = normalizeNumber(number);
 
-      if (!number) {
-        throw new Error(
-          "PAIR_NUMBER is missing. Set it in Render environment variables or config.js."
-        );
+      if (number) {
+        await sleep(2000);
+
+        const code = await currentSocket.requestPairingCode(number);
+
+        log("========================================");
+        log("YOUR WHATSAPP PAIRING CODE:");
+        log(code);
+        log("========================================");
+      } else {
+        log("No PAIR_NUMBER set. Waiting for pairing request from the web site or console.");
       }
-
-      await sleep(2000);
-
-      const code = await currentSocket.requestPairingCode(number);
-
-      log("========================================");
-      log("YOUR WHATSAPP PAIRING CODE:");
-      log(code);
-      log("========================================");
     }
 
   } catch (error) {
