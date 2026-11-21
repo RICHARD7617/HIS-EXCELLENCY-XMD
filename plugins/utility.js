@@ -29,7 +29,7 @@ const commands = {
   repo: async (s, m, a, c) => {
     const repoUrl = "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD";
     const imageUrl = "https://i.ibb.co/m5XvzLZn/789312781119.jpg";
-    
+
     const caption = `╭─⌈ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘-𝐗𝐌𝐃|𝟎𝟎𝟏🔥 ⌋
 │
 │ ✧ *𝐍𝐚𝐦𝐞* : 𝐇𝐢𝐬 𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐗𝐦𝐝𝟎𝟎𝟏
@@ -42,16 +42,23 @@ const commands = {
 ╰──=
 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅
 
-🔗 *Repo:* ${repoUrl}`;
+*🌐 Repo:* ${repoUrl}`;
 
     try {
-      // Send the image with the caption and the link embedded
-      await s.sendMessage(c.from, { 
-        image: { url: imageUrl }, 
-        caption: caption
+      // Download the image first to prevent "Invalid media" crashes
+      const axios = require("axios");
+      const response = await axios.get(imageUrl, { responseType: "arraybuffer" });
+      const imageBuffer = Buffer.from(response.data, "binary");
+
+      // Send the image with the caption
+      await s.sendMessage(c.from, {
+        image: imageBuffer,
+        caption: caption,
+        mimetype: "image/jpeg"
       }, { quoted: m });
+
     } catch (err) {
-      // If image fails, send text
+      // If the image fails to download, just send the text
       await c.reply(caption);
     }
   },
