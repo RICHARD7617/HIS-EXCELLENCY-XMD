@@ -29,8 +29,7 @@ const commands = {
   repo: async (s, m, a, c) => {
     const repoUrl = "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD";
     const imageUrl = "https://i.ibb.co/m5XvzLZn/789312781119.jpg";
-    const ownerJid = process.env.OWNER_NUMBER ? `${process.env.OWNER_NUMBER}@s.whatsapp.net` : "254738993575@s.whatsapp.net";
-
+    
     const caption = `╭─⌈ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘-𝐗𝐌𝐃|𝟎𝟎𝟏🔥 ⌋
 │
 │ ✧ *𝐍𝐚𝐦𝐞* : 𝐇𝐢𝐬 𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 𝐗𝐦𝐝𝟎𝟎𝟏
@@ -41,49 +40,19 @@ const commands = {
 │ ✧   𝐃𝐨𝐧'𝐭 𝐟𝐨𝐫𝐠𝐞𝐭🔥
 │  𝐭𝐨 𝐟𝐨𝐫𝐤 𝐚𝐧𝐝 𝐬𝐭𝐚𝐫 𝐭𝐡𝐞 𝐫𝐞𝐩𝐨.🙏
 ╰──=
-𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅`;
+𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅
+
+🔗 *Repo:* ${repoUrl}`;
 
     try {
-      // 1. Send Image
+      // Send the image with the caption and the link embedded
       await s.sendMessage(c.from, { 
         image: { url: imageUrl }, 
-        caption: caption,
-        mentions: [ownerJid]
+        caption: caption
       }, { quoted: m });
-
-      // 2. Send Interactive Buttons (The exact format for v7)
-      await s.sendMessage(c.from, {
-        viewOnceMessage: {
-          message: {
-            interactiveMessage: {
-              body: { text: "👇 *Click below to visit:*" },
-              footer: { text: "HIS EXCELLENCY XMD" },
-              nativeFlowMessage: {
-                buttons: [
-                  {
-                    name: "cta_url",
-                    buttonParamsJson: JSON.stringify({
-                      display_text: "🌐 Fork Repo",
-                      url: repoUrl
-                    })
-                  },
-                  {
-                    name: "cta_url",
-                    buttonParamsJson: JSON.stringify({
-                      display_text: "🚀 Pair Site",
-                      url: "https://his-excellency-xmd.onrender.com"
-                    })
-                  }
-                ]
-              }
-            }
-          }
-        }
-      }, { quoted: m });
-
     } catch (err) {
-      // IF IT FAILS, SEND THIS SO WE KNOW WHY
-      await c.reply(`❌ Error: ${err.message}`);
+      // If image fails, send text
+      await c.reply(caption);
     }
   },
   // ================= WHATSAPP NATIVE ACTIONS =================
