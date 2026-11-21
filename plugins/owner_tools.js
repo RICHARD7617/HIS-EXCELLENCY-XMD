@@ -2,15 +2,36 @@
 
 const C = require("../config");
 
-async function toggleAuto(c, key) {
-  if (!c.isOwner) return c.reply("❌ Owner only.");
-  const db = c.db();
+async function handleToggle(ctx, key, label) {
+  const db = ctx.db();
   if (!db.bot) db.bot = {};
-  db.bot[key] = !db.bot[key];
-  c.saveDB(db);
-  c.reply(`${db.bot[key] ? "✅ Enabled" : "❌ Disabled"} *${key}*`);
-}
+  if (!db.groups) db.groups = {};
+  
+  const isGroup = ctx.isGroup;
+  const targetObj = isGroup ? (db.groups[ctx.from] ||= {}) : db.bot;
+  
+  // 1. Get the requested state from args (e.g., "on" or "off")
+  const requested = ctx.args?.[0]?.toLowerCase();
+  
+  // 2. Default current state to true if it's undefined (Except for group moderations which default to false)
+  const defaultValue = isGroup ? false : true;
+  let currentState = targetObj[key] ?? defaultValue;
+  
+  // 3. Apply the new state
+  if (requested === "on") {
+    targetObj[key] = true;
+  } else if (requested === "off") {
+    targetObj[key] = false;
+  } else {
+    targetObj[key] = !currentState; // Just flip it if no args provided
+  }
 
+  // 4. Save to DB
+  ctx.saveDB(db);
+
+  // 5. Reply
+  ctx.reply(`${targetObj[key] ? "✅ Enabled" : "❌ Disabled"} *${label || key}*`);
+}
 const commands = {
   // ================= OWNER CONTROLS =================
   setprefix: async (s, m, a, c) => {
