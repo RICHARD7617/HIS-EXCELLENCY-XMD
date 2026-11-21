@@ -278,6 +278,7 @@ function buildMenuText(userName) {
     ["OWNER CONTROLS", ["setbotname", "resetbotname", "setowner", "resetowner", "setprefix", "prefix", "iamowner", "about", "owner", "block", "unblock", "blockdetect", "blockall", "unblockall", "silent", "anticall", "mode", "public", "private", "setpp", "setfooter", "repo", "pair", "antidelete", "antideletestatus", "antiedit", "chatbot", "shutdown", "broadcast"]],
     ["CHANNEL MODE", ["setchannel", "resetchannel"]],
     ["SYSTEM & MAINTENANCE", ["restart", "workingreload", "reloadenv", "getsettings", "setsetting", "test", "disk", "hostip", "findcommands", "latestupdates", "panel", "debugchat", "ls", "pwd", "cat", "head", "tail", "find", "grep", "stat", "du", "df", "ps", "envkeys", "exec", "package"]],
+    ["GITHUB TOOLS", ["gitclone", "repanalyze", "zip", "update", "repo"]],
     ["CPANEL", ["setlink", "setkey", "nestconfig", "createuser", "createpanel", "createunlimited", "setpayment", "prompt", "cpanelmenu"]],
     ["SUDO", ["addsudo", "delsudo", "listsudo", "getsudo", "checksudo", "clearsudo", "sudomode", "sudoinfo", "mysudo", "sudodebug", "linksudo"]],
     ["AUTOMATION", ["autoread", "autotyping", "autorecording", "autorecordtyping", "autoreact", "autoreactstatus", "autoviewstatus", "autobio", "autorec", "reactowner"]],
