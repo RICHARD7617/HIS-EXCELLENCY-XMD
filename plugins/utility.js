@@ -29,7 +29,7 @@ const commands = {
     repo: async (s, m, a, c) => {
     const repoUrl = "https://github.com/RICHARD7617/HIS-EXCELLENCY-XMD";
     const imageUrl = "https://i.ibb.co/m5XvzLZn/789312781119.jpg";
-    const ownerJid = "254738993575@s.whatsapp.net"; // Replace with your actual JID if needed
+    const ownerJid = "`https://wa.me/254738993575?text=Hi%20there";
 
     const caption = `╭─⌈ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘-𝐗𝐌𝐃|𝟎𝟎𝟏🔥 ⌋
 │
@@ -62,7 +62,7 @@ const commands = {
               name: "cta_url",
               buttonParamsJson: JSON.stringify({
                 display_text: "🚀 Pair Site",
-                url: "https://his-excellency-xmd.onrender.com", // Update if your pair site is different
+                url: "https://his-excellency-xmd.onrender.com",
                 merchant_url: "https://his-excellency-xmd.onrender.com"
               })
             }
