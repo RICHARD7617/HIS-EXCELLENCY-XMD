@@ -85,9 +85,9 @@ const commands = {
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
     const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    if (!quoted) return c.reply("❌ Reply to a View Once image or video.");
+    if (!quoted) return c.reply("❌ Please reply to a View Once image or video.");
 
-    // 1. Unwrap properly
+    // Unwrap properly
     let msg = quoted.viewOnceMessageV2?.message || 
               quoted.viewOnceMessageV2Extension?.message || 
               quoted.viewOnceMessage?.message || 
@@ -95,23 +95,25 @@ const commands = {
 
     const type = Object.keys(msg)[0];
     if (!["imageMessage", "videoMessage"].includes(type)) {
-      return c.reply("❌ Not a View Once media.");
+      return c.reply("❌ The replied message is not a View Once image or video.");
     }
 
     try {
       const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
       
-      // 2. Pass the raw media object (contains mediaKey and url)
+      // Get the inner media object
       const media = msg[type];
+      
+      // Download the stream
       const stream = await downloadContentFromMessage(media, type.replace("Message", ""));
       
       let buffer = Buffer.from([]);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
       
       const caption = media.caption ? `\n\n${media.caption}` : "";
       
-      // 3. Send the opened media (Optionally send to owner's DM instead of group)
-      // Change c.from to ownerJid if you want it sent to your DM
       await s.sendMessage(c.from, { 
         [type.replace("Message", "")]: buffer, 
         caption: `📸 *View Once Opened*${caption}` 
