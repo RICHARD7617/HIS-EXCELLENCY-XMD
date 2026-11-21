@@ -490,9 +490,6 @@ async function handleMessage(socket, message) {
     // --------------------------------------------------------
     // MODE PERMISSIONS
     // --------------------------------------------------------
-    // --------------------------------------------------------
-    // MODE PERMISSIONS
-    // --------------------------------------------------------
 
     const currentMode = getMode();
     
@@ -624,8 +621,29 @@ async function handleMessage(socket, message) {
     // PLUGIN DISPATCH
     // --------------------------------------------------------
 
-    if (PLUGINS.has(command)) {
-      const entry = PLUGINS.get(command);
+    let targetCommand = command;
+    let isToggleAction = false;
+    let toggleState = null;
+
+    // INTERCEPT "command on" or "command off"
+    if (command.endsWith("off")) {
+      targetCommand = command.slice(0, -3); // removes "off"
+      isToggleAction = true;
+      toggleState = "off";
+    } else if (command.endsWith("on")) {
+      targetCommand = command.slice(0, -2); // removes "on"
+      isToggleAction = true;
+      toggleState = "on";
+    }
+
+    // If it's a toggle action, we force the arguments to be ["on"] or ["off"]
+    if (isToggleAction) {
+      args.unshift(toggleState); 
+    }
+
+    // Now we look for the base command (e.g., "autostatusreact")
+    if (PLUGINS.has(targetCommand)) {
+      const entry = PLUGINS.get(targetCommand);
 
       const handler =
         typeof entry === "function"
@@ -633,7 +651,7 @@ async function handleMessage(socket, message) {
           : entry?.handler;
 
       if (typeof handler !== "function") {
-        log(`Invalid plugin handler: ${command}`);
+        log(`Invalid plugin handler: ${targetCommand}`);
         return;
       }
 
@@ -643,7 +661,7 @@ async function handleMessage(socket, message) {
         isGroup,
         isOwner,
         prefix,
-        command,
+        command: targetCommand, // Pass the base command to the plugin
         text,
         config: C,
         runtime,
@@ -658,13 +676,11 @@ async function handleMessage(socket, message) {
       try {
         await handler(socket, message, args, ctx);
       } catch (error) {
-        log(`Plugin "${command}" error:`, error.stack || error.message);
-
+        log(`Plugin "${targetCommand}" error:`, error.stack || error.message);
         await socket.sendMessage(from, {
           text: `❌ Command failed: ${error.message}`
         }, { quoted: message }).catch(() => {});
       }
-
       return;
     }
 
