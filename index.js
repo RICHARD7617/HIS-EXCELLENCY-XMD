@@ -899,6 +899,8 @@ async function connectToWhatsApp() {
               react: { text: randomStatusEmoji, key: msg.key }
             }).catch(() => {});
           }
+           continue;
+        }
 
         // Don't trigger automations on your own messages
         if (msg.key.fromMe) {
@@ -930,16 +932,14 @@ async function connectToWhatsApp() {
           await currentSocket.sendMessage(msg.key.remoteJid, { 
             react: { text: randomEmoji, key: msg.key } 
           }).catch(() => {});
-          continue;
         }
-
+          
         // --- HANDLE COMMANDS ---
         handleMessage(currentSocket, msg).catch(error => {
           log("Message processing error:", error.message);
         });
       }
     });
-
         // ANTI-DELETE LISTENER
     currentSocket.ev.on("messages.upsert", ({ messages }) => {
       for (const m of messages) {
