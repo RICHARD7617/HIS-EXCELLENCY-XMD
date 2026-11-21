@@ -829,40 +829,69 @@ async function connectToWhatsApp() {
     });
 
     // --------------------------------------------------------
-    // INCOMING MESSAGES
-    // --------------------------------------------------------
-
-       // --------------------------------------------------------
     // INCOMING MESSAGES & AUTOMATION
     // --------------------------------------------------------
+    const msgCache = new Map(); // For Anti-delete
 
     currentSocket.ev.on("messages.upsert", async ({ messages, type }) => {
       if (type !== "notify") return;
 
-      // AUTOMATION LISTENER ===
       const db = getDB();
-      if (db.bot) {
-        for (const msg of messages) {
-          if (!msg.key?.remoteJid) continue;
-          
-          // Auto Read
-          if (db.bot.autoread) {
-            currentSocket.readMessages([msg.key]).catch(() => {});
-          }
-          // Auto View Status
-          if (db.bot.autoviewstatus && msg.key.remoteJid === "status@broadcast") {
-            currentSocket.readMessages([msg.key]).catch(() => {});
-          }
-          // Auto Typing
-          if (db.bot.autotyping && !msg.key.fromMe) {
-            currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {});
-          }
-        }
-      }
-      // ====================================
+      const bot = db.bot || {};
 
-      for (const message of messages || []) {
-        handleMessage(currentSocket, message).catch(error => {
+      for (const msg of messages) {
+        if (!msg.key?.remoteJid) continue;
+
+        // --- ANTI-DELETE CACHE ---
+        if (msg.key.id) msgCache.set(msg.key.id, msg);
+
+        // --- AUTO VIEW STATUS ---
+        if (bot.autoviewstatus && msg.key.remoteJid === "status@broadcast") {
+          await currentSocket.readMessages([msg.key]).catch(() => {});
+          
+          // Auto React Status
+          if (bot.autoreactstatus && msg.key.participant) {
+            await currentSocket.sendMessage(msg.key.participant, {
+              react: { text: "🔥", key: msg.key }
+            }).catch(() => {});
+          }
+          continue; // Skip the rest for statuses
+        }
+
+        // Don't trigger automations on your own messages
+        if (msg.key.fromMe) {
+           handleMessage(currentSocket, msg).catch(e => log(e.message));
+           continue; 
+        }
+
+        // --- AUTO READ ---
+        if (bot.autoread) {
+          await currentSocket.readMessages([msg.key]).catch(() => {});
+        }
+
+        // --- AUTO TYPING / RECORDING ---
+        if (bot.autorecording) {
+          await currentSocket.sendPresenceUpdate("recording", msg.key.remoteJid).catch(() => {});
+        }
+        
+        if (bot.autorecordtyping) {
+          await currentSocket.sendPresenceUpdate("recording", msg.key.remoteJid).catch(() => {});
+          setTimeout(() => currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {}), 1500);
+        } else if (bot.autotyping) {
+          await currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {});
+        }
+
+        // --- AUTO REACT ---
+        if (bot.autoreact) {
+          const emojis = ["❤️", "👍", "🔥", "😂", "💯", "🙌"];
+          const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+          await currentSocket.sendMessage(msg.key.remoteJid, { 
+            react: { text: randomEmoji, key: msg.key } 
+          }).catch(() => {});
+        }
+
+        // --- HANDLE COMMANDS ---
+        handleMessage(currentSocket, msg).catch(error => {
           log("Message processing error:", error.message);
         });
       }
