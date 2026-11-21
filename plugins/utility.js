@@ -44,50 +44,44 @@ const commands = {
 𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐛𝐲 @ᬼ⃝⃪𝐇𝐢𝐬ᬼ⃝⃪ᬼ⃝𝐗𝐜𝐞𝐥𝐥𝐞𝐧𝐜𝐲 ⃝⃪ᬼ⃝✅`;
 
     try {
-      // 1. Send the Image + Caption first
+      // 1. Send the Image + Caption
       await s.sendMessage(c.from, { 
         image: { url: imageUrl }, 
         caption: caption,
         mentions: [ownerJid]
       }, { quoted: m });
 
-      // 2. Send the Interactive Message with the hidden link buttons
+      // 2. Send the Interactive Buttons (Template Message)
       await s.sendMessage(c.from, {
-        viewOnceMessage: {
-          message: {
-            interactiveMessage: {
-              body: { text: "Click a button below to proceed:" },
-              footer: { text: "HIS EXCELLENCY XMD" },
-              nativeFlowMessage: {
-                buttons: [
-                  {
-                    name: "cta_url",
-                    buttonParamsJson: JSON.stringify({
-                      display_text: "🌐 Fork Repo",
-                      url: repoUrl,
-                      merchant_url: repoUrl
-                    })
-                  },
-                  {
-                    name: "cta_url",
-                    buttonParamsJson: JSON.stringify({
-                      display_text: "🚀 Pair Site",
-                      url: "https://his-excellency-xmd.onrender.com",
-                      merchant_url: "https://his-excellency-xmd.onrender.com"
-                    })
-                  }
-                ]
+        text: "🔗 *Quick Links*",
+        footer: "HIS EXCELLENCY XMD",
+        templateMessage: {
+          hydratedTemplate: {
+            hydratedContentText: "Select an option below:",
+            hydratedFooterText: "HIS EXCELLENCY XMD",
+            hydratedButtons: [
+              {
+                urlButton: {
+                  displayText: "🌐 Fork Repo",
+                  url: repoUrl
+                }
+              },
+              {
+                urlButton: {
+                  displayText: "🚀 Pair Site",
+                  url: "https://his-excellency-xmd.onrender.com"
+                }
               }
-            }
+            ]
           }
         }
       }, { quoted: m });
 
     } catch (err) {
-      c.reply(`❌ Failed to send repo menu: ${err.message}`);
+      // If buttons fail, send the links as plain text so it NEVER fails
+      await c.reply(`❌ Interactive buttons failed.\n\n🌐 *Repo:* ${repoUrl}\n🚀 *Pair Site:* https://his-excellency-xmd.onrender.com`);
     }
   },
-
     try {
       // 1. Send the message with the image link preview
       await s.sendMessage(c.from, {
