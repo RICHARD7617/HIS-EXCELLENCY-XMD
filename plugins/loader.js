@@ -10,7 +10,8 @@ function loadPlugins(log = console.log) {
 
   const files = fs
     .readdirSync(dir)
-    .filter((f) => f.endsWith(".js") && f !== "loader.js");
+    .filter((f) => f.endsWith(".js") && f !== "loader.js")
+    .sort((a, b) => (a === "stubs.js" ? 1 : 0) - (b === "stubs.js" ? 1 : 0));
 
   for (const file of files) {
     try {
