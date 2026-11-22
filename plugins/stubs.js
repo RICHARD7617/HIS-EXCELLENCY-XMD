@@ -65,7 +65,7 @@ module.exports = {
     pencil: editor, sketch: editor, skull: editor, wanted: editor, zombie: editor,
 
     // ---- Game ----
-    tictactoe: game, wcg: game, wrg: game,
+    
 
     // ---- Logia ----
     ope: logia, yami: logia, zushi: logia,
