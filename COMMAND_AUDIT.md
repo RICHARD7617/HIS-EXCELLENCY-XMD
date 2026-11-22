@@ -23,3 +23,11 @@ This is a static source-code audit of the Heroku-ready project archive. It is no
 2. Integrate external API-backed commands only after confirming each documented endpoint, parameters, limits, and response schema.
 3. Remove menu entries only if the owner later chooses to do so; otherwise keep every command name and make unsupported commands return an accurate setup/error message.
 4. Run dependency installation, unit tests, and a live WhatsApp test on a separate test account before production deployment.
+
+## Stage 1 implementation update (static code only)
+- Added `plugins/downloads.js`: HTTPS direct-file downloads and YouTube search/download handlers for `ytv`, `yta`, `video`, `song`, and `play`, with a 48 MB cap. Social-platform aliases are not claimed as implemented by this module.
+- Added `plugins/media_tools.js`: FFmpeg-backed MP3 extraction, selected audio filters, and basic video compression/rotation/crop/trim.
+- Added `plugins/storage_tools.js`: owner-managed persistent `setvar`, `getvar`, `delvar`, and `allvar` commands using the existing database layer.
+- Updated `lib/db.js` to initialize `vars`, `budgets`, and `schedules` buckets in application state.
+- Updated `plugins/loader.js` to load real command handlers before `stubs.js`, preventing placeholder registrations from shadowing implemented commands.
+- Runtime integration remains unverified; YouTube extraction depends on `ytdl-core` compatibility with current YouTube changes. PostgreSQL persistence requires `DATABASE_URL` and `XMD_STORAGE_KEY` in the deployment environment.
