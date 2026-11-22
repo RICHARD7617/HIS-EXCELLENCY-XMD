@@ -35,3 +35,8 @@ This is a static source-code audit of the Heroku-ready project archive. It is no
 ## Stage 2 implementation notes
 
 Implemented real handlers for budget records (`budget`, `summary`, `income`, `expense`, `delbudget`), saved reminder records (`setschedule`, `getschedule`, `delschedule`), PDF text generation and PDF page counting (`pdf`, `page`), and utility searches (`find`, `img`, `yts`). These handlers use the existing JSON/PostgreSQL-backed application state. Reminder entries are stored but are not automatically delivered in this stage. Social-platform download commands and many other menu entries remain unimplemented and are still explicit stubs.
+
+## Stage 3 (2026-11-22)
+- Added persistent chat-scoped single-player Tic-Tac-Toe (`tictactoe`), Word Riddle (`wrg`), and Word Chain (`wcg`). Game state is saved in the database object and therefore uses PostgreSQL when `DATABASE_URL` is configured.
+- Removed these three commands from the placeholder registry.
+- Vinnie Digital Hub API integration is pending documentation: the supplied homepage did not expose readable endpoint paths, request schemas, or authentication requirements. No endpoint or key format has been guessed. AI and text-effect API commands remain unverified until API docs or an OpenAPI specification are provided.
