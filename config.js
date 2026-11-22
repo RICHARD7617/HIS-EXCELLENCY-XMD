@@ -85,7 +85,7 @@ const config = {
     NEWS: env("NEWS_API_KEY", ""),
     TMDB: env("TMDB_API_KEY", ""),
     SPOTIFY: env("SPOTIFY_API_KEY", ""),
-    YT: env("YT_API_KEY", ""),
+    YT: env("YT_API_KEY", "ttps://api.vevioz.com/api/button/mp3"),
     MONGODB_URI: env("MONGODB_URI", ""),
     POSTGRES_URL: env("POSTGRES_URL", ""),
     APIX: env("APIX_API_KEY", ""),
