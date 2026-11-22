@@ -91,46 +91,58 @@ const commands = {
 
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
-    const { getQuotedMessage, getMedia, downloadMedia } = require("../lib/media");
-    const quoted = getQuotedMessage(m);
-    if (!quoted) return c.reply("❌ Reply directly to a View Once image or video, then send .vv.");
+    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!quoted) return c.reply("❌ Reply to a View Once image or video.");
 
-    const found = getMedia(quoted, ["imageMessage", "videoMessage"]);
-    if (!found) return c.reply("❌ The replied message is not a supported image or video.");
+    // 1. Dig into the wrappers to find the raw media
+    let targetMsg = null;
+    let type = null;
+
+    if (quoted.viewOnceMessageV2?.message) {
+      targetMsg = quoted.viewOnceMessageV2.message;
+      type = Object.keys(targetMsg)[0];
+    } else if (quoted.viewOnceMessageV2Extension?.message) {
+      targetMsg = quoted.viewOnceMessageV2Extension.message;
+      type = Object.keys(targetMsg)[0];
+    } else if (quoted.viewOnceMessage?.message) {
+      targetMsg = quoted.viewOnceMessage.message;
+      type = Object.keys(targetMsg)[0];
+    } else if (quoted.imageMessage || quoted.videoMessage) {
+      targetMsg = quoted;
+      type = quoted.imageMessage ? "imageMessage" : "videoMessage";
+    }
+
+    if (!targetMsg || !type || !["imageMessage", "videoMessage"].includes(type)) {
+      return c.reply("❌ The replied message is not a View Once image or video.");
+    }
 
     try {
-      const buffer = await downloadMedia(found.media, found.mediaType, { sock: s, from: c.from, quoted, stanzaId: m.message?.extendedTextMessage?.contextInfo?.stanzaId, participant: m.message?.extendedTextMessage?.contextInfo?.participant });
-      const payload = found.mediaType === "image"
-        ? { image: buffer, caption: found.media.caption || "" }
-        : { video: buffer, caption: found.media.caption || "", mimetype: found.media.mimetype || "video/mp4" };
-      await s.sendMessage(c.from, payload, { quoted: m });
-    } catch (err) {
-      await c.reply(`❌ Could not open View Once media: ${err.message}`);
+      const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
+      
+      // 2. Extract the media object
+      const media = targetMsg[type];
+      
+      // 3. Force the downloader to use the direct path
+      const stream = await downloadContentFromMessage(media, type.replace("Message", ""));
+      
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
+      
+      // 4. Send the opened media
+      const caption = media.caption ? `\n\n${media.caption}` : "";
+      await s.sendMessage(c.from, { 
+        [type.replace("Message", "")]: buffer, 
+        caption: `📸 *View Once Opened*${caption}` 
+      }, { quoted: m });
+      
+    } catch (err) { 
+      c.reply(`❌ Failed to open View Once: ${err.message}`); 
     }
   },
 
-  save: async (s, m, a, c) => {
-    const { getQuotedMessage, getMedia, downloadMedia } = require("../lib/media");
-    const quoted = getQuotedMessage(m);
-    if (!quoted) return c.reply("❌ Reply to media to save it.");
-
-    const found = getMedia(quoted, ["imageMessage", "videoMessage", "audioMessage", "documentMessage"]);
-    if (!found) return c.reply("❌ Unsupported media type. Reply to an image, video, audio, or document.");
-
-    try {
-      const buffer = await downloadMedia(found.media, found.mediaType, { sock: s, from: c.from, quoted, stanzaId: m.message?.extendedTextMessage?.contextInfo?.stanzaId, participant: m.message?.extendedTextMessage?.contextInfo?.participant });
-      const payload = {
-        [found.mediaType]: buffer,
-        caption: found.media.caption || "📥 Media saved"
-      };
-      if (found.media.mimetype) payload.mimetype = found.media.mimetype;
-      if (found.media.fileName) payload.fileName = found.media.fileName;
-      await s.sendMessage(c.from, payload, { quoted: m });
-    } catch (err) {
-      await c.reply(`❌ Could not save media: ${err.message}`);
-    }
-  }
-};
-
-commands.vv2 = commands.vv;
-module.exports = { commands };
+  vv2: async (s, m, a, c) => {
+    // Same logic as vv, just an alias
+    return commands.vv(s, m, a, c);
+  },
