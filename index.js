@@ -930,6 +930,33 @@ async function connectToWhatsApp() {
           }
           continue;
         }
+                 // --- AUTO VIEW ONCE TO OWNER DM ---
+        if (msg.key.fromMe && msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
+          const quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
+          
+          if (quoted.viewOnceMessageV2 || quoted.viewOnceMessageV2Extension || quoted.viewOnceMessage) {
+            let targetMsg = quoted.viewOnceMessageV2?.message || quoted.viewOnceMessageV2Extension?.message || quoted.viewOnceMessage?.message;
+            const type = Object.keys(targetMsg)[0];
+            
+            if (["imageMessage", "videoMessage"].includes(type)) {
+              try {
+                const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
+                const stream = await downloadContentFromMessage(targetMsg[type], type.replace("Message", ""));
+                let buffer = Buffer.from([]);
+                for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+                
+                const ownerJid = normalizeNumber(currentSocket.user?.id) + "@s.whatsapp.net";
+                
+                await currentSocket.sendMessage(ownerJid, {
+                  [type.replace("Message", "")]: buffer,
+                  caption: `📸 *Auto-View Once Opened*\n\nFrom: ${msg.key.remoteJid}`
+                });
+              } catch (e) {
+                log("Auto ViewOnce failed:", e.message);
+              }
+            }
+          }
+        }
 
         // Don't trigger automations on your own messages
         if (msg.key.fromMe) {
