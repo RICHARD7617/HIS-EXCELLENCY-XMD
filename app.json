@@ -14,7 +14,7 @@
       "required": true
     },
     "DATABASE_URL": {
-      "description": "OPTIONAL: PostgreSQL connection string for persistent storage.",
+      "description": "Set automatically when Heroku Postgres is attached; required for persistent WhatsApp session and settings storage on Heroku.",
       "value": "",
       "required": false
     },
