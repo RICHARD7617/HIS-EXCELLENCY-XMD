@@ -523,6 +523,10 @@ async function handleMessage(socket, message) {
       case "menu":
       case "help": {
         const menuText = buildMenuText(userName);
+            // LOADING MENU MESSAGE
+    await socket.sendMessage(from, {
+        text: "🔥HIS EXCELLENCY XMD 001🔥\n\nLoading menu..."
+    }, { quoted: message });
 
         try {
           await socket.sendMessage(from, {
