@@ -25,7 +25,8 @@ const fetchLatestVersion =
 const C = require("./config");
 const pair = require("./pair");
 const { loadPlugins } = require("./plugins/loader");
-const { getDB, saveDB, getMode, setMode } = require("./lib/db");
+const { getDB, saveDB, getMode, setMode, initDatabase, flushDB } = require("./lib/db");
+const { usePostgresAuthState, closeStorage } = require("./lib/storage");
 
 const logger = pino({ level: "silent" });
 
@@ -731,6 +732,7 @@ async function connectToWhatsApp() {
 
     if (
       C.SESSION_ID &&
+      !C.DATABASE_URL &&
       !ignoreSessionId &&
       !fs.existsSync(credentialsPath) &&
       typeof pair.decodeSession === "function"
@@ -752,7 +754,19 @@ async function connectToWhatsApp() {
       }
     }
 
-    const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
+    let authState;
+    if (C.DATABASE_URL) {
+      // Existing DB credentials always win; SESSION_ID seeds a new database only.
+      const initialCreds = C.SESSION_ID && !ignoreSessionId
+        ? JSON.parse(pair.decodeSession(C.SESSION_ID))
+        : null;
+      authState = await usePostgresAuthState(initialCreds);
+      log("Using PostgreSQL-backed WhatsApp authentication.");
+    } else {
+      authState = await useMultiFileAuthState(SESSION_DIR);
+      log("WARNING: DATABASE_URL is missing; WhatsApp session is stored on ephemeral dyno disk and may be lost on restart.");
+    }
+    const { state, saveCreds } = authState;
 
     let version;
 
@@ -852,10 +866,8 @@ async function connectToWhatsApp() {
           ignoreSessionId = true;
 
           try {
-            fs.rmSync(SESSION_DIR, {
-              recursive: true,
-              force: true
-            });
+            if (authState?.clearAuthState) await authState.clearAuthState();
+            fs.rmSync(SESSION_DIR, { recursive: true, force: true });
             fs.mkdirSync(SESSION_DIR, { recursive: true });
           } catch (error) {
             log("Session cleanup failed:", error.message);
@@ -1041,6 +1053,8 @@ async function shutdown(signal) {
     reconnectTimer = null;
   }
 
+  try { await flushDB(); } catch (error) { log("Database flush error:", error.message); }
+
   try {
     if (sock) {
       sock.end(undefined);
@@ -1049,7 +1063,9 @@ async function shutdown(signal) {
     log("Socket shutdown error:", error.message);
   }
 
-  server.close(() => {
+  server.close(async () => {
+    try { await flushDB(); } catch (_) {}
+    try { await closeStorage(); } catch (error) { log("Storage shutdown error:", error.message); }
     log("HTTP server closed.");
     process.exit(0);
   });
@@ -1079,7 +1095,14 @@ log("       HIS EXCELLENCY XMD 001");
 log("       Starting WhatsApp Bot...");
 log("========================================");
 
-connectToWhatsApp().catch(error => {
-  log("Startup failed:", error.stack || error.message);
-  scheduleReconnect("Startup failed");
-});
+(async () => {
+  try {
+    if (C.DATABASE_URL) await initDatabase();
+    else await initDatabase();
+    await connectToWhatsApp();
+  } catch (error) {
+    log("Startup failed:", error.stack || error.message);
+    if (!C.DATABASE_URL) log("Set DATABASE_URL in Heroku Config Vars after provisioning Heroku Postgres.");
+    scheduleReconnect("Startup failed");
+  }
+})();
