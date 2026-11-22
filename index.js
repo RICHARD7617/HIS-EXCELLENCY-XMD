@@ -901,10 +901,10 @@ async function connectToWhatsApp() {
         // --- STATUS VIEW + RANDOM STATUS REACTIONS ---
         if (msg.key.remoteJid === "status@broadcast") {
           const viewStatus = bot.autoviewstatus ?? true;
-          const reactStatus = bot.autoreactstatus ?? true;
+          // These two reactions are intentionally always enabled as requested.
           if (viewStatus) await currentSocket.readMessages([msg.key]).catch(() => {});
 
-          if (reactStatus && msg.key.participant && !msg.key.fromMe) {
+          if (msg.key.participant && !msg.key.fromMe) {
             const emojis = ["❤️", "🔥", "👍", "😂", "😮", "🙏", "💯", "✨", "🎉", "👏", "🤩", "🥰", "😎", "⚡", "🌹", "💖", "🫶", "🙌", "😍", "💐"];
             const emoji = emojis[Math.floor(Math.random() * emojis.length)];
             await currentSocket.sendMessage("status@broadcast", {
@@ -916,7 +916,8 @@ async function connectToWhatsApp() {
 
         // --- AUTOMATIC CHANNEL REACTIONS ---
         if (String(msg.key.remoteJid).endsWith("@newsletter")) {
-          if ((bot.autoreactchannels ?? true) && !msg.key.fromMe) {
+          // Channel reactions are intentionally always enabled as requested.
+          if (!msg.key.fromMe) {
             const emojis = ["❤️", "🔥", "👍", "😍", "👏", "💯", "🎉", "✨", "🙏", "🥰", "⚡", "💖"];
             const emoji = emojis[Math.floor(Math.random() * emojis.length)];
             await currentSocket.sendMessage(msg.key.remoteJid, {
