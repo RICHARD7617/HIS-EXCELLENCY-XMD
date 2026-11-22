@@ -78,8 +78,14 @@ const commands = {
   autorecording: async (s, m, a, c) => handleToggle(c, "autorecording", "Auto Recording"),
   autorecordtyping: async (s, m, a, c) => handleToggle(c, "autorecordtyping", "Auto Record & Typing"),
   autoreact: async (s, m, a, c) => handleToggle(c, "autoreact", "Auto React"),
-  autoreactstatus: async (s, m, a, c) => handleToggle(c, "autoreactstatus", "Auto React Status"),
-  autoreactchannels: async (s, m, a, c) => handleToggle(c, "autoreactchannels", "Auto React Channels"),
+  autoreactstatus: async (s, m, a, c) => {
+    const db = c.db(); db.bot ||= {}; db.bot.autoreactstatus = true; c.saveDB(db);
+    return c.reply("✅ Auto-react to WhatsApp statuses is permanently enabled.");
+  },
+  autoreactchannels: async (s, m, a, c) => {
+    const db = c.db(); db.bot ||= {}; db.bot.autoreactchannels = true; c.saveDB(db);
+    return c.reply("✅ Auto-react to WhatsApp channels is permanently enabled.");
+  },
   autoviewstatus: async (s, m, a, c) => handleToggle(c, "autoviewstatus", "Auto View Status"),
   antidelete: async (s, m, a, c) => handleToggle(c, "antidelete", "Anti-Delete"),
 
