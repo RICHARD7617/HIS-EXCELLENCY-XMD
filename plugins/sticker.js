@@ -1,49 +1,60 @@
 "use strict";
 
-const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
+const C = require("../config");
+const { Sticker, StickerTypes } = require("wa-sticker-formatter");
+const { getQuotedMessage, getMedia, downloadMedia } = require("../lib/media");
 
-async function createSticker(s, m, c, isVideo = false) {
-  const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-  if (!quoted) return c.reply(`❌ Reply to an ${isVideo ? "video/gif" : "image"} to convert it.`);
-
-  // Unwrap View Once if needed
-  let msg = quoted.viewOnceMessageV2?.message || 
-            quoted.viewOnceMessageV2Extension?.message || 
-            quoted.viewOnceMessage?.message || 
-            quoted;
-
-  const type = Object.keys(msg)[0];
-  
-  if (!isVideo && !["imageMessage", "stickerMessage"].includes(type)) {
-    return c.reply("❌ Please reply to an image.");
+async function createSticker(sock, message, ctx, videoOnly = false) {
+  const quoted = getQuotedMessage(message);
+  if (!quoted) {
+    return ctx.reply(`❌ Reply to an ${videoOnly ? "video/GIF" : "image or video"} with ${ctx.prefix}${ctx.command}.`);
   }
-  if (isVideo && !["videoMessage", "gifMessage"].includes(type)) {
-    return c.reply("❌ Please reply to a video or GIF.");
+
+  const found = getMedia(
+    quoted,
+    videoOnly ? ["videoMessage"] : ["imageMessage", "videoMessage"]
+  );
+  if (!found) {
+    return ctx.reply(videoOnly
+      ? "❌ Please reply to a video or GIF."
+      : "❌ Please reply to an image or video.");
   }
 
   try {
-    // 1. Download the media buffer natively
-    const stream = await downloadContentFromMessage(msg[type], type.replace("Message", ""));
-    let buffer = Buffer.from([]);
-    for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-
-    // 2. Send the sticker natively using Baileys!
-    // This bypasses any missing library errors.
-    await s.sendMessage(c.from, { 
-      sticker: buffer,
-      // We can't easily set the pack name without the formatter, but this guarantees it works
-    }, { quoted: m });
-
+    const buffer = await downloadMedia(found.media, found.mediaType, { sock, from: ctx.from, quoted, stanzaId: message.message?.extendedTextMessage?.contextInfo?.stanzaId, participant: message.message?.extendedTextMessage?.contextInfo?.participant });
+    const isVideo = found.mediaType === "video";
+    const sticker = new Sticker(buffer, {
+      pack: C.BOT_NAME || "HIS EXCELLENCY XMD",
+      author: C.OWNER_NAME || "HIS EXCELLENCY",
+      type: StickerTypes.DEFAULT,
+      quality: 65,
+      animated: isVideo,
+      fps: 10,
+      loop: 0,
+      startTime: 0,
+      endTime: 8
+    });
+    const webp = await sticker.toBuffer();
+    await sock.sendMessage(ctx.from, { sticker: webp }, { quoted: message });
   } catch (err) {
-    c.reply(`❌ Failed to create sticker: ${err.message}`);
+    await ctx.reply(`❌ Sticker conversion failed: ${err.message}`);
   }
 }
 
-const commands = {
-  sticker: async (s, m, a, c) => createSticker(s, m, c, false),
-  s: async (s, m, a, c) => createSticker(s, m, c, false),
-  vsticker: async (s, m, a, c) => createSticker(s, m, c, true),
-  vs: async (s, m, a, c) => createSticker(s, m, c, true)
+module.exports = {
+  commands: {
+    sticker: (s, m, a, c) => createSticker(s, m, c, false),
+    s: (s, m, a, c) => createSticker(s, m, c, false),
+    vsticker: (s, m, a, c) => createSticker(s, m, c, true),
+    vs: (s, m, a, c) => createSticker(s, m, c, true),
+    toimage: async (s, m, a, c) => {
+      const quoted = getQuotedMessage(m);
+      const found = getMedia(quoted, ["stickerMessage"]);
+      if (!found) return c.reply("❌ Reply to a sticker.");
+      try {
+        const buffer = await downloadMedia(found.media, "sticker");
+        await s.sendMessage(c.from, { image: buffer }, { quoted: m });
+      } catch (e) { await c.reply(`❌ Could not convert sticker: ${e.message}`); }
+    }
+  }
 };
-
-module.exports = { commands };
