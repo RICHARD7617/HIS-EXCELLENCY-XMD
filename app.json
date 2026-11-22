@@ -18,6 +18,11 @@
       "value": "",
       "required": false
     },
+    "XMD_STORAGE_KEY": {
+      "description": "Required 32-byte encryption key for WhatsApp credentials and auth keys stored in PostgreSQL. Generate with openssl rand -base64 32. Keep secret and back it up securely.",
+      "value": "",
+      "required": false
+    },
     "MONGODB_URI": {
       "description": "OPTIONAL: MongoDB Atlas connection string for persistent cloud storage.",
       "value": "",
