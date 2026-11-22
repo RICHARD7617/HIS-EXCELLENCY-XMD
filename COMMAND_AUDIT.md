@@ -31,3 +31,7 @@ This is a static source-code audit of the Heroku-ready project archive. It is no
 - Updated `lib/db.js` to initialize `vars`, `budgets`, and `schedules` buckets in application state.
 - Updated `plugins/loader.js` to load real command handlers before `stubs.js`, preventing placeholder registrations from shadowing implemented commands.
 - Runtime integration remains unverified; YouTube extraction depends on `ytdl-core` compatibility with current YouTube changes. PostgreSQL persistence requires `DATABASE_URL` and `XMD_STORAGE_KEY` in the deployment environment.
+
+## Stage 2 implementation notes
+
+Implemented real handlers for budget records (`budget`, `summary`, `income`, `expense`, `delbudget`), saved reminder records (`setschedule`, `getschedule`, `delschedule`), PDF text generation and PDF page counting (`pdf`, `page`), and utility searches (`find`, `img`, `yts`). These handlers use the existing JSON/PostgreSQL-backed application state. Reminder entries are stored but are not automatically delivered in this stage. Social-platform download commands and many other menu entries remain unimplemented and are still explicit stubs.
