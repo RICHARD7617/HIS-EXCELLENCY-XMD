@@ -79,79 +79,49 @@ const commands = {
   autorecordtyping: async (s, m, a, c) => handleToggle(c, "autorecordtyping", "Auto Record & Typing"),
   autoreact: async (s, m, a, c) => handleToggle(c, "autoreact", "Auto React"),
   autoreactstatus: async (s, m, a, c) => handleToggle(c, "autoreactstatus", "Auto React Status"),
+  autoreactchannels: async (s, m, a, c) => handleToggle(c, "autoreactchannels", "Auto React Channels"),
   autoviewstatus: async (s, m, a, c) => handleToggle(c, "autoviewstatus", "Auto View Status"),
   antidelete: async (s, m, a, c) => handleToggle(c, "antidelete", "Anti-Delete"),
 
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
-    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    if (!quoted) return c.reply("❌ Please reply to a View Once image or video.");
+    const { getQuotedMessage, getMedia, downloadMedia } = require("../lib/media");
+    const quoted = getQuotedMessage(m);
+    if (!quoted) return c.reply("❌ Reply directly to a View Once image or video, then send .vv.");
 
-    // Unwrap properly
-    let msg = quoted.viewOnceMessageV2?.message || 
-              quoted.viewOnceMessageV2Extension?.message || 
-              quoted.viewOnceMessage?.message || 
-              quoted;
-
-    const type = Object.keys(msg)[0];
-    if (!["imageMessage", "videoMessage"].includes(type)) {
-      return c.reply("❌ The replied message is not a View Once image or video.");
-    }
+    const found = getMedia(quoted, ["imageMessage", "videoMessage"]);
+    if (!found) return c.reply("❌ The replied message is not a supported image or video.");
 
     try {
-      const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
-      
-      // Get the inner media object
-      const media = msg[type];
-      
-      // Download the stream
-      const stream = await downloadContentFromMessage(media, type.replace("Message", ""));
-      
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
-      
-      const caption = media.caption ? `\n\n${media.caption}` : "";
-      
-      await s.sendMessage(c.from, { 
-        [type.replace("Message", "")]: buffer, 
-        caption: `📸 *View Once Opened*${caption}` 
-      }, { quoted: m });
-      
-    } catch (err) { 
-      c.reply(`❌ Failed to open View Once: ${err.message}`); 
+      const buffer = await downloadMedia(found.media, found.mediaType, { sock: s, from: c.from, quoted, stanzaId: m.message?.extendedTextMessage?.contextInfo?.stanzaId, participant: m.message?.extendedTextMessage?.contextInfo?.participant });
+      const payload = found.mediaType === "image"
+        ? { image: buffer, caption: found.media.caption || "" }
+        : { video: buffer, caption: found.media.caption || "", mimetype: found.media.mimetype || "video/mp4" };
+      await s.sendMessage(c.from, payload, { quoted: m });
+    } catch (err) {
+      await c.reply(`❌ Could not open View Once media: ${err.message}`);
     }
   },
 
   save: async (s, m, a, c) => {
-    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    const { getQuotedMessage, getMedia, downloadMedia } = require("../lib/media");
+    const quoted = getQuotedMessage(m);
     if (!quoted) return c.reply("❌ Reply to media to save it.");
-    
-    let msg = quoted.viewOnceMessageV2?.message || 
-              quoted.viewOnceMessageV2Extension?.message || 
-              quoted.viewOnceMessage?.message || 
-              quoted;
 
-    const type = Object.keys(msg)[0];
-    const validTypes = ["imageMessage", "videoMessage", "audioMessage", "documentMessage"];
-    if (!validTypes.includes(type)) return c.reply("❌ Not a savable media file.");
+    const found = getMedia(quoted, ["imageMessage", "videoMessage", "audioMessage", "documentMessage"]);
+    if (!found) return c.reply("❌ Unsupported media type. Reply to an image, video, audio, or document.");
 
     try {
-      const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
-      const stream = await downloadContentFromMessage(msg[type], type.replace("Message", ""));
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
-      
-      const caption = msg[type].caption ? msg[type].caption : "";
-      
-      await s.sendMessage(c.from, { 
-        [type.replace("Message", "")]: buffer, 
-        caption: `📥 *Media Saved*\n\n${caption}` 
-      }, { quoted: m });
-      
-    } catch (err) { 
-      c.reply(`❌ Failed to save: ${err.message}`); 
+      const buffer = await downloadMedia(found.media, found.mediaType, { sock: s, from: c.from, quoted, stanzaId: m.message?.extendedTextMessage?.contextInfo?.stanzaId, participant: m.message?.extendedTextMessage?.contextInfo?.participant });
+      const payload = {
+        [found.mediaType]: buffer,
+        caption: found.media.caption || "📥 Media saved"
+      };
+      if (found.media.mimetype) payload.mimetype = found.media.mimetype;
+      if (found.media.fileName) payload.fileName = found.media.fileName;
+      await s.sendMessage(c.from, payload, { quoted: m });
+    } catch (err) {
+      await c.reply(`❌ Could not save media: ${err.message}`);
     }
   }
 };
