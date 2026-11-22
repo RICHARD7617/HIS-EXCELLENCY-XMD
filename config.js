@@ -77,7 +77,7 @@ const config = {
 //API KEYS //
   API_KEYS: {
     OPENAI: env("OPENAI_API_KEY", ""),
-    GEMINI: env("GEMINI_API_KEY", "
+    GEMINI: env("GEMINI_API_KEY", ""),
           'https://api.giftedtech.my.id/api/ai/gpt4?apikey=gifted&q=${encodeURIComponent(text)}"),
     GROQ: env("GROQ_API_KEY", ""),
     BING: env("BING_API_KEY", ""),
