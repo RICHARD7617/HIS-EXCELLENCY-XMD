@@ -81,7 +81,7 @@ const config = {
     GROQ: env("GROQ_API_KEY", ""),
     BING: env("BING_API_KEY", ""),
     REPLICATE: env("REPLICATE_API_KEY", ""),
-    WEATHER: env("WEATHER_API_KEY", ""),
+    WEATHER: env("WEATHER_API_KEY", "https://apis.emmyhenztech.name.ng/api/accuweather"),
     NEWS: env("NEWS_API_KEY", ""),
     TMDB: env("TMDB_API_KEY", ""),
     SPOTIFY: env("SPOTIFY_API_KEY", ""),
