@@ -74,7 +74,7 @@ const config = {
 
   AUTO_JOIN_GROUP:
     env("AUTO_JOIN_GROUP", "true") === "true",
-
+//API KEYS //
   API_KEYS: {
     OPENAI: env("OPENAI_API_KEY", ""),
     GEMINI: env("GEMINI_API_KEY", "
