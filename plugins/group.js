@@ -1,25 +1,6 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-
-const DB_PATH = path.join(__dirname, "..", "database.json");
-
-function getDB() {
-  try {
-    if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify({ groups: {}, bot: {} }, null, 2));
-    const db = JSON.parse(fs.readFileSync(DB_PATH, "utf8"));
-    if (!db.groups || typeof db.groups !== "object") db.groups = {};
-    return db;
-  } catch {
-    return { groups: {}, bot: {} };
-  }
-}
-function saveDB(db) {
-  const tmp = `${DB_PATH}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2));
-  fs.renameSync(tmp, DB_PATH);
-}
+const { getDB, saveDB } = require("../lib/db");
 function groupSettings(jid) {
   const db = getDB();
   db.groups[jid] ||= {};
