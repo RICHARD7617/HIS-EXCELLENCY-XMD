@@ -76,8 +76,8 @@ const config = {
     env("AUTO_JOIN_GROUP", "true") === "true",
 //API KEYS //
   API_KEYS: {
-    OPENAI: env("OPENAI_API_KEY", ""),
-    GEMINI: env("GEMINI_API_KEY", ""),
+    OPENAI: env("OPENAI_API_KEY", "https://apis.emmyhenztech.name.ng/api/ch-at"),
+    GEMINI: env("GEMINI_API_KEY", "https://apis.emmyhenztech.name.ng/api/gemini-proxy"),
     GROQ: env("GROQ_API_KEY", ""),
     BING: env("BING_API_KEY", ""),
     REPLICATE: env("REPLICATE_API_KEY", ""),
