@@ -4,7 +4,6 @@ const commands = {
     ctx.reply("✅ Chat marked as read.");
   },
 
-
   async react(sock, message, args, ctx) {
     const quoted = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
     if (!quoted) return ctx.reply("❌ Reply to a message with .react ❤️");
