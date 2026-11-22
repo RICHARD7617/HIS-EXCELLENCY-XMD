@@ -50,11 +50,8 @@ module.exports = {
     tog: bot, update: bot, "update-now": bot, ytlogin: bot,
 
     // ---- Budget ----
-    budget: budget, delbudget: budget, expense: budget,
-    income: budget, summary: budget,
 
     // ---- Document ----
-    page: doc, pdf: doc,
 
     // ---- Download ----
     apk: dl, fb: dl, fullss: dl, insta: dl, mediafire: dl, pinterest: dl,
@@ -85,12 +82,8 @@ module.exports = {
     plugin: plugin, remove: plugin,
 
     // ---- Schedule ----
-    delschedule: schedule, getschedule: schedule, setschedule: schedule,
 
     // ---- Search ----
-    emoji: search, find: search, ig: search, img: search, ison: search,
-    jean: search, movie: search, time: search, trt: search,
-    weather: search, yts: search,
 
     // ---- Sticker (sticker & take are real in sticker.js) ----
     circle: textmaker, exif: textmaker, mp4: textmaker, photo: textmaker, tg: textmaker,
