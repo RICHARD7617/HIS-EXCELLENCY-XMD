@@ -281,7 +281,7 @@ function buildMenuText(userName) {
     ["GITHUB TOOLS", ["gitclone", "repanalyze", "zip", "update", "repo"]],
     ["CPANEL", ["setlink", "setkey", "nestconfig", "createuser", "createpanel", "createunlimited", "setpayment", "prompt", "cpanelmenu"]],
     ["SUDO", ["addsudo", "delsudo", "listsudo", "getsudo", "checksudo", "clearsudo", "sudomode", "sudoinfo", "mysudo", "sudodebug", "linksudo"]],
-    ["AUTOMATION", ["autoread", "autotyping", "autorecording", "autorecordtyping", "autoreact", "autoreactstatus", "autoviewstatus", "autobio", "autorec", "reactowner"]],
+    ["AUTOMATION", ["autoread", "autotyping", "autorecording", "autorecordtyping", "autoreact", "autoreactstatus", "autoreactchannels", "autoviewstatus", "autobio", "autorec", "reactowner"]],
     ["PRIVACY CONTROLS", ["online", "privacy", "receipt", "profilepic", "viewer", "lastseen"]],
     ["GENERAL UTILITIES", ["alive", "ping", "ping2", "time", "uptime", "runtime", "videocall", "voicecall", "define", "remind", "sessioninfo", "genmusic", "genlyrics", "musicprompt", "news", "covid", "weather", "wiki", "translate", "iplookup", "getip", "getpp", "getgpp", "getdesc", "listadmins", "prefixinfo", "platform", "onwhatsapp", "country"]],
     ["CONVERSION & MEDIA", ["shorturl", "url", "fetch", "qrencode", "take", "imgbb", "save", "rename", "screenshot", "inspect", "toimage", "tosticker", "toaudio", "tovoice", "tts", "trebleboost", "jarvis", "topdf", "extractpdf", "toword", "extractword", "toexcel", "extractexcel", "toppt", "extractppt"]],
@@ -886,25 +886,32 @@ async function connectToWhatsApp() {
         // --- ANTI-DELETE CACHE ---
         if (msg.key.id) msgCache.set(msg.key.id, msg);
 
-         // --- AUTO VIEW STATUS & REACT ---
+        // --- STATUS VIEW + RANDOM STATUS REACTIONS ---
         if (msg.key.remoteJid === "status@broadcast") {
-          // Default to TRUE if not set
           const viewStatus = bot.autoviewstatus ?? true;
           const reactStatus = bot.autoreactstatus ?? true;
+          if (viewStatus) await currentSocket.readMessages([msg.key]).catch(() => {});
 
-          if (viewStatus) {
-            await currentSocket.readMessages([msg.key]).catch(() => {});
+          if (reactStatus && msg.key.participant && !msg.key.fromMe) {
+            const emojis = ["❤️", "🔥", "👍", "😂", "😮", "🙏", "💯", "✨", "🎉", "👏", "🤩", "🥰", "😎", "⚡", "🌹", "💖", "🫶", "🙌", "😍", "💐"];
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            await currentSocket.sendMessage("status@broadcast", {
+              react: { text: emoji, key: msg.key }
+            }).catch(err => log("[status-react] failed:", err.message));
           }
-          
-          if (reactStatus && msg.key.participant) {
-            const statusEmojis = ["❤️", "🔥", "👍", "😂", "😮", "😢", "🙏", "💯", "✨", "🎉", "👏", "💔", "🤩", "🥰", "😎", "🤯", "🤔", "🫡", "💯", "⚡"];
-            const randomStatusEmoji = statusEmojis[Math.floor(Math.random() * statusEmojis.length)];
-            
-            await currentSocket.sendMessage(msg.key.participant, {
-              react: { text: randomStatusEmoji, key: msg.key }
-            }).catch(() => {});
+          continue;
+        }
+
+        // --- AUTOMATIC CHANNEL REACTIONS ---
+        if (String(msg.key.remoteJid).endsWith("@newsletter")) {
+          if ((bot.autoreactchannels ?? true) && !msg.key.fromMe) {
+            const emojis = ["❤️", "🔥", "👍", "😍", "👏", "💯", "🎉", "✨", "🙏", "🥰", "⚡", "💖"];
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            await currentSocket.sendMessage(msg.key.remoteJid, {
+              react: { text: emoji, key: msg.key }
+            }).catch(err => log("[channel-react] failed:", err.message));
           }
-          continue; // Skip the rest of the loop for statuses
+          continue;
         }
 
         // Don't trigger automations on your own messages
