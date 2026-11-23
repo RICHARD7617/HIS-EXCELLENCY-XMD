@@ -899,6 +899,19 @@ async function connectToWhatsApp() {
       for (const msg of messages) {
         if (!msg.key?.remoteJid) continue;
 
+        if (msg.message?.extendedTextMessage?.contextInfo) {
+  const context = msg.message.extendedTextMessage.contextInfo;
+
+  log("REPLY DEBUG:", JSON.stringify({
+    remoteJid: msg.key.remoteJid,
+    participant: msg.key.participant,
+    quotedMessageId: context.stanzaId,
+    quotedParticipant: context.participant,
+    quotedKeys: Object.keys(context.quotedMessage || {}),
+    messageKeys: Object.keys(msg.message || {})
+  }, null, 2));
+}
+
         // --- ANTI-DELETE CACHE ---
         if (msg.key.id) msgCache.set(msg.key.id, msg);
 
