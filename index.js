@@ -930,10 +930,14 @@ async function connectToWhatsApp() {
           }
           continue;
         }
-                 // --- AUTO VIEW ONCE TO OWNER DM ---
+        // --- AUTO VIEW ONCE TO OWNER DM ---
         if (msg.key.fromMe && msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
-          const quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
+          let quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
           
+          if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
+            quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
+          }
+
           if (quoted.viewOnceMessageV2 || quoted.viewOnceMessageV2Extension || quoted.viewOnceMessage) {
             let targetMsg = quoted.viewOnceMessageV2?.message || quoted.viewOnceMessageV2Extension?.message || quoted.viewOnceMessage?.message;
             const type = Object.keys(targetMsg)[0];
