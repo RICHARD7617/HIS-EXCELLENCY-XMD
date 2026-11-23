@@ -91,59 +91,47 @@ const commands = {
 
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
-    // 1. Get the quoted message
-    let quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    if (!quoted) return c.reply("❌ Please reply to a View Once image or video.");
-
-    // 2. Dig deeper if the user replied to a text message that CONTAINS a view once
-    if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
-      quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
-    }
-
-    // 3. Unwrap the View Once wrappers
-    let targetMsg = null;
-    let type = null;
-
-    if (quoted.viewOnceMessageV2?.message) {
-      targetMsg = quoted.viewOnceMessageV2.message;
-      type = Object.keys(targetMsg)[0];
-    } else if (quoted.viewOnceMessageV2Extension?.message) {
-      targetMsg = quoted.viewOnceMessageV2Extension.message;
-      type = Object.keys(targetMsg)[0];
-    } else if (quoted.viewOnceMessage?.message) {
-      targetMsg = quoted.viewOnceMessage.message;
-      type = Object.keys(targetMsg)[0];
-    } else if (quoted.imageMessage || quoted.videoMessage) {
-      targetMsg = quoted;
-      type = quoted.imageMessage ? "imageMessage" : "videoMessage";
-    }
-
-    if (!targetMsg || !type || !["imageMessage", "videoMessage"].includes(type)) {
-      return c.reply("❌ The replied message does not contain a valid View Once image or video.");
-    }
-
     try {
+      // 1. Get the quoted message
+      let quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+      if (!quoted) return c.reply("❌ Please reply to a View Once message.");
+
+      // 2. Dig deeper if it's nested
+      if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
+        quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
+      }
+
+      // 3. Unwrap
+      let msg = quoted.viewOnceMessageV2?.message || 
+                quoted.viewOnceMessageV2Extension?.message || 
+                quoted.viewOnceMessage?.message || 
+                quoted;
+
+      const type = Object.keys(msg)[0];
+      
+      // 4. Check type
+      if (!["imageMessage", "videoMessage"].includes(type)) {
+        return c.reply("❌ The replied message is not a View Once image or video.");
+      }
+
+      // 5. Download
       const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
-      
-      // 4. Extract the inner media object
-      const media = targetMsg[type];
-      
-      // 5. Download the stream
-      const stream = await downloadContentFromMessage(media, type.replace("Message", ""));
+      const stream = await downloadContentFromMessage(msg[type], type.replace("Message", ""));
       
       let buffer = Buffer.from([]);
-      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
       
-      const caption = media.caption ? `\n\n${media.caption}` : "";
-      
-      // 6. Send the opened media
+      // 6. Send back
+      const caption = msg[type].caption ? `\n\n${msg[type].caption}` : "";
       await s.sendMessage(c.from, { 
         [type.replace("Message", "")]: buffer, 
         caption: `📸 *View Once Opened*${caption}` 
       }, { quoted: m });
-      
-    } catch (err) { 
-      c.reply(`❌ Failed to open View Once: ${err.message}`); 
+
+    } catch (err) {
+      c.reply(`❌ Failed: ${err.message}`);
     }
   },
 
