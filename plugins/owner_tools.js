@@ -91,27 +91,45 @@ const commands = {
   antidelete: async (s, m, a, c) => handleToggle(c, "antidelete", "Anti-Delete"),
 
   // ================= CONTACT TOOLS =================
-    vv: async (s, m, a, c) => {
-    if (!c.isOwner) return;
+  vv: async (s, m, a, c) => {
+    console.log("[owner_tools] vv called");
+
+    if (!c.isOwner) {
+      return c.reply("❌ Owner only. Your number was not recognized as owner.");
+    }
+
     const result = await viewonce.openFromReply(m);
     if (!result.found) return c.reply(viewonce.errorText(result));
 
     await viewonce.sendOpened(
-      s, c.from, result.found, result.buffer,
+      s,
+      c.from,
+      result.found,
+      result.buffer,
       result.found.media.caption || "📸 *View Once Opened*",
       { quoted: m }
     );
   },
 
   vv2: async (s, m, a, c) => {
-    if (!c.isOwner) return;
+    console.log("[owner_tools] vv2 called");
+
+    if (!c.isOwner) {
+      return c.reply("❌ Owner only. Your number was not recognized as owner.");
+    }
+
     const result = await viewonce.openFromReply(m);
     if (!result.found) return c.reply(viewonce.errorText(result));
 
     const botJid = `${viewonce.norm(s.user?.id)}@s.whatsapp.net`;
+
     await viewonce.sendOpened(
-      s, botJid, result.found, result.buffer,
+      s,
+      botJid,
+      result.found,
+      result.buffer,
       `📸 *View Once Opened (private)*\n\nFrom chat: ${c.from}`
     );
+
     if (c.from !== botJid) await c.reply("✅ Sent to your private chat.");
   },
