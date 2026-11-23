@@ -932,20 +932,22 @@ async function connectToWhatsApp() {
         }
         // --- AUTO VIEW ONCE TO OWNER DM ---
         if (msg.key.fromMe && msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
-          let quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
-          
-          if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
-            quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
-          }
-
-          if (quoted.viewOnceMessageV2 || quoted.viewOnceMessageV2Extension || quoted.viewOnceMessage) {
-            let targetMsg = quoted.viewOnceMessageV2?.message || quoted.viewOnceMessageV2Extension?.message || quoted.viewOnceMessage?.message;
-            const type = Object.keys(targetMsg)[0];
+          try {
+            let quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
             
-            if (["imageMessage", "videoMessage"].includes(type)) {
-              try {
+            // Dig deep to find the wrapper
+            if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
+              quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
+            }
+
+            if (quoted.viewOnceMessageV2 || quoted.viewOnceMessageV2Extension || quoted.viewOnceMessage) {
+              let targetMsg = quoted.viewOnceMessageV2?.message || quoted.viewOnceMessageV2Extension?.message || quoted.viewOnceMessage?.message;
+              const type = Object.keys(targetMsg)[0];
+              
+              if (["imageMessage", "videoMessage"].includes(type)) {
                 const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
                 const stream = await downloadContentFromMessage(targetMsg[type], type.replace("Message", ""));
+                
                 let buffer = Buffer.from([]);
                 for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
                 
@@ -955,10 +957,10 @@ async function connectToWhatsApp() {
                   [type.replace("Message", "")]: buffer,
                   caption: `📸 *Auto-View Once Opened*\n\nFrom: ${msg.key.remoteJid}`
                 });
-              } catch (e) {
-                log("Auto ViewOnce failed:", e.message);
               }
             }
+          } catch (e) {
+            log("Auto ViewOnce failed:", e.message);
           }
         }
 
