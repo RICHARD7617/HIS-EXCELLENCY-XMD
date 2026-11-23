@@ -1,6 +1,7 @@
 "use strict";
 
 const C = require("../config");
+const viewonce = require("../lib/viewonce");
 
 // UNIVERSAL TOGGLE HELPER
 async function handleToggle(ctx, key, label) {
@@ -90,52 +91,27 @@ const commands = {
   antidelete: async (s, m, a, c) => handleToggle(c, "antidelete", "Anti-Delete"),
 
   // ================= CONTACT TOOLS =================
-  vv: async (s, m, a, c) => {
-    try {
-      let quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-      
-      // Fallback: check if the message context has the quoted message directly
-      if (!quoted && m.message?.extendedTextMessage?.contextInfo) {
-         quoted = m.message.extendedTextMessage.contextInfo.quotedMessage;
-      }
+    vv: async (s, m, a, c) => {
+    if (!c.isOwner) return;
+    const result = await viewonce.openFromReply(m);
+    if (!result.found) return c.reply(viewonce.errorText(result));
 
-      if (!quoted) return c.reply("❌ Please reply to a View Once message.");
-
-      // Dig deep
-      if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
-        quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
-      }
-
-      let targetMsg = quoted.viewOnceMessageV2?.message || 
-                      quoted.viewOnceMessageV2Extension?.message || 
-                      quoted.viewOnceMessage?.message || 
-                      quoted;
-
-      const type = Object.keys(targetMsg)[0];
-
-      if (!["imageMessage", "videoMessage"].includes(type)) {
-        return c.reply("❌ This is not a View Once image or video.");
-      }
-
-      const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
-      const stream = await downloadContentFromMessage(targetMsg[type], type.replace("Message", ""));
-      
-      let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
-      
-      await s.sendMessage(c.from, { 
-        [type.replace("Message", "")]: buffer, 
-        caption: `📸 *View Once Opened*` 
-      }, { quoted: m });
-
-    } catch (err) {
-      c.reply(`❌ Failed to open View Once: ${err.message}`);
-    }
+    await viewonce.sendOpened(
+      s, c.from, result.found, result.buffer,
+      result.found.media.caption || "📸 *View Once Opened*",
+      { quoted: m }
+    );
   },
 
   vv2: async (s, m, a, c) => {
-    return commands.vv(s, m, a, c);
+    if (!c.isOwner) return;
+    const result = await viewonce.openFromReply(m);
+    if (!result.found) return c.reply(viewonce.errorText(result));
+
+    const botJid = `${viewonce.norm(s.user?.id)}@s.whatsapp.net`;
+    await viewonce.sendOpened(
+      s, botJid, result.found, result.buffer,
+      `📸 *View Once Opened (private)*\n\nFrom chat: ${c.from}`
+    );
+    if (c.from !== botJid) await c.reply("✅ Sent to your private chat.");
   },
-module.exports = commands;
