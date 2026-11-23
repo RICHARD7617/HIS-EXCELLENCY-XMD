@@ -138,3 +138,4 @@ const commands = {
   vv2: async (s, m, a, c) => {
     return commands.vv(s, m, a, c);
   },
+module.exports = commands;
