@@ -1,5 +1,6 @@
 "use strict";
 
+const viewonce = require("./lib/viewonce");
 const { registerEventHandlers } = require("./lib/event-handlers");
 const fs = require("fs");
 const http = require("http");
@@ -819,7 +820,7 @@ async function connectToWhatsApp() {
     currentSocket.ev.on("creds.update", saveCreds);
 
     registerEventHandlers(currentSocket, log);
-
+    viewonce.attach(currentSocket, log, C);
     // --------------------------------------------------------
     // CONNECTION EVENTS
     // --------------------------------------------------------
@@ -942,12 +943,7 @@ async function connectToWhatsApp() {
             }).catch(err => log("[channel-react] failed:", err.message));
           }
           continue;
-        }
-        // --- AUTO VIEW ONCE TO OWNER DM ---
-        if (msg.key.fromMe && msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
-          try {
-            let quoted = msg.message.extendedTextMessage.contextInfo.quotedMessage;
-            
+        }            
             // Dig deep to find the wrapper
             if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
               quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
