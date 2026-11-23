@@ -440,6 +440,7 @@ async function handleMessage(socket, message) {
 
     const userName = message.pushName || sender.split("@")[0];
     const isOwner = checkOwner(socket, message, sender);
+    log(`CMD "${command}" | owner: ${isOwner} | mode: ${getMode()} | fromMe: ${message.key.fromMe} | sender: ${sender}`);
 
     if (typeof socket.readMessages === "function") {
       socket.readMessages([message.key]).catch(() => {});
