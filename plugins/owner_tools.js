@@ -91,10 +91,16 @@ const commands = {
 
   // ================= CONTACT TOOLS =================
   vv: async (s, m, a, c) => {
-    const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-    if (!quoted) return c.reply("❌ Reply to a View Once image or video.");
+    // 1. Get the quoted message
+    let quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!quoted) return c.reply("❌ Please reply to a View Once image or video.");
 
-    // 1. Dig into the wrappers to find the raw media
+    // 2. Dig deeper if the user replied to a text message that CONTAINS a view once
+    if (quoted.extendedTextMessage?.contextInfo?.quotedMessage) {
+      quoted = quoted.extendedTextMessage.contextInfo.quotedMessage;
+    }
+
+    // 3. Unwrap the View Once wrappers
     let targetMsg = null;
     let type = null;
 
@@ -113,25 +119,24 @@ const commands = {
     }
 
     if (!targetMsg || !type || !["imageMessage", "videoMessage"].includes(type)) {
-      return c.reply("❌ The replied message is not a View Once image or video.");
+      return c.reply("❌ The replied message does not contain a valid View Once image or video.");
     }
 
     try {
       const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
       
-      // 2. Extract the media object
+      // 4. Extract the inner media object
       const media = targetMsg[type];
       
-      // 3. Force the downloader to use the direct path
+      // 5. Download the stream
       const stream = await downloadContentFromMessage(media, type.replace("Message", ""));
       
       let buffer = Buffer.from([]);
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
+      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
       
-      // 4. Send the opened media
       const caption = media.caption ? `\n\n${media.caption}` : "";
+      
+      // 6. Send the opened media
       await s.sendMessage(c.from, { 
         [type.replace("Message", "")]: buffer, 
         caption: `📸 *View Once Opened*${caption}` 
@@ -143,6 +148,5 @@ const commands = {
   },
 
   vv2: async (s, m, a, c) => {
-    // Same logic as vv, just an alias
     return commands.vv(s, m, a, c);
   },
