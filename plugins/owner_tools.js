@@ -133,3 +133,6 @@ const commands = {
 
     if (c.from !== botJid) await c.reply("✅ Sent to your private chat.");
   },
+  };
+
+module.exports = commands;
