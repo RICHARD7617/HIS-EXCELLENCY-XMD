@@ -111,6 +111,7 @@ function getPlugins() {
 }
 
 const PLUGINS = getPlugins();
+global.__BOT_PLUGINS = PLUGINS;
 log(`Loaded ${PLUGINS.size} plugins.`);
 
 // ============================================================
@@ -229,10 +230,25 @@ function getMessageText(message) {
 // MENU DESIGN
 // ============================================================
 
-function buildMenuText(userName) {
+function getMenuConfig() {
+  const db = getDB();
+  db.bot ||= {};
+  if (!db.bot.menuStyle) db.bot.menuStyle = 1;
+  if (typeof db.bot.menuInfo !== "boolean") db.bot.menuInfo = true;
+  return {
+    style: Number(db.bot.menuStyle) || 1,
+    showInfo: db.bot.menuInfo,
+    customUrl: db.bot.menuImage || "",
+    image: db.bot.menuImage || C.BOT_IMAGE || "https://i.ibb.co/3sX4Q4y/placeholder.jpg"
+  };
+}
+
+function buildMenuText(userName, opts = {}) {
   const p = C.PREFIX || ".";
   const timezone = C.TIMEZONE || "Africa/Nairobi";
   const now = new Date();
+  const cfg = getMenuConfig();
+  const style = opts.style || cfg.style;
 
   const time = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -254,7 +270,28 @@ function buildMenuText(userName) {
   const usedMem = totalMem - freeMem;
   const ramText = `${Math.round(usedMem)}/${Math.round(totalMem)}MB`;
 
-  const header = `
+  let header = "";
+  if (cfg.showInfo) {
+    if (style === 2 || opts.compact) {
+      header = `⚡ *${C.BOT_NAME || "HIS EXCELLENCY XMD"}* (${getMode()}) | Prefix: ${p} | ${time} ${date} | RAM: ${ramText} | Up: ${runtime()}\n`;
+    } else if (style === 3) {
+      header = `
+╔══════════════════════════════╗
+║ ⚡ ${C.BOT_NAME || "HIS EXCELLENCY XMD"} // SYS-MENU ║
+╠══════════════════════════════╣
+║ Prefix   : ${p}
+║ User     : ${userName || "User"}
+║ Mode     : ${getMode()}
+║ Time     : ${time} (${day})
+║ Date     : ${date}
+║ Version  : ${C.VERSION || "1.1.7"}
+║ Plugins  : ${PLUGINS.size}
+║ RAM      : ${ramText}
+║ Uptime   : ${runtime()}
+╚══════════════════════════════╝
+`;
+    } else {
+      header = `
 ╭═══ 🔥𝐇𝐈𝐒 𝐄𝐗𝐂𝐄𝐋𝐋𝐄𝐍𝐂𝐘 𝐗𝐌𝐃 𝟎𝟎𝟏🔥 ═══⊷
 ┃❃╭──────────────
 ┃❃│ 𝐏𝐫𝐞𝐟𝐢𝐱 : ${p}
@@ -271,6 +308,10 @@ function buildMenuText(userName) {
 ┃❃╰───────────────
 ╰═════════════════⊷
 `;
+    }
+  } else {
+    header = `\n🔥 *${C.BOT_NAME || "HIS EXCELLENCY XMD"}* — Prefix: ${p}\n`;
+  }
 
   const cats = [
     ["GROUP MANAGEMENT", ["add", "promote", "promoteall", "demote", "demoteall", "kick", "kickall", "ban", "unban", "clearbanlist", "warn", "resetwarn", "setwarn", "warnings", "mute", "unmute", "gctime", "antileave", "antilink", "addbadword", "removebadword", "listbadword", "welcome", "goodbye", "joinapproval", "onlyadmins", "leave", "creategroup"]],
@@ -397,13 +438,21 @@ async function sendStartupMessage(socket) {
 function checkOwner(socket, message, sender) {
   const botNumber = normalizeNumber(socket.user?.id);
   const senderNumber = normalizeNumber(sender);
+  const db = typeof getDB === "function" ? getDB() : {};
   const ownerNumber = normalizeNumber(
-    process.env.OWNER_NUMBER || C.OWNER_NUMBER || ""
+    db?.bot?.ownerNumber || process.env.OWNER_NUMBER || C.OWNER_NUMBER || ""
   );
 
   if (message.key?.fromMe === true) return true;
   if (botNumber && senderNumber === botNumber) return true;
   if (ownerNumber && senderNumber === ownerNumber) return true;
+
+  if (db?.bot?.sudomode !== false && Array.isArray(db?.bot?.sudoUsers) && senderNumber) {
+    const sudoSet = new Set(db.bot.sudoUsers.map(x => normalizeNumber(x)));
+    if (sudoSet.has(senderNumber)) return true;
+    const mapped = db?.bot?.sudoLinks?.[senderNumber];
+    if (mapped && sudoSet.has(normalizeNumber(mapped))) return true;
+  }
 
   return false;
 }
@@ -417,6 +466,8 @@ async function handleMessage(socket, message) {
     if (!message?.message || !message.key?.remoteJid) return;
 
     const from = message.key.remoteJid;
+    global.__LAST_MSG ||= new Map();
+    global.__LAST_MSG.set(from, { id: message.key.id, fromMe: !!message.key.fromMe, participant: message.key.participant || null, pushName: message.pushName || null, keys: Object.keys(message.message || {}), ts: Date.now() });
     if (from === "status@broadcast") return;
 
     const text = getMessageText(message);
@@ -521,30 +572,141 @@ async function handleMessage(socket, message) {
     // BUILT-IN COMMANDS
     // --------------------------------------------------------
 
+async function sendBotMenu(socket, from, message, userName, opts = {}) {
+  const menuText = buildMenuText(userName, opts);
+  const cfg = getMenuConfig();
+  await socket.sendMessage(from, {
+    text: `🔥 ${C.BOT_NAME || "HIS EXCELLENCY XMD"}\n\nLoading menu...`
+  }, { quoted: message });
+
+  const localBanner = path.join(__dirname, "data", "menu-banner.jpg");
+  let imagePayload = null;
+  if (!cfg.customUrl && fs.existsSync(localBanner)) {
+    imagePayload = { image: fs.readFileSync(localBanner), caption: menuText };
+  } else {
+    imagePayload = { image: { url: cfg.image }, caption: menuText };
+  }
+
+  try {
+    await socket.sendMessage(from, imagePayload, { quoted: message });
+  } catch (error) {
+    log("Menu image failed; sending text menu:", error.message);
+    await socket.sendMessage(from, { text: menuText }, { quoted: message });
+  }
+}
+
     switch (command) {
       case "menu":
       case "help": {
-        const menuText = buildMenuText(userName);
-        // LOADING MENU MESSAGE
-    await socket.sendMessage(from, {
-      text: "🔥 HIS EXCELLENCY XMD 001\n\nLoading menu..."
-    }, { quoted: message });
+        await sendBotMenu(socket, from, message, userName);
+        return;
+      }
 
-        try {
-          await socket.sendMessage(from, {
-            image: {
-              url: C.BOT_IMAGE || "https://i.ibb.co/3sX4Q4y/placeholder.jpg"
-            },
-            caption: menuText
-          }, { quoted: message });
-        } catch (error) {
-          log("Menu image failed; sending text menu:", error.message);
+      case "menu2": {
+        await sendBotMenu(socket, from, message, userName, { style: 2, compact: true });
+        return;
+      }
 
+      case "menustyle": {
+        const db = getDB();
+        db.bot ||= {};
+        const arg = String(args[0] || "").trim().toLowerCase();
+        let nextStyle;
+        if (["1", "2", "3"].includes(arg)) {
+          nextStyle = Number(arg);
+        } else if (arg === "compact") {
+          nextStyle = 2;
+        } else if (arg === "cyber") {
+          nextStyle = 3;
+        } else if (arg === "classic" || arg === "box") {
+          nextStyle = 1;
+        } else {
+          nextStyle = ((Number(db.bot.menuStyle) || 1) % 3) + 1;
+        }
+        db.bot.menuStyle = nextStyle;
+        saveDB(db);
+        await socket.sendMessage(from, {
+          text: `✅ Menu style set to *${nextStyle}* (1: Classic, 2: Compact, 3: Cyber).`
+        }, { quoted: message });
+        return;
+      }
+
+      case "togglemenuinfo": {
+        const db = getDB();
+        db.bot ||= {};
+        const arg = String(args[0] || "").trim().toLowerCase();
+        const current = typeof db.bot.menuInfo === "boolean" ? db.bot.menuInfo : true;
+        const nextVal = arg === "on" ? true : arg === "off" ? false : !current;
+        db.bot.menuInfo = nextVal;
+        saveDB(db);
+        await socket.sendMessage(from, {
+          text: `${nextVal ? "✅ Enabled" : "❌ Disabled"} *Menu Info Header*.`
+        }, { quoted: message });
+        return;
+      }
+
+      case "setmenuimage": {
+        const db = getDB();
+        db.bot ||= {};
+        const urlArg = String(args[0] || "").trim();
+        const quotedImg = message.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage;
+        const directImg = message.message?.imageMessage;
+
+        if (urlArg && /^https?:\/\//i.test(urlArg)) {
+          db.bot.menuImage = urlArg;
+          saveDB(db);
+          const localBanner = path.join(__dirname, "data", "menu-banner.jpg");
+          if (fs.existsSync(localBanner)) {
+            try { fs.unlinkSync(localBanner); } catch {}
+          }
           await socket.sendMessage(from, {
-            text: menuText
+            text: `✅ Menu image updated to URL:
+${urlArg}`
           }, { quoted: message });
+          return;
         }
 
+        if ((directImg || quotedImg) && typeof downloadMediaMessage === "function") {
+          const targetMsg = directImg
+            ? message
+            : {
+                key: {
+                  remoteJid: from,
+                  id: message.message.extendedTextMessage.contextInfo.stanzaId,
+                  participant: message.message.extendedTextMessage.contextInfo.participant
+                },
+                message: { imageMessage: quotedImg }
+              };
+          const buf = await downloadMediaMessage(targetMsg, "buffer", {}, { logger: log, reuploadRequest: socket.updateMediaMessage });
+          const dataDir = path.join(__dirname, "data");
+          if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+          fs.writeFileSync(path.join(dataDir, "menu-banner.jpg"), buf);
+          delete db.bot.menuImage;
+          saveDB(db);
+          await socket.sendMessage(from, {
+            text: "✅ Menu image saved from image message!"
+          }, { quoted: message });
+          return;
+        }
+
+        await socket.sendMessage(from, {
+          text: `Usage: ${C.PREFIX || "."}setmenuimage <https://image-url> (or reply to / send an image with the command)`
+        }, { quoted: message });
+        return;
+      }
+
+      case "restoremenuimage": {
+        const db = getDB();
+        db.bot ||= {};
+        delete db.bot.menuImage;
+        saveDB(db);
+        const localBanner = path.join(__dirname, "data", "menu-banner.jpg");
+        if (fs.existsSync(localBanner)) {
+          try { fs.unlinkSync(localBanner); } catch {}
+        }
+        await socket.sendMessage(from, {
+          text: "✅ Menu image restored to default."
+        }, { quoted: message });
         return;
       }
 
@@ -806,6 +968,7 @@ async function connectToWhatsApp() {
 
     const currentSocket = makeWASocket(socketOptions);
     sock = currentSocket;
+    global.__BOT_SOCK = () => sock;
 
     (async () => {
       for (const { file, fn } of PLUGINS.__initHooks || []) {

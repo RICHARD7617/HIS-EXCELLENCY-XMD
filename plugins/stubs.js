@@ -5,12 +5,7 @@
 function makeStub(category, needs) {
   return async (sock, message, args, ctx) => {
     await sock.sendMessage(ctx.from, {
-      text:
-        `⚠️ *${ctx.command}* is not configured yet.\n\n` +
-        `▸ Category: ${category}\n` +
-        `▸ Needs: ${needs}\n\n` +
-        `Add the key in *config.js* under *API_KEYS* and restart the bot.`,
-    }, { quoted: message });
+      }, { quoted: message });
   };
 }
 
@@ -34,81 +29,72 @@ const logia = makeStub("Logia", "a database");
 const whatsapp = makeStub("WhatsApp", "a WhatsApp Business API");
 
 module.exports = {
-  commands: {
-    // ---- Audio ----
-    avec: audio, bass: audio, black: audio, blown: audio, cut: audio,
-    deep: audio, earrape: audio, fast: audio, fat: audio, histo: audio,
-    low: audio, nightcore: audio, pitch: audio, robot: audio, slow: audio,
-    smooth: audio, treble: audio, tupai: audio, vector: audio,
+  black: audio, blown: audio, cut: audio,
+    earrape: audio, fast: audio, fat: audio, histo: audio,
+    nightcore: audio, pitch: audio, robot: audio, slow: audio,
+    treble: audio, tupai: audio, vector: audio,
 
     // ---- AutoReply ----
-    filter: autoreply, gfilter: autoreply, gstop: autoreply,
-    pfilter: autoreply, pstop: autoreply, stop: autoreply,
+    gfilter: autoreply, gstop: autoreply,
+    pstop: autoreply, stop: autoreply,
 
     // ---- Bot ----
-    backup: bot, gauth: bot, gupload: bot, reminder: bot, task: bot,
-    tog: bot, update: bot, "update-now": bot, ytlogin: bot,
+    gauth: bot, gupload: bot, reminder: bot, task: bot,
+    "update-now": bot, ytlogin: bot,
 
     // ---- Budget ----
 
     // ---- Document ----
 
     // ---- Download ----
-    apk: dl, fb: dl, fullss: dl, insta: dl, mediafire: dl, pinterest: dl,
-    play: dl, reddit: dl, song: dl, spotify: dl, ss: dl, story: dl,
-    tiktok: dl, twitter: dl, upload: dl, video: dl, yta: dl, ytv: dl,
+    insta: dl, reddit: dl, ss: dl, story: dl,
+    yta: dl, 
 
     // ---- Editor ----
-    bloody: editor, bokeh: editor, cartoon: editor, color: editor,
-    dark: editor, demon: editor, enhance: editor, gandm: editor,
-    horned: editor, kiss: editor, look: editor, makeup: editor,
-    pencil: editor, sketch: editor, skull: editor, wanted: editor, zombie: editor,
+    bokeh: editor, cartoon: editor, color: editor,
+    demon: editor, gandm: editor,
+     look: editor, makeup: editor,
+    sketch: editor, skull: editor, wanted: editor, zombie: editor,
 
     // ---- Game ----
     
 
     // ---- Logia ----
-    ope: logia, yami: logia, zushi: logia,
+    yami: logia, zushi: logia,
 
     // ---- Misc (some handled in misc.js already; these are the rest) ----
-    avm: misc, delcmd: misc, fancy: misc, forward: misc, getcmd: misc,
-    lydia: misc, mention: misc, mforward: misc, news: misc, reboot: misc,
-    rmbg: editor, save: misc, setcmd: misc, url: misc, whois: search,
+    delcmd: misc, fancy: misc, forward: misc, getcmd: misc,
+    mention: misc, mforward: misc, reboot: misc,
+    setcmd: misc,  
 
     // ---- Personal ----
-    delgreet: personal, getgreet: personal, setgreet: personal,
+    getgreet: personal, setgreet: personal,
 
     // ---- Plugin ----
-    plugin: plugin, remove: plugin,
+    remove: plugin,
 
     // ---- Schedule ----
 
     // ---- Search ----
 
     // ---- Sticker (sticker & take are real in sticker.js) ----
-    circle: textmaker, exif: textmaker, mp4: textmaker, photo: textmaker, tg: textmaker,
+    mp4: textmaker, photo: textmaker, tg: textmaker,
 
     // ---- TextMaker ----
     "3d": textmaker, angel: textmaker, avenger: textmaker, blub: textmaker,
-    bpink: textmaker, cat: textmaker, glitch: textmaker, glitter: textmaker,
-    graffiti: textmaker, hacker: textmaker, light: textmaker, marvel: textmaker,
-    neon: textmaker, sci: textmaker, sign: textmaker, tattoo: textmaker,
-    watercolor: textmaker,
-
+    glitch: textmaker, glitter: textmaker,
+    hacker: textmaker, light: textmaker, marvel: textmaker,
+    sci: textmaker, sign: textmaker, tattoo: textmaker,
     // ---- User ----
-    block: user, fullpp: user, gjid: user, jid: user, pp: user, unblock: user,
-
     // ---- Vars ----
-    allvar: vars, delsudo: vars, delvar: vars, getsudo: vars,
-    getvar: vars, setsudo: vars, setvar: vars,
+    delvar: vars, getvar: vars, setsudo: vars, setvar: vars,
 
     // ---- Video ----
-    compress: audio, crop: audio, merge: audio, mp3: audio,
-    reverse: audio, rotate: audio, trim: audio,
+    crop: audio, merge: audio, mp3: audio,
+    rotate: audio, trim: audio,
 
     // ---- WhatsApp (Remaining ones) ----
-    antiedit: whatsapp, call: whatsapp, caption: whatsapp, cinfo: whatsapp,
-    create: whatsapp, delete: whatsapp, dlt: whatsapp,
-    doc: whatsapp, online: whatsapp, poll: whatsapp, scstatus: whatsapp, status: whatsapp,
-  },
-};
+    caption: whatsapp, cinfo: whatsapp,
+    delete: whatsapp, dlt: whatsapp,
+     poll: whatsapp, scstatus: whatsapp, status: whatsapp
+  };

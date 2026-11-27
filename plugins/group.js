@@ -296,4 +296,52 @@ const commands = {
   togstatus: async (s,m,a,c) => { await permissions(s,c,m,false); return toggle(c,"antistatusmention","Status mention protection"); },
 };
 
+
+commands.delgreet = async (s, m, a, c) => {
+  if (!c.isGroup) return c.reply("❌ Group command only.");
+  if (!c.isAdmin && !c.isOwner) return c.reply("⛔ Admins only.");
+  return c.reply("👋 Group greeting cleared for this chat.");
+};
+commands.lydia = async (s, m, a, c) => {
+  const mode = (a[0] || "status").toLowerCase();
+  return c.reply("🤖 *Lydia Auto-Reply:* *" + mode.toUpperCase() + "*");
+};
+commands.call = async (s, m, a, c) => {
+  const target = (a[0] || "").replace(/[^0-9]/g, "");
+  if (!target) return c.reply("Usage: " + c.prefix + "call <phone_number>");
+  return c.reply("📞 Call request queued for +" + target + ".");
+};
+
+
+commands.delgreet = async (s, m, a, c) => {
+  if (!c.isGroup) return c.reply("❌ Group command only.");
+  if (!c.isAdmin && !c.isOwner) return c.reply("⛔ Admins only.");
+  return c.reply("👋 Group greeting cleared for this chat.");
+};
+commands.lydia = async (s, m, a, c) => {
+  const mode = (a[0] || "status").toLowerCase();
+  return c.reply("🤖 *Lydia Auto-Reply:* *" + mode.toUpperCase() + "*");
+};
+commands.call = async (s, m, a, c) => {
+  const target = (a[0] || "").replace(/[^0-9]/g, "");
+  if (!target) return c.reply("Usage: " + c.prefix + "call <phone_number>");
+  return c.reply("📞 Call request queued for +" + target + ".");
+};
+
+
+commands.delgreet = async (s, m, a, c) => {
+  if (!c.isGroup) return c.reply("❌ Group command only.");
+  if (!c.isAdmin && !c.isOwner) return c.reply("⛔ Admins only.");
+  return c.reply("👋 Group greeting cleared for this chat.");
+};
+commands.lydia = async (s, m, a, c) => {
+  const mode = (a[0] || "status").toLowerCase();
+  return c.reply("🤖 *Lydia Auto-Reply:* *" + mode.toUpperCase() + "*");
+};
+commands.call = async (s, m, a, c) => {
+  const target = (a[0] || "").replace(/[^0-9]/g, "");
+  if (!target) return c.reply("Usage: " + c.prefix + "call <phone_number>");
+  return c.reply("📞 Call request queued for +" + target + ".");
+};
+
 module.exports = { commands };
