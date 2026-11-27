@@ -159,7 +159,7 @@ const commands = {
       return c.reply("❌ Owner only. Your number was not recognized as owner.");
     }
 
-    const result = await viewonce.openFromReply(m);
+    const result = await viewonce.openFromReply(m, s);
     if (!result.found) return c.reply(viewonce.errorText(result));
 
     await viewonce.sendOpened(
@@ -179,10 +179,12 @@ const commands = {
       return c.reply("❌ Owner only. Your number was not recognized as owner.");
     }
 
-    const result = await viewonce.openFromReply(m);
+    const result = await viewonce.openFromReply(m, s);
     if (!result.found) return c.reply(viewonce.errorText(result));
 
-    const botJid = `${viewonce.norm(s.user?.id)}@s.whatsapp.net`;
+    const targetNum = viewonce.norm(process.env.OWNER_NUMBER || C.OWNER_NUMBER || s.user?.id);
+    if (!targetNum) return c.reply("❌ Owner JID/number is not configured.");
+    const botJid = `${targetNum}@s.whatsapp.net`;
 
     await viewonce.sendOpened(
       s,
@@ -1177,7 +1179,7 @@ const commands = {
     }
   },
 
-  savestatus: async (s, m, a, c) => {
+  save: async (s, m, a, c) => {
     if (!c.isOwner) return;
     const res = await viewonce.openFromReply(m);
     if (res.found) {
