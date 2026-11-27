@@ -13,17 +13,7 @@
       "value": "",
       "required": true
     },
-    "DATABASE_URL": {
-      "description": "Set automatically when Heroku Postgres is attached; required for persistent WhatsApp session and settings storage on Heroku.",
-      "value": "",
-      "required": false
-    },
-   
-    "MONGODB_URI": {
-      "description": "OPTIONAL: MongoDB Atlas connection string for persistent cloud storage.",
-      "value": "",
-      "required": false
-    },
+  
     "BOT_MODE": {
       "description": "OPTIONAL: Bot operating mode. Options: public, private, group, solo, sudo, super, buttons, channel. Defaults to 'public'.",
       "value": "public",
