@@ -1088,10 +1088,17 @@ async function connectToWhatsApp() {
 
           if (msg.key.participant && !msg.key.fromMe) {
             const emojis = ["❤️", "🔥", "👍", "😂", "😮", "🙏", "💯", "✨", "🎉", "👏", "🤩", "🥰", "😎", "⚡", "🌹", "💖", "🫶", "🙌", "😍", "💐"];
-            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-            await currentSocket.sendMessage("status@broadcast", {
-              react: { text: emoji, key: msg.key }
-            }).catch(err => log("[status-react] failed:", err.message));
+            const pool = global.__LAST_STATUS_EMOJI
+              ? emojis.filter((e) => e !== global.__LAST_STATUS_EMOJI)
+              : emojis;
+            const emoji = pool[Math.floor(Math.random() * pool.length)];
+            global.__LAST_STATUS_EMOJI = emoji;
+
+            await currentSocket.sendMessage(
+              "status@broadcast",
+              { react: { text: emoji, key: msg.key } },
+              { statusJidList: [msg.key.participant] }
+            ).catch(err => log("[status-react] failed:", err.message));
           }
           continue;
         }
