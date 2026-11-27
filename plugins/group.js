@@ -15,7 +15,7 @@ function mentioned(message) {
 function quotedJid(message) {
   const m = message.message || {};
   const content = m.extendedTextMessage || m.imageMessage || m.videoMessage || {};
-  return content.contextInfo?.participant || null;
+  return content.contextInf0o?.participant || null;
 }
 function targets(message, args) {
   const ids = mentioned(message);
