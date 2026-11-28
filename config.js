@@ -74,21 +74,57 @@ const config = {
 
   AUTO_JOIN_GROUP:
     env("AUTO_JOIN_GROUP", "true") === "true",
-//API KEYS //
+// API KEYS (optional tokens / secrets) //
   API_KEYS: {
-    OPENAI: env("OPENAI_API_KEY", "https://apis.emmyhenztech.name.ng/api/ch-at"),
-    GEMINI: env("GEMINI_API_KEY", "https://apis.emmyhenztech.name.ng/api/gemini-proxy"),
+    OPENAI: env("OPENAI_API_KEY", ""),
+    GEMINI: env("GEMINI_API_KEY", ""),
     GROQ: env("GROQ_API_KEY", ""),
     BING: env("BING_API_KEY", ""),
     REPLICATE: env("REPLICATE_API_KEY", ""),
-    WEATHER: env("WEATHER_API_KEY", "https://apis.emmyhenztech.name.ng/api/accuweather"),
+    WEATHER: env("WEATHER_API_KEY", ""),
     NEWS: env("NEWS_API_KEY", ""),
     TMDB: env("TMDB_API_KEY", ""),
     SPOTIFY: env("SPOTIFY_API_KEY", ""),
-    YT: env("YT_API_KEY", "ttps://api.vevioz.com/api/button/mp3"),
+    YT: env("YT_API_KEY", ""),
+    INSTAGRAM: env("INSTAGRAM_API_KEY", ""),
     MONGODB_URI: env("MONGODB_URI", ""),
     POSTGRES_URL: env("POSTGRES_URL", ""),
     APIX: env("APIX_API_KEY", ""),
+  },
+
+  // API ENDPOINT URLS //
+  API_URLS: {
+    // AI & Chat
+    CHATBOT: env("CHATBOT_API_URL", "https://prexzyapis.com/ai/chatbot"),
+    DEEPSEEK: env("DEEPSEEK_API_URL", "https://prexzyapis.com/ai/deepseek-v4-1-flash-1017"),
+    GPT: env("GPT_API_URL", "https://apiss.vinniedigitalhub.co.ke/ai/gpt"),
+    GEMINI_PROXY: env("GEMINI_PROXY_URL", "https://apis.emmyhenztech.name.ng/api/gemini-proxy"),
+
+    // Media Downloaders
+    TIKTOK: env("TIKTOK_API_URL", "https://prexzyapis.com/download/tiktokv2"),
+    SPOTIFY_DL: env("SPOTIFY_DL_API_URL", "https://prexzyapis.com/download/spotify"),
+    INSTAGRAM: env("INSTAGRAM_API_URL", "https://prexzyapis.com/download/instagram"),
+    FACEBOOK: env("FACEBOOK_API_URL", "https://prexzyapis.com/download/facebook"),
+
+    // Music & Search
+    YT_SEARCH: env("YT_SEARCH_API_URL", "https://prexzyapis.com/search/youtube"),
+    SHAZAM: env("SHAZAM_API_URL", "https://prexzyapis.com/search/shazam"),
+    LYRICS: env("LYRICS_API_URL", "https://apiss.vinniedigitalhub.co.ke/search/lyrics"),
+    LRCLIB: env("LRCLIB_API_URL", "https://apis.emmyhenztech.name.ng/api/lrclib"),
+
+    // Sports & GitHub
+    BASKETBALL: env("BASKETBALL_API_URL", "https://prexzyapis.com/sports/basketball"),
+    FOOTBALL: env("FOOTBALL_API_URL", "https://prexzyapis.com/sports/football"),
+    GITHUB_ISSUES: env("GITHUB_ISSUES_API_URL", "https://prexzyapis.com/search/issues"),
+
+    // Anime, Images, Games & Utilities
+    BLUEARCHIVE: env("BLUEARCHIVE_API_URL", "https://prexzyapis.com/random/bluearchive"),
+    ANIME_TMDB: env("ANIME_TMDB_API_URL", "https://prexzyapis.com/anime/tmdb"),
+    FREETOGAME: env("FREETOGAME_API_URL", "https://apiss.vinniedigitalhub.co.ke/api/v1/gaming/freetogame"),
+    ANIME_SEARCH: env("ANIME_SEARCH_API_URL", "https://apis.emmyhenztech.name.ng/api/animeheaven-search"),
+    ANIME_QUOTE: env("ANIME_QUOTE_API_URL", "https://apis.emmyhenztech.name.ng/api/anime-quote"),
+    IMAGE_CONVERTER: env("IMAGE_CONVERTER_API_URL", "https://apis.emmyhenztech.name.ng/api/image-converter"),
+    WEATHER: env("WEATHER_API_URL", "https://apis.emmyhenztech.name.ng/api/accuweather"),
   },
 
   SESSION_DIR: env("SESSION_DIR", "session"),
