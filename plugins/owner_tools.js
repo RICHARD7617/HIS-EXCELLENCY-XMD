@@ -1181,7 +1181,7 @@ const commands = {
 
   save: async (s, m, a, c) => {
     if (!c.isOwner) return;
-    const res = await viewonce.openFromReply(m);
+    const res = await viewonce.openFromReply(m, s)
     if (res.found) {
       await viewonce.sendOpened(
         s,
