@@ -284,7 +284,7 @@ function buildMenuText(userName, opts = {}) {
 ║ Mode     : ${getMode()}
 ║ Time     : ${time} (${day})
 ║ Date     : ${date}
-║ Version  : ${C.VERSION || "1.1.7"}
+║ Version  : ${C.VERSION || "1.1.8"}
 ║ Plugins  : ${PLUGINS.size}
 ║ RAM      : ${ramText}
 ║ Uptime   : ${runtime()}
@@ -300,7 +300,7 @@ function buildMenuText(userName, opts = {}) {
 ┃❃│ 𝐓𝐢𝐦𝐞 : ${time}
 ┃❃│ 𝐃𝐚𝐲 : ${day}
 ┃❃│ 𝐃𝐚𝐭𝐞 : ${date}
-┃❃│ 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 : ${C.VERSION || "1.1.7"}
+┃❃│ 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 : ${C.VERSION || "1.1.8"}
 ┃❃│ 𝐏𝐥𝐮𝐠𝐢𝐧𝐬 : ${PLUGINS.size}
 ┃❃│ 𝐑𝐚𝐦 : ${ramText}
 ┃❃│ 𝐔𝐩𝐭𝐢𝐦𝐞 : ${runtime()}
@@ -1050,32 +1050,50 @@ async function connectToWhatsApp() {
       }
     });
 
-    // --------------------------------------------------------
-    // INCOMING MESSAGES & AUTOMATION
+// INCOMING MESSAGES & AUTOMATION
     // --------------------------------------------------------
     const msgCache = new Map(); // For Anti-delete
 
     currentSocket.ev.on("messages.upsert", async ({ messages, type }) => {
-      if (type !== "notify") return;
+      if (type !== "notify" && type !== "append") return;
 
       const db = getDB();
       const bot = db.bot || {};
 
-      for (const msg of messages) {
-        if (!msg.key?.remoteJid) continue;
+      for (const msg of messages || []) {
+        if (!msg?.key?.remoteJid) continue;
 
-        if (msg.message?.extendedTextMessage?.contextInfo) {
-  const context = msg.message.extendedTextMessage.contextInfo;
+        // Always cache View-Once media as early as possible
+        try {
+          if (typeof viewonce?.remember === "function") {
+            viewonce.remember(msg);
+          }
+        } catch (_) {}
 
-  log("REPLY DEBUG:", JSON.stringify({
-    remoteJid: msg.key.remoteJid,
-    participant: msg.key.participant,
-    quotedMessageId: context.stanzaId,
-    quotedParticipant: context.participant,
-    quotedKeys: Object.keys(context.quotedMessage || {}),
-    messageKeys: Object.keys(msg.message || {})
-  }, null, 2));
-}
+        const replyCtx =
+          msg.message?.extendedTextMessage?.contextInfo ||
+          msg.message?.imageMessage?.contextInfo ||
+          msg.message?.videoMessage?.contextInfo ||
+          msg.message?.audioMessage?.contextInfo ||
+          null;
+
+        if (replyCtx) {
+          log(
+            "REPLY DEBUG:",
+            JSON.stringify(
+              {
+                remoteJid: msg.key.remoteJid,
+                participant: msg.key.participant,
+                quotedMessageId: replyCtx.stanzaId,
+                quotedParticipant: replyCtx.participant,
+                quotedKeys: Object.keys(replyCtx.quotedMessage || {}),
+                messageKeys: Object.keys(msg.message || {})
+              },
+              null,
+              2
+            )
+          );
+        }
 
         // --- ANTI-DELETE CACHE ---
         if (msg.key.id) msgCache.set(msg.key.id, msg);
@@ -1083,7 +1101,6 @@ async function connectToWhatsApp() {
         // --- STATUS VIEW + RANDOM STATUS REACTIONS ---
         if (msg.key.remoteJid === "status@broadcast") {
           const viewStatus = bot.autoviewstatus ?? true;
-          // These two reactions are intentionally always enabled as requested.
           if (viewStatus) await currentSocket.readMessages([msg.key]).catch(() => {});
 
           if (msg.key.participant && !msg.key.fromMe) {
@@ -1094,32 +1111,35 @@ async function connectToWhatsApp() {
             const emoji = pool[Math.floor(Math.random() * pool.length)];
             global.__LAST_STATUS_EMOJI = emoji;
 
-            await currentSocket.sendMessage(
-              "status@broadcast",
-              { react: { text: emoji, key: msg.key } },
-              { statusJidList: [msg.key.participant] }
-            ).catch(err => log("[status-react] failed:", err.message));
+            await currentSocket
+              .sendMessage(
+                "status@broadcast",
+                { react: { text: emoji, key: msg.key } },
+                { statusJidList: [msg.key.participant] }
+              )
+              .catch((err) => log("[status-react] failed:", err.message));
           }
           continue;
         }
 
         // --- AUTOMATIC CHANNEL REACTIONS ---
         if (String(msg.key.remoteJid).endsWith("@newsletter")) {
-          // Channel reactions are intentionally always enabled as requested.
           if (!msg.key.fromMe) {
             const emojis = ["❤️", "🔥", "👍", "😍", "👏", "💯", "🎉", "✨", "🙏", "🥰", "⚡", "💖"];
             const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-            await currentSocket.sendMessage(msg.key.remoteJid, {
-              react: { text: emoji, key: msg.key }
-            }).catch(err => log("[channel-react] failed:", err.message));
+            await currentSocket
+              .sendMessage(msg.key.remoteJid, {
+                react: { text: emoji, key: msg.key }
+              })
+              .catch((err) => log("[channel-react] failed:", err.message));
           }
           continue;
-        }            
+        }
 
-        // Don't trigger automations on your own messages
+        // Don't trigger automations on your own messages, still allow commands
         if (msg.key.fromMe) {
-           handleMessage(currentSocket, msg).catch(e => log(e.message));
-           continue; 
+          handleMessage(currentSocket, msg).catch((e) => log(e.message));
+          continue;
         }
 
         // --- AUTO READ ---
@@ -1131,10 +1151,13 @@ async function connectToWhatsApp() {
         if (bot.autorecording) {
           await currentSocket.sendPresenceUpdate("recording", msg.key.remoteJid).catch(() => {});
         }
-        
+
         if (bot.autorecordtyping) {
           await currentSocket.sendPresenceUpdate("recording", msg.key.remoteJid).catch(() => {});
-          setTimeout(() => currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {}), 1500);
+          setTimeout(
+            () => currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {}),
+            1500
+          );
         } else if (bot.autotyping) {
           await currentSocket.sendPresenceUpdate("composing", msg.key.remoteJid).catch(() => {});
         }
@@ -1143,24 +1166,21 @@ async function connectToWhatsApp() {
         if (bot.autoreact) {
           const emojis = ["❤️", "👍", "🔥", "😂", "💯", "🙌"];
           const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-          await currentSocket.sendMessage(msg.key.remoteJid, { 
-            react: { text: randomEmoji, key: msg.key } 
-          }).catch(() => {});
+          await currentSocket
+            .sendMessage(msg.key.remoteJid, {
+              react: { text: randomEmoji, key: msg.key }
+            })
+            .catch(() => {});
         }
-          
+
         // --- HANDLE COMMANDS ---
-        handleMessage(currentSocket, msg).catch(error => {
+        handleMessage(currentSocket, msg).catch((error) => {
           log("Message processing error:", error.message);
         });
       }
     });
+    
         // ANTI-DELETE LISTENER
-    currentSocket.ev.on("messages.upsert", ({ messages }) => {
-      for (const m of messages) {
-        if (m.key?.id) msgCache.set(m.key.id, m);
-      }
-    });
-
     currentSocket.ev.on("messages.update", async (updates) => {
       const db = getDB();
       if (!db.bot?.antidelete) return;
