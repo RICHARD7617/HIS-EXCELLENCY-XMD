@@ -1,20 +1,65 @@
 "use strict";
 
 const axios = require("axios");
+const C = require("../config");
+
+function getEndpoint(key, fallback) {
+  return C?.API_URLS?.[key] || process.env[`${key}_API_URL`] || fallback;
+}
+
+function formatTmdbResult(data, query) {
+  if (!data) return "";
+  if (typeof data === "string") return data.trim();
+
+  const list = Array.isArray(data)
+    ? data
+    : Array.isArray(data.result)
+    ? data.result
+    : Array.isArray(data.results)
+    ? data.results
+    : Array.isArray(data.data)
+    ? data.data
+    : null;
+
+  const item = list ? list[0] : data.result || data.data || data;
+  if (!item || typeof item !== "object") return "";
+
+  const title = item.title || item.name || item.original_title || item.original_name || query;
+  const date = item.release_date || item.first_air_date || item.premiered || "N/A";
+  const rating = item.vote_average ?? item.rating?.average ?? "N/A";
+  const overview = String(item.overview || item.summary || item.description || "")
+    .replace(/<[^>]+>/g, "")
+    .trim()
+    .slice(0, 400);
+  const url = item.url || item.homepage || "";
+
+  return (
+    `🎬 *${title}* (${date})\n` +
+    `⭐ Rating: *${rating}*\n` +
+    (overview ? `📝 ${overview}\n` : "") +
+    (url ? `🔗 ${url}` : "")
+  ).trim();
+}
 
 const commands = {
   joke: async (s, m, a, c) => {
     try {
       const r = await axios.get("https://official-joke-api.appspot.com/random_joke", { timeout: 8000 });
       await c.reply(`😂 ${r.data.setup}\n\n${r.data.punchline}`);
-    } catch { await c.reply("Could not fetch a joke right now."); }
+    } catch {
+      await c.reply("Could not fetch a joke right now.");
+    }
   },
+
   quote: async (s, m, a, c) => {
     try {
       const r = await axios.get("https://api.quotable.io/random", { timeout: 8000 });
       await c.reply(`💬 "${r.data.content}"\n\n— ${r.data.author}`);
-    } catch { await c.reply("Could not fetch a quote right now."); }
+    } catch {
+      await c.reply("Could not fetch a quote right now.");
+    }
   },
+
   truth: async (s, m, a, c) => {
     const list = [
       "What's your most embarrassing moment?",
@@ -25,6 +70,7 @@ const commands = {
     ];
     await c.reply(`🎯 *Truth:* ${list[Math.floor(Math.random() * list.length)]}`);
   },
+
   dare: async (s, m, a, c) => {
     const list = [
       "Send a voice note singing your favorite song.",
@@ -35,80 +81,130 @@ const commands = {
     ];
     await c.reply(`🔥 *Dare:* ${list[Math.floor(Math.random() * list.length)]}`);
   },
-  goodmorning: async (s, m, a, c) => c.reply(`🌅 Good morning, ${m.pushName || "friend"}! Have a great day.`),
-  goodnight: async (s, m, a, c) => c.reply(`🌙 Good night, ${m.pushName || "friend"}. Sleep well.`),
+
+  goodmorning: async (s, m, a, c) =>
+    c.reply(`🌅 Good morning, ${m.pushName || "friend"}! Have a great day.`),
+
+  goodnight: async (s, m, a, c) =>
+    c.reply(`🌙 Good night, ${m.pushName || "friend"}. Sleep well.`),
+
   device: async (s, m, a, c) => {
     const q = m.message?.extendedTextMessage?.contextInfo?.participant || c.sender;
-    await c.reply(`Device info requires a WhatsApp presence lookup, which is unreliable on linked devices. Requested for ${q.split("@")[0]}.`);
+    await c.reply(
+      `Device info requires a WhatsApp presence lookup, which is unreliable on linked devices. Requested for ${q.split("@")[0]}.`
+    );
   },
+
   getjid: async (s, m, a, c) => c.reply(`Your JID: ${c.sender}\nChat JID: ${c.from}`),
+
   bf: async (s, m, a, c) => {
     const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
-    const target = a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : "a lucky match");
+    const target =
+      a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : "a lucky match");
     const pct = Math.floor(Math.random() * 101);
-    return c.reply("💙 *Bestie / BF Meter*\nTarget: *" + target + "*\nCompatibility: *" + pct + "%*");
+    return c.reply(`💙 *Bestie / BF Meter*\nTarget: *${target}*\nCompatibility: *${pct}%*`);
   },
+
   gf: async (s, m, a, c) => {
     const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
-    const target = a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : "a lucky match");
+    const target =
+      a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : "a lucky match");
     const pct = Math.floor(Math.random() * 101);
-    return c.reply("💖 *GF Meter*\nTarget: *" + target + "*\nCompatibility: *" + pct + "%*");
+    return c.reply(`💖 *GF Meter*\nTarget: *${target}*\nCompatibility: *${pct}%*`);
   },
+
   couple: async (s, m, a, c) => {
     const u1 = m.pushName || c.sender.split("@")[0];
     const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
-    const u2 = a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : "Mystery Partner");
+    const u2 =
+      a.join(" ").trim() ||
+      (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : "Mystery Partner");
     const pct = Math.floor(Math.random() * 101);
-    return c.reply("💞 *Couple Match*\n*" + u1 + "* ❤️ *" + u2 + "*\nMatch Score: *" + pct + "%*");
+    return c.reply(`💞 *Couple Match*\n*${u1}* ❤️ *${u2}*\nMatch Score: *${pct}%*`);
   },
+
   gay: async (s, m, a, c) => {
     const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
-    const target = a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : (m.pushName || "User"));
+    const target =
+      a.join(" ").trim() ||
+      (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : m.pushName || "User");
     const pct = Math.floor(Math.random() * 101);
-    return c.reply("🏳️‍🌈 *Meter for " + target + "*: *" + pct + "%*");
+    return c.reply(`🏳️‍🌈 *Meter for ${target}*: *${pct}%*`);
   },
+
   movie: async (s, m, a, c) => {
     const query = a.join(" ").trim();
-    if (!query) return c.reply("Usage: " + c.prefix + "movie <title>");
+    if (!query) return c.reply(`Usage: ${c.prefix}movie <title>`);
+
     try {
-      const res = await fetch("https://api.tvmaze.com/singlesearch/shows?q=" + encodeURIComponent(query));
-      if (!res.ok) return c.reply("❌ No movie/show details found for *" + query + "*.");
+      const tmdbBase = getEndpoint("ANIME_TMDB", "https://prexzyapis.com/anime/tmdb");
+      const { data: tmdbData } = await axios.get(tmdbBase, {
+        params: {
+          action: "search",
+          query,
+          id: "",
+          type: "multi",
+          limit: "5",
+          season: "",
+          episode: ""
+        },
+        timeout: 15000,
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+
+      const formattedTmdb = formatTmdbResult(tmdbData, query);
+      if (formattedTmdb) {
+        return c.reply(formattedTmdb);
+      }
+
+      const res = await fetch(
+        "https://api.tvmaze.com/singlesearch/shows?q=" + encodeURIComponent(query)
+      );
+      if (!res.ok) return c.reply(`❌ No movie/show details found for *${query}*.`);
       const d = await res.json();
-      const summary = String(d.summary || "").replace(/<[^>]+>/g, "").slice(0, 350);
+      const summary = String(d.summary || "")
+        .replace(/<[^>]+>/g, "")
+        .slice(0, 350);
       return c.reply(
-        "🎬 *" + d.name + "* (" + (d.premiered || "N/A") + ")\n" +
-        "⭐ Rating: *" + (d.rating?.average || "N/A") + "* | 🎭 Genres: *" + ((d.genres || []).join(", ") || "N/A") + "*\n" +
-        (summary ? "📝 " + summary + "\n" : "") +
-        (d.url ? "🔗 " + d.url : "")
+        `🎬 *${d.name}* (${d.premiered || "N/A"})\n` +
+          `⭐ Rating: *${d.rating?.average || "N/A"}* | 🎭 Genres: *${(d.genres || []).join(", ") || "N/A"}*\n` +
+          (summary ? `📝 ${summary}\n` : "") +
+          (d.url ? `🔗 ${d.url}` : "")
       );
     } catch (e) {
-      return c.reply("❌ movie lookup failed: " + e.message);
+      return c.reply(`❌ movie lookup failed: ${e.message}`);
     }
   },
+
   trailer: async (s, m, a, c) => {
     const query = a.join(" ").trim();
-    if (!query) return c.reply("Usage: " + c.prefix + "trailer <movie or show title>");
+    if (!query) return c.reply(`Usage: ${c.prefix}trailer <movie or show title>`);
     try {
-      const res = await fetch("https://itunes.apple.com/search?term=" + encodeURIComponent(query + " trailer") + "&media=movie&limit=3");
+      const res = await fetch(
+        "https://itunes.apple.com/search?term=" +
+          encodeURIComponent(`${query} trailer`) +
+          "&media=movie&limit=3"
+      );
       const data = await res.json().catch(() => ({}));
       const item = data?.results?.[0];
-      if (!item) return c.reply("❌ No trailer found for *" + query + "*.");
+      if (!item) return c.reply(`❌ No trailer found for *${query}*.`);
       return c.reply(
-        "🎞️ *Trailer: " + (item.trackName || query) + "*\n" +
-        (item.releaseDate ? "📅 Release: *" + item.releaseDate.slice(0, 10) + "*\n" : "") +
-        "▶️ Preview/Link: " + (item.previewUrl || item.trackViewUrl || "N/A")
+        `🎞️ *Trailer: ${item.trackName || query}*\n` +
+          (item.releaseDate ? `📅 Release: *${item.releaseDate.slice(0, 10)}*\n` : "") +
+          `▶️ Preview/Link: ${item.previewUrl || item.trackViewUrl || "N/A"}`
       );
     } catch (e) {
-      return c.reply("❌ trailer search failed: " + e.message);
+      return c.reply(`❌ trailer search failed: ${e.message}`);
     }
   },
+
   readsite: async (s, m, a, c) => {
     let url = (a[0] || "").trim();
-    if (!url) return c.reply("Usage: " + c.prefix + "readsite <https://example.com>");
+    if (!url) return c.reply(`Usage: ${c.prefix}readsite <https://example.com>`);
     if (!/^https?:\/\//i.test(url)) url = "https://" + url;
     try {
       const res = await fetch(url, { headers: { "User-Agent": "HIS-EXCELLENCY-XMD/1.0" } });
-      if (!res.ok) return c.reply("❌ Failed to fetch site (HTTP " + res.status + ").");
+      if (!res.ok) return c.reply(`❌ Failed to fetch site (HTTP ${res.status}).`);
       const html = await res.text();
       const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
       const title = titleMatch ? titleMatch[1].replace(/\s+/g, " ").trim() : url;
@@ -119,34 +215,43 @@ const commands = {
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 1200);
-      return c.reply("🌐 *" + title + "*\n🔗 " + url + "\n\n" + (text || "(No readable text extracted)"));
+      return c.reply(`🌐 *${title}*\n🔗 ${url}\n\n${text || "(No readable text extracted)"}`);
     } catch (e) {
-      return c.reply("❌ readsite failed: " + e.message);
+      return c.reply(`❌ readsite failed: ${e.message}`);
     }
   },
+
   channelstatus: async (s, m, a, c) => {
-    const db = c.db();
-    const ch = db?.bot?.channelJid || db?.bot?.channel || process.env.CHANNEL_JID || "Not configured";
+    const db = typeof c.db === "function" ? c.db() : c.db;
+    const ch =
+      db?.bot?.channelJid ||
+      db?.bot?.channel ||
+      C?.CHANNEL_JID ||
+      process.env.CHANNEL_JID ||
+      "Not configured";
     const upSec = Math.floor(process.uptime());
     const hrs = Math.floor(upSec / 3600);
     const mins = Math.floor((upSec % 3600) / 60);
     return c.reply(
-      "📡 *Channel & Bot Status*\n" +
-      "Bot: *" + (C.BOT_NAME || "HIS EXCELLENCY XMD") + "*\n" +
-      "Mode: *" + (C.MODE || "PUBLIC") + "*\n" +
-      "Channel: `" + ch + "`\n" +
-      "Uptime: *" + hrs + "h " + mins + "m*"
+      `📡 *Channel & Bot Status*\n` +
+        `Bot: *${C?.BOT_NAME || "HIS EXCELLENCY XMD"}*\n` +
+        `Mode: *${C?.MODE || "PUBLIC"}*\n` +
+        `Channel: \`${ch}\`\n` +
+        `Uptime: *${hrs}h ${mins}m*`
     );
   },
+
   hack: async (s, m, a, c) => {
     const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];
-    const target = a.join(" ").trim() || (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : (m.pushName || "target"));
+    const target =
+      a.join(" ").trim() ||
+      (mentioned ? "@" + mentioned.split("@")[0].split(":")[0] : m.pushName || "target");
     const steps = [
-      "💻 *Initializing Fun Hack Sequence on " + target + "...*",
+      `💻 *Initializing Fun Hack Sequence on ${target}...*`,
       "🔌 Bypassing firewall... [28%]",
       "📡 Injecting comedic payload... [67%]",
       "💾 Downloading 420 memes & 0 classified files... [100%]",
-      "✅ *Prank Complete:* " + target + " has been diagnosed with excessive coolness 😎"
+      `✅ *Prank Complete:* ${target} has been diagnosed with excessive coolness 😎`
     ];
     for (const step of steps) {
       await c.reply(step);
